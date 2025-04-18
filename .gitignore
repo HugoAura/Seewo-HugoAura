@@ -1,0 +1,29 @@
+# Dependencies
+
+node_modules/
+.npm
+.yarn
+
+# ESLint Cache
+
+.eslintcache
+
+# NYC Test Output
+
+.nyc_output
+
+# Build Artifacts
+
+/dist
+/buikd
+
+# dotEnv Files
+
+.env
+.env*
+
+# Misc
+
+.DS_Store
+*.log
+*.bak

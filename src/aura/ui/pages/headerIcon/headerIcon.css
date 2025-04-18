@@ -3,6 +3,16 @@
   height: 40px;
   -webkit-app-region: no-drag;
   position: relative;
+
+  transition: opacity 0.25s;
+}
+
+.aura-header-icon:hover {
+  opacity: 0.75;
+}
+
+.aura-header-icon:active {
+  opacity: 0.375;
 }
 
 .aura-header-icon img {

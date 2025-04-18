@@ -1,0 +1,9 @@
+.aura-config-subpage-disable-limit-root {
+  opacity: 1;
+
+  transition: opacity 0.5s;
+}
+
+.aura-config-subpage-disable-limit-root.acs-disable-limit-root-hidden {
+  opacity: 0;
+}

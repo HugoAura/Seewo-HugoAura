@@ -1,0 +1,70 @@
+.aura-settings-form {
+  padding: 0.5rem 1.5rem;
+}
+
+.aura-settings-category-header {
+  font-size: x-large;
+  margin-bottom: 1.5rem;
+}
+
+.aura-settings-entry {
+  display: flex;
+  flex-direction: row;
+  margin-top: 1.5rem;
+}
+
+.aura-settings-entry.aura-settings-entry-hidden {
+  display: none;
+}
+
+.aura-settings-entry-info-container {
+  flex: 1;
+}
+
+.aura-settings-entry-title {
+  font-size: 15px;
+}
+
+.aura-settings-entry-desc {
+  font-size: small;
+  opacity: 0.5;
+  margin-top: 0.25rem;
+}
+
+.aura-settings-entry-desc.ase-desc-error-hint {
+  color: rgba(230, 0, 0);
+  opacity: 0.875;
+}
+
+.aura-settings-entry-operation-area {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.aura-settings-entry-operation-area.ase-operation-area-expanded {
+  flex: 0.75;
+}
+
+.aura-settings-entry-operation-area.form-switch {
+  transform: scale(1.2);
+}
+
+.aura-settings-hr-horizontal {
+  margin-top: 1rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 0.75px solid rgba(0, 0, 0, 0.25);
+}
+
+.aura-settings-entry-property-icon {
+  margin-left: 0.5rem;
+  font-size: 15px;
+}
+
+.aura-settings-entry-property-icon.layui-icon-logout {
+  color: rgb(226, 113, 17);
+}
+
+.aura-settings-entry-property-icon.layui-icon-refresh {
+  color: rgb(0, 106, 188);
+}

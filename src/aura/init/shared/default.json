@@ -4,9 +4,18 @@
       "enabled": true,
       "type": "customPassword",
       "customPassword": {
-        "passwordWithSalt": "770f27b0379ee6ba0f11731e49aa7af1",
+        "passwordWithSalt": "89f6c4d57d0202a05c32d37cc6a2c6a0",
         "salt": "aura"
-      }
+      },
+      "authModeRewrite": "default"
+    }
+  },
+  "networkRewrite": {
+    "disableFriday": {
+      "enabled": true
+    },
+    "disableBehaviorAudit": {
+      "enabled": true
     }
   },
   "devTools": false

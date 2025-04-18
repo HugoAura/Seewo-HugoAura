@@ -1,0 +1,166 @@
+<div class="aura-config-page-root-inactive aura-config-page-root">
+  <div class="header-collapsed aura-config-page-header-area">
+    <div class="aura-config-page-app-bar" style="-webkit-app-region: drag">
+      <div
+        onclick="global.__HUGO_AURA_UI_FUNCTIONS__.config.handleNavBack()"
+        style="-webkit-app-region: no-drag; z-index: 2000"
+      >
+        <i class="iconfont"></i>
+      </div>
+      <p>雨光之环</p>
+    </div>
+  </div>
+
+  <div class="aura-config-page-status-container">
+    <div class="aura-config-page-status-main">
+      <div
+        class="aura-config-page-status-side left-side status-side-hidden"
+        id="leftStatusContainer"
+      >
+        <div class="aura-config-page-status-el">
+          <p class="version-type">Node</p>
+          <p class="version-content" id="nodeVersion">
+            v{{ versionInfo.node }}
+          </p>
+          <!-- I want to use Vue plz 😭😭😭 -->
+        </div>
+        <hr class="aura-config-hr-vertical" />
+        <div class="aura-config-page-status-el">
+          <p class="version-type">Electron</p>
+          <p class="version-content" id="electronVersion">
+            v{{ versionInfo.electron }}
+          </p>
+        </div>
+      </div>
+
+      <img
+        src="../../aura/ui/static/aura.svg"
+        class="aura-config-page-central-aura-logo"
+      />
+
+      <div
+        class="aura-config-page-status-side right-side status-side-hidden"
+        id="rightStatusContainer"
+      >
+        <div class="aura-config-page-status-el">
+          <p class="version-type">Hugo</p>
+          <p class="version-content" id="hugoVersion">
+            v{{ versionInfo.hugo }}
+          </p>
+        </div>
+        <hr class="aura-config-hr-vertical" />
+        <div class="aura-config-page-status-el">
+          <p class="version-type">Aura</p>
+          <p class="version-content" id="auraVersion">
+            v{{ versionInfo.aura }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="status-description-hidden aura-config-page-status-description">
+      <i class="layui-icon layui-icon-ok" style="font-size: 24px"></i>
+      <p>HugoAura 正常运行中</p>
+    </div>
+  </div>
+
+  <div class="aura-config-page-operation-area">
+    <div class="aura-config-page-subpage-container"></div>
+    <div class="aura-config-page-operation-container">
+      <div
+        class="operation-el-hidden aura-config-page-operation-el"
+        onclick="window.__HUGO_AURA_UI_FUNCTIONS__.config.toggleSubConfig('disableLimitations', true)"
+      >
+        <div class="aura-config-page-operation-body">
+          <img src="../../aura/ui/static/config/no_limitations.svg" />
+          <div>
+            <p class="config-operation-title">限制解除</p>
+            <p class="config-operation-description">禁用密码、关闭冰点</p>
+          </div>
+        </div>
+      </div>
+      <div
+        class="operation-el-hidden aura-config-page-operation-el"
+        aura-disabled="true"
+      >
+        <div class="aura-config-page-operation-body">
+          <img src="../../aura/ui/static/config/behaviour_mon.svg" />
+          <div>
+            <p class="config-operation-title">行为管控</p>
+            <p class="config-operation-description">窥屏提醒、数据欺骗</p>
+          </div>
+        </div>
+      </div>
+      <div
+        class="operation-el-hidden aura-config-page-operation-el"
+        aura-disabled="true"
+      >
+        <div class="aura-config-page-operation-body">
+          <img src="../../aura/ui/static/config/plugin.svg" />
+          <div>
+            <p class="config-operation-title">插件管理</p>
+            <p class="config-operation-description">插件列表、安装插件</p>
+          </div>
+        </div>
+      </div>
+      <div class="operation-el-hidden aura-config-page-operation-el">
+        <div class="aura-config-page-operation-body">
+          <img src="../../aura/ui/static/config/about.svg" />
+          <div>
+            <p class="config-operation-title">关于项目</p>
+            <p class="config-operation-description">使用文档、获取帮助</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="aura-config-page-toast-area">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div
+        id="reloadNotifyToast"
+        class="toast"
+        aria-atomic="true"
+        data-bs-autohide="false"
+      >
+        <div class="toast-header">
+          <i class="layui-icon layui-icon-tips"></i>
+          <strong class="me-auto">重载页面以应用设置</strong>
+        </div>
+        <div class="toast-body">
+          <p>请重载当前窗口以应用修改的设置</p>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            onclick="window.location.reload()"
+          >
+            重载页面
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div
+        id="relaunchNotifyToast"
+        class="toast acp-toast-emerg"
+        aria-atomic="true"
+        data-bs-autohide="false"
+      >
+        <div class="toast-header">
+          <i class="layui-icon layui-icon-tips"></i>
+          <strong class="me-auto">重启进程以应用设置</strong>
+        </div>
+        <div class="toast-body">
+          <p>请重启 Electron 进程以应用修改的设置</p>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            onclick="ipcRenderer.invoke('$aura.base.restartApplication')"
+          >
+            重启进程
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

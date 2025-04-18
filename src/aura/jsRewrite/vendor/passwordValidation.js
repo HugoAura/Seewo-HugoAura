@@ -11,6 +11,19 @@ const __config =
 
 /// End of the rewrite rules basic config section ///
 
+// >> Begin of Notes << //
+
+/*
+adminAuthMode -> mount on window._ACCEPT_DATA.data.adminAuthMode
+0 == Hybrid (remoteAuth === true: 密码 / 二维码, remoteAuth === false: 密码)
+1 == 仅二维码 (remoteAuth === true, 若 !remoteAuth, 页面样式会出问题)
+2 == 仅密码
+
+Reference: https://cstore-public.seewo.com/faq-service/ab2a474d022b4ddabfab788c50359115
+*/
+
+// >> End of Notes << //
+
 const newFunction = function (e, t, b) {
   "use strict";
   var n,
@@ -326,6 +339,7 @@ const newFunction = function (e, t, b) {
                       a.setState({ isError: !0, errorText: "" });
                     break;
                   case G:
+                    // ### BOR ### //
                     const originalFunc = () => {
                       w.a.send("passwordInputLockError", {
                         name: q,
@@ -351,7 +365,8 @@ const newFunction = function (e, t, b) {
                             a.state.crypto
                               .createHash("md5")
                               .update(
-                                a.state.password.toString() + __config.customPassword.salt
+                                a.state.password.toString() +
+                                  __config.customPassword.salt
                               )
                               .digest("hex") ===
                             __config.customPassword.passwordWithSalt
@@ -362,14 +377,17 @@ const newFunction = function (e, t, b) {
                           }
                           break;
                         case "bypass":
-                        default:
                           a.handleSuccess();
+                          break;
+                        default:
+                          originalFunc();
                           break;
                       }
                     } else {
                       originalFunc();
                     }
                     break;
+                  // ### EOR ### //
                   default:
                     return;
                 }
@@ -441,6 +459,26 @@ const newFunction = function (e, t, b) {
                 {
                   key: "componentDidUpdate",
                   value: function (e) {
+                    // ### BOR ### //
+                    if (__config.authModeRewrite !== "default") {
+                      switch (__config.authModeRewrite) {
+                        case "hybrid":
+                          window._ACCEPT_DATA.data.adminAuthMode = 0;
+                          window._ACCEPT_DATA.data.remoteAuth = true;
+                          break;
+                        case "remoteOnly":
+                          window._ACCEPT_DATA.data.adminAuthMode = 1;
+                          window._ACCEPT_DATA.data.remoteAuth = true;
+                          break;
+                        case "passwordOnly":
+                          window._ACCEPT_DATA.data.adminAuthMode = 2;
+                          window._ACCEPT_DATA.data.remoteAuth = false;
+                          break;
+                        default:
+                          break;
+                      }
+                    }
+                    // ### EOR ### //
                     this.state.show
                       ? this.refs.password &&
                         this.refs.password.addEventListener(

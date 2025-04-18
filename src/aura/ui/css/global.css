@@ -1,0 +1,27 @@
+:root {
+  /* Bootstrap var overrides */
+  --bs-body-bg: transparent !important;
+
+  --bs-border-color: #00000036 !important;
+
+  --bs-link-color: #383838 !important;
+  --bs-link-hover-color: #5d5d5d !important;
+
+  --bs-emphasis-color: #1a1a1a !important;
+
+  --bs-border-radius: 0.2rem !important;
+}
+
+/* Bootstrap Component Styles Overrides */
+
+button.nav-link {
+  margin: 0.5rem 1rem;
+}
+
+.nav {
+  margin-left: 0.5rem;
+}
+
+.nav-underline {
+  --bs-nav-underline-link-active-color: #0d6efd !important;
+}
