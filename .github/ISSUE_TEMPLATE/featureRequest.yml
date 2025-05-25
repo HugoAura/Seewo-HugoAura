@@ -1,0 +1,53 @@
+name: 功能请求 / Feature Request
+description: 提交你想要的新功能
+labels: ["Feature"]
+title: "[Feature Request] "
+body:
+  - type: textarea
+    attributes:
+      label: 概述 / Overview
+      description: 简述你想要的新功能, 需要它做什么
+      placeholder:
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 背景 (可选) / Background info (Optional)
+      description: 有哪些因素让你想到了这个新功能? 它为什么对用户体验至关重要?
+      placeholder:
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: 具体需求 / Detail Requirements
+      description: 请详细描述具体希望实现哪些目标, 以及提出你认为可能的实现思路
+      placeholder: |
+        我希望能够实现...
+        具体来讲, 包含:
+        1. 实现 XXX
+        2. XXXXXX
+        3. XXXXXX
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: HugoAura 版本 / HugoAura version
+      description: 创建此 Issue 时的最新 HugoAura 版本
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirms
+    attributes:
+      label: 提交前请确认 / Confirm before submit
+      options:
+        - label: 我已经在 [HugoAura Issues](https://github.com/HugoAura/Seewo-HugoAura/issues) 中查询过相关关键词, 并确定此功能请求是唯一的。
+          required: true
+
+  - type: textarea
+    id: extraDesc
+    attributes:
+      label: 其他信息 (可选) / Additional info (Optional)

@@ -1,0 +1,20 @@
+name: 其他问题 / Any Other
+description: 其他任何类型的问题
+labels: []
+title: "[Question] "
+body:
+  - type: textarea
+    attributes:
+      label: 你的问题 / Your question
+      placeholder: |
+        开发者能不能 v 我 50
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirms
+    attributes:
+      label: 提交前请确认 / Confirm before submit
+      options:
+        - label: 请勿利用此 Issue 类型进行灌水 / 闲聊, 如果您有相关需求, 可留意后续 HugoAura 的论坛 / 用户讨论群开放情况
+          required: true
