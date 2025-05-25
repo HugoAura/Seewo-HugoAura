@@ -1,9 +1,22 @@
+// @ts-check
+
 if (!global.__HUGO_AURA__) {
-  global.__HUGO_AURA__ = {
+  /**
+   * @type {import("../aura/types/main/core").MainProcessGlobal}
+   */
+  const __HUGO_AURA__ = {
     hookedWindows: new Map(),
-    hooks: null,
+    hooks: new Map(),
     configInit: false,
+    plsStats: null,
+    plsSettings: null,
+    plsRules: null,
   };
+  global.__HUGO_AURA__ = __HUGO_AURA__;
+}
+
+if (!global.__HUGO_AURA_CONFIG__) {
+  global.__HUGO_AURA_CONFIG__ = {};
 }
 
 const fs = require("fs");
@@ -74,7 +87,12 @@ const initLogger = () => {
   console.log("Logger initialized. Log file:", logFile);
 };
 
-module.exports = function ({ central, windowName, config }) {
+/**
+ *
+ * @param {import("../aura/types/main/core").LauncherArgs} param0
+ * @returns
+ */
+const launcher = ({ central, windowName, config }) => {
   process.stdout.isTTY = true;
   process.stderr.isTTY = true;
 
@@ -91,16 +109,18 @@ module.exports = function ({ central, windowName, config }) {
 
   console.log("[HugoAura / Loaded] Aura is loaded!");
 
+  configManager.ensureConfigExists();
+  const loadedConfig = configManager.loadConfig();
+  if (!global.__HUGO_AURA__.configInit) global.__HUGO_AURA__.configInit = true;
+
+  global.__HUGO_AURA_CONFIG__ = loadedConfig;
+
   if (!global.__HUGO_AURA__.ipcInit) {
     buildIpcMain(electron);
     global.__HUGO_AURA__.ipcInit = true;
   }
 
   const hooksManager = new HooksManager();
-
-  configManager.ensureConfigExists();
-  const loadedConfig = configManager.loadConfig();
-  if (!global.__HUGO_AURA__.configInit) global.__HUGO_AURA__.configInit = true;
 
   const hooks = hooksManager.loadHooks();
 
@@ -137,3 +157,5 @@ module.exports = function ({ central, windowName, config }) {
     app.removeListener("web-contents-created", webContentsCreatedListener);
   };
 };
+
+module.exports = launcher;

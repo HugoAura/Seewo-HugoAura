@@ -49,16 +49,32 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
       "aura-config-page-operation-el"
     );
     let pendingSubPageId = "";
+    let preserveOperationIdx = 0;
     switch (subPage) {
       case "disableLimitations":
-        side
-          ? operationElArr[0].classList.add("preserve-operation")
-          : operationElArr[0].classList.remove("preserve-operation");
+        preserveOperationIdx = 0;
         pendingSubPageId = "Aura.UI.Assistant.Config.DisableLimitations";
+        break;
+      case "behaviourCtrl":
+        preserveOperationIdx = 1;
+        pendingSubPageId = "Aura.UI.Assistant.Config.BehaviourCtrl";
+        if (!side) {
+          setTimeout(() => {
+            global.__HUGO_AURA_LOADER__[
+              "Aura.UI.Assistant.Config.BehaviourCtrl.PlsStatus"
+            ].active = false;
+          }, 500);
+        }
         break;
       default:
         break;
     }
+
+    side
+      ? operationElArr[preserveOperationIdx].classList.add("preserve-operation")
+      : operationElArr[preserveOperationIdx].classList.remove(
+          "preserve-operation"
+        );
 
     const operationAreaEl = document.getElementsByClassName(
       "aura-config-page-operation-area"

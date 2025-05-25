@@ -18,15 +18,30 @@ const showRelaunchToast = () => {
   if (!toastBs.isShown()) toastBs.show();
 };
 
+const showRelaunchPLSToast = () => {
+  const toast = document.getElementById("relaunchPlsNotifyToast");
+  const toastBs = bootstrap.Toast.getOrCreateInstance(toast);
+
+  if (global.__HUGO_AURA_GLOBAL__.plsStatus.detached) {
+    const relaunchBtn = document.getElementById("plsRelaunchBtn");
+    relaunchBtn.disabled = true;
+    relaunchBtn.textContent = "分离模式下无法执行"
+  }
+
+  if (!toastBs.isShown()) toastBs.show();
+};
+
 const showToast = (entry) => {
   if (entry.reload) {
     showReloadToast();
   } else if (entry.restart) {
     showRelaunchToast();
+  } else if (entry.restartPLS) {
+    showRelaunchPLSToast();
   }
 };
 
-const settingsRenderer = (pendingEl, settingsObj) => {
+const settingsRenderer = (pendingEl, settingsObj, isPls = false) => {
   const formEl = document.createElement("form");
   formEl.classList.add("aura-settings-form");
   for (const category of settingsObj) {
@@ -55,6 +70,18 @@ const settingsRenderer = (pendingEl, settingsObj) => {
         powerIcon.setAttribute("data-bs-placement", "top");
         powerIcon.setAttribute("data-bs-title", "需要重启 Electron 进程");
         entryTitle.appendChild(powerIcon);
+      }
+      if (entry.restartPLS) {
+        const plsIcon = document.createElement("i");
+        plsIcon.classList.add(
+          "layui-icon",
+          "layui-icon-logout",
+          "aura-settings-entry-property-icon"
+        );
+        plsIcon.setAttribute("data-bs-toggle", "tooltip");
+        plsIcon.setAttribute("data-bs-placement", "top");
+        plsIcon.setAttribute("data-bs-title", "需要重启 PLS 进程");
+        entryTitle.appendChild(plsIcon);
       }
       if (entry.reload) {
         const reloadIcon = document.createElement("i");
@@ -182,14 +209,18 @@ const settingsRenderer = (pendingEl, settingsObj) => {
       if (!isShow) entryContainerEl.classList.add("aura-settings-entry-hidden");
 
       if (entry.associateVal) {
-        document.addEventListener("onHugoAuraConfigUpdate", (event) => {
-          if (!entry.associateVal.includes(event.detail.path.join("."))) return;
-          const cls = entryContainerEl.classList;
-          const isShow = entry.auraIf();
-          isShow
-            ? cls.remove("aura-settings-entry-hidden")
-            : cls.add("aura-settings-entry-hidden");
-        });
+        document.addEventListener(
+          isPls ? "onPLSConfigUpdate" : "onHugoAuraConfigUpdate",
+          (event) => {
+            if (!entry.associateVal.includes(event.detail.path.join(".")))
+              return;
+            const cls = entryContainerEl.classList;
+            const isShow = entry.auraIf();
+            isShow
+              ? cls.remove("aura-settings-entry-hidden")
+              : cls.add("aura-settings-entry-hidden");
+          }
+        );
       }
 
       formEl.appendChild(entryContainerEl);

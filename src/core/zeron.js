@@ -2,8 +2,16 @@
 
 console.debug("[HugoAura / Zeron] Early load script loaded.");
 
+const appendSwitch = () => {
+  const { app } = require("electron");
+  app.commandLine.appendSwitch("host-rules", "MAP *.hugoaura.local 127.0.0.1");
+};
+
 module.exports = function (central) {
   const originalCentral = { ...central };
+
+  appendSwitch();
+
   const genHookedWS = require("../aura/init/zeron/hookWS");
 
   console.debug(

@@ -1,0 +1,78 @@
+.acs-behaviour-control-pls-status-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.acs-behaviour-control-pls-status-page p {
+  font-family: sans-serif;
+}
+
+.acs-bc-pls-status-page-pls-description {
+  margin-top: 0.5rem;
+  max-width: 80%;
+  opacity: 0.35;
+  font-size: small;
+  text-align: center;
+}
+
+.acs-bc-pls-status-page-main-logo {
+  max-width: 13.5%;
+  opacity: 0.45;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.acs-bc-pls-status-page-status-el {
+  display: flex;
+  align-items: center;
+  width: 40%;
+  padding: 0.625rem 0.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.acs-bc-pls-status-page-status-el div {
+  display: flex;
+  align-items: center;
+}
+
+.acs-bc-pls-status-page-status-area {
+  flex-grow: 1;
+  justify-content: flex-end;
+}
+
+.acs-bc-pls-status-page-status-area-circle {
+  height: 10px;
+  width: 10px;
+  border-radius: 100%;
+  margin-right: 8px;
+  margin-top: 2px;
+}
+
+.acs-bc-pls-status-page-status-area.pending
+  .acs-bc-pls-status-page-status-area-circle {
+  background-color: rgba(0, 0, 0, 0.375);
+}
+
+.acs-bc-pls-status-page-status-area.pending p {
+  opacity: 0.5;
+}
+
+.acs-bc-pls-status-page-status-area.success
+  .acs-bc-pls-status-page-status-area-circle {
+  background-color: rgb(0, 175, 38);
+}
+
+.acs-bc-pls-status-page-status-area.success p {
+  color: rgb(0, 150, 33);
+}
+
+.acs-bc-pls-status-page-status-area.failed
+  .acs-bc-pls-status-page-status-area-circle {
+  background-color: rgb(175, 0, 0);
+}
+
+.acs-bc-pls-status-page-status-area.failed p {
+  color: rgb(175, 0, 0);
+}

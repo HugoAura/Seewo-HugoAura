@@ -1,0 +1,8 @@
+.aura-config-subpage-behaviour-control {
+  opacity: 1;
+  transition: opacity 0.5s;
+}
+
+.aura-config-subpage-behaviour-control.acs-behaviour-control-hidden {
+  opacity: 0;
+}

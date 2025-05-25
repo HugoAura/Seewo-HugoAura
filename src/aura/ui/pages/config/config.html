@@ -80,7 +80,7 @@
       </div>
       <div
         class="operation-el-hidden aura-config-page-operation-el"
-        aura-disabled="true"
+        onclick="window.__HUGO_AURA_UI_FUNCTIONS__.config.toggleSubConfig('behaviourCtrl', true)"
       >
         <div class="aura-config-page-operation-body">
           <img src="../../aura/ui/static/config/behaviour_mon.svg" />
@@ -156,6 +156,31 @@
             type="button"
             class="btn btn-primary btn-sm"
             onclick="ipcRenderer.invoke('$aura.base.restartApplication')"
+          >
+            重启进程
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div
+        id="relaunchPlsNotifyToast"
+        class="toast acp-toast-emerg"
+        aria-atomic="true"
+        data-bs-autohide="false"
+      >
+        <div class="toast-header">
+          <i class="layui-icon layui-icon-tips"></i>
+          <strong class="me-auto">重启 PLS 进程以应用设置</strong>
+        </div>
+        <div class="toast-body">
+          <p>请重启 PLS 进程以应用修改的设置</p>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            id="plsRelaunchBtn"
+            onclick="ipcRenderer.invoke('$aura.pls.relaunchPls')"
           >
             重启进程
           </button>

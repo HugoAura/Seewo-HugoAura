@@ -1,0 +1,51 @@
+<div class="acs-behaviour-control-pls-status-page">
+  <p class="acs-bc-pls-status-page-pls-description">
+    HugoAura ProxyLayerServices (Aura-PLS) 是基于 Python + MITMProxy 实现的代理服务,
+    用于解密并修改希沃基础服务 (SeewoCore) 的 MQTT 数据包,
+    实现行为监控、伪造上报等功能
+  </p>
+  <img
+    src="../../aura/ui/static/aura_pls.png"
+    class="acs-bc-pls-status-page-main-logo"
+  />
+
+  <div class="acs-bc-pls-status-page-status-el">
+    <p>安装状态</p>
+    <div
+      class="acs-bc-pls-status-page-status-area pending"
+      id="acs-bc-psp-installStatus-container"
+    >
+      <span class="acs-bc-pls-status-page-status-area-circle"></span>
+      <p id="acs-bc-psp-installStatus-text">未安装</p>
+    </div>
+  </div>
+
+  <div class="acs-bc-pls-status-page-status-el">
+    <p>启动状态</p>
+    <div
+      class="acs-bc-pls-status-page-status-area pending"
+      id="acs-bc-psp-launchStatus-container"
+    >
+      <span class="acs-bc-pls-status-page-status-area-circle"></span>
+      <p id="acs-bc-psp-launchStatus-text">未启动</p>
+    </div>
+  </div>
+
+  <div class="acs-bc-pls-status-page-status-el">
+    <p>连接状态</p>
+    <div
+      class="acs-bc-pls-status-page-status-area pending"
+      id="acs-bc-psp-connStatus-container"
+    >
+      <span class="acs-bc-pls-status-page-status-area-circle"></span>
+      <p id="acs-bc-psp-connStatus-text">已断开</p>
+    </div>
+  </div>
+
+  <div class="acs-bc-pls-status-page-status-el" style="border-bottom: none">
+    <p>版本</p>
+    <div class="acs-bc-pls-status-page-status-area">
+      <p id="acs-bc-psp-version-text">不可用</p>
+    </div>
+  </div>
+</div>

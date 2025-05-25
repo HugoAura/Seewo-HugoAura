@@ -114,8 +114,8 @@ const authSettings = [
           ].enabled;
         },
         defaultValue: "hybrid",
-        templates: ["hybrid", "remoteOnly", "passwordOnly"],
-        templateLabels: ["混合", "仅二维码", "仅密码"],
+        templates: ["default", "hybrid", "remoteOnly", "passwordOnly"],
+        templateLabels: ["默认", "混合", "仅二维码", "仅密码"],
         valueGetter: () => {
           return global.__HUGO_AURA_CONFIG__.rewrite[
             "vendor/passwordValidation"

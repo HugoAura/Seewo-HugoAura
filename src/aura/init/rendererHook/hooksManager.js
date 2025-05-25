@@ -1,13 +1,20 @@
+// @ts-check
+
 const fs = require("fs");
 const path = require("path");
 
 class HooksManager {
   loadHooks() {
-    if (global.__HUGO_AURA__.hooks) {
+    if (
+      global.__HUGO_AURA__.hooks &&
+      Object.keys(global.__HUGO_AURA__.hooks).length !== 0
+    ) {
       return global.__HUGO_AURA__.hooks;
     }
 
-    const hooksPath = path.join(__dirname, "../../../aura/ui/hooks");
+    const hooksPath = path.join(__dirname, "../../../aura/ui/hookDefinitions");
+
+    /** @type {import("../../types/main/core").HooksMap} */
     const hooks = new Map();
 
     try {
@@ -17,6 +24,7 @@ class HooksManager {
 
         try {
           const hook = require(path.join(hooksPath, file));
+          /** @type {import("../../types/main/core").WindowName} */
           const targetWindow = hook.windowName || path.basename(file, ".js");
           hooks.set(targetWindow, hook);
           console.log(
@@ -40,13 +48,19 @@ class HooksManager {
     return hooks;
   }
 
-  cleanupWindow(windowKey, listeners) {
+  /**
+   *
+   * @param {import("../../types/main/core").WindowName} windowKey
+   * @param {import("../../types/main/core").HookedWindow} hookedWindowProps
+   */
+  cleanupWindow(windowKey, hookedWindowProps) {
     console.log(
       `[HugoAura / Cleanup / ${windowKey}] Window destroyed, cleaning up...`
     );
 
-    if (listeners) {
-      const { webContents, domReadyListener, destroyedListener } = listeners;
+    if (hookedWindowProps) {
+      const { webContents, domReadyListener, destroyedListener } =
+        hookedWindowProps;
       webContents.removeListener("dom-ready", domReadyListener);
       webContents.removeListener("destroyed", destroyedListener);
     }
@@ -54,9 +68,17 @@ class HooksManager {
     global.__HUGO_AURA__.hookedWindows.delete(windowKey);
   }
 
+  /**
+   *
+   * @param {import("electron").WebContents} webContents
+   * @param {import("../../types/render/uiHook").UIHookConfigFin} hookConfig
+   * @param {import("../../types/main/core").WindowName} windowName
+   * @returns
+   */
   handleWindowHook(webContents, hookConfig, windowName) {
     if (!hookConfig) return;
 
+    /** @type {import("../../types/main/core").WindowName} */
     const windowKey = `${hookConfig.windowName || windowName}`;
     if (global.__HUGO_AURA__.hookedWindows.has(windowKey)) {
       console.log(

@@ -1,4 +1,9 @@
-module.exports = {
+// @ts-check
+
+/**
+ * @type {import("../../types/render/uiHook").UIHookConfig}
+ */
+const def = {
   targets: {
     "Aura.UI.Assistant.HeaderEntry": {
       active: true,
@@ -28,6 +33,22 @@ module.exports = {
       pageCSS:
         "ui/pages/configSubPages/disableLimitations/disableLimitations.css",
     },
+    "Aura.UI.Assistant.Config.BehaviourCtrl": {
+      active: false,
+      pageURI: "ui/pages/configSubPages/behaviourCtrl/behaviourCtrl.html",
+      pageScript: "ui/pages/configSubPages/behaviourCtrl/behaviourCtrl.js",
+      pageSelector: ".aura-config-page-subpage-container",
+      selectorMode: "appendChild",
+      pageCSS: "ui/pages/configSubPages/behaviourCtrl/behaviourCtrl.css",
+    },
+    "Aura.UI.Assistant.Config.BehaviourCtrl.PlsStatus": {
+      active: false,
+      pageURI: "ui/pages/configSubPages/behaviourCtrl/plsStatus.html",
+      pageScript: "ui/pages/configSubPages/behaviourCtrl/plsStatus.js",
+      pageSelector: "#status-subpage",
+      selectorMode: "appendChild",
+      pageCSS: "ui/pages/configSubPages/behaviourCtrl/plsStatus.css",
+    },
   },
   globalStyles: [
     "ui/css/global.css",
@@ -41,3 +62,5 @@ module.exports = {
     console.log('[HugoAura / UI / Hooks / Assistant] Page loaded.');
   `,
 };
+
+module.exports = def;

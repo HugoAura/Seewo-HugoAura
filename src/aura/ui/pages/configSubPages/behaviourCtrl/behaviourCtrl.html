@@ -1,0 +1,69 @@
+<div
+  id="acs-behaviour-control-el"
+  class="aura-config-subpage-behaviour-control acs-behaviour-control-hidden"
+>
+  <ul class="nav nav-underline mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link active"
+        id="status-subpage-tab"
+        data-bs-toggle="pill"
+        data-bs-target="#status-subpage"
+        type="button"
+        role="tab"
+        aria-controls="status-subpage"
+        aria-selected="true"
+      >
+        状态
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="basic-config-tab"
+        data-bs-toggle="pill"
+        data-bs-target="#basic-config-subpage"
+        type="button"
+        role="tab"
+        aria-controls="basic-config-subpage"
+        aria-selected="false"
+      >
+        基本设置
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="security-config-tab"
+        data-bs-toggle="pill"
+        data-bs-target="#security-config-subpage"
+        type="button"
+        role="tab"
+        aria-controls="security-config-subpage"
+        aria-selected="false"
+      >
+        设备安全
+      </button>
+    </li>
+  </ul>
+  <div class="tab-content">
+    <div
+      class="tab-pane fade show active"
+      id="status-subpage"
+      role="tabpanel"
+      aria-labelledby="status-subpage-tab"
+    ></div>
+    <div
+      class="tab-pane fade"
+      id="basic-config-subpage"
+      role="tabpanel"
+      aria-labelledby="basic-config-tab"
+    ></div>
+    <div
+      class="tab-pane fade"
+      id="security-config-subpage"
+      role="tabpanel"
+      aria-labelledby="security-config-tab"
+    ></div>
+  </div>
+</div>
