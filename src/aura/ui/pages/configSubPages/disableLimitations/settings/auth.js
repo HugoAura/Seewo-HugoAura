@@ -19,12 +19,32 @@ const authSettings = [
             "vendor/passwordValidation"
           ].enabled;
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        },
         callbackFn: (newVal) => {
           if (typeof newVal !== "boolean") return;
           global.__HUGO_AURA_CONFIG__.rewrite[
             "vendor/passwordValidation"
           ].enabled = newVal;
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        }
       },
       {
         index: 1,
@@ -42,6 +62,16 @@ const authSettings = [
             "vendor/passwordValidation"
           ].enabled;
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        },
         defaultValue: "none",
         templates: ["customPassword", "bypass", "none"],
         templateLabels: ["自定义", "任意", "不修改"],
@@ -50,11 +80,31 @@ const authSettings = [
             "vendor/passwordValidation"
           ].type;
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        },
         callbackFn: (newVal) => {
           global.__HUGO_AURA_CONFIG__.rewrite[
             "vendor/passwordValidation"
           ].type = newVal;
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        }
       },
       {
         index: 2,
@@ -77,10 +127,30 @@ const authSettings = [
               .type === "customPassword"
           );
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        },
         defaultValue: "",
         placeHolder: "留空表示不修改, 保留已设置值",
         valueGetter: () => {
           return "";
+        },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
         },
         callbackFn: (newVal) => {
           if (newVal === "" || !newVal) return { valid: true };
@@ -96,6 +166,16 @@ const authSettings = [
           __config.customPassword.passwordWithSalt = result;
           return { valid: true };
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        }
       },
       {
         index: 3,
@@ -113,6 +193,16 @@ const authSettings = [
             "vendor/passwordValidation"
           ].enabled;
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        },
         defaultValue: "hybrid",
         templates: ["default", "hybrid", "remoteOnly", "passwordOnly"],
         templateLabels: ["默认", "混合", "仅二维码", "仅密码"],
@@ -121,11 +211,31 @@ const authSettings = [
             "vendor/passwordValidation"
           ].authModeRewrite;
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        },
         callbackFn: (newVal) => {
           global.__HUGO_AURA_CONFIG__.rewrite[
             "vendor/passwordValidation"
           ].authModeRewrite = newVal;
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        }
       },
     ],
   },
@@ -149,10 +259,30 @@ const authSettings = [
         valueGetter: () => {
           return global.__HUGO_AURA_CONFIG__.devTools;
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        },
         callbackFn: (newVal) => {
           if (typeof newVal !== "boolean") return;
           global.__HUGO_AURA_CONFIG__.devTools = newVal;
         },
+        // 添加密码验证逻辑
+        beforeOpen: async () => {
+          const { ipcRenderer } = require('electron');
+          const inputPassword = prompt('请输入配置页面访问密码：');
+          if (!inputPassword) return false;
+          const __config = global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
+          const crypto = require('crypto');
+          const hashedPassword = crypto.createHash('md5').update(inputPassword + __config.customPassword.salt).digest('hex');
+          return hashedPassword === __config.customPassword.passwordWithSalt;
+        }
       },
     ],
   },
