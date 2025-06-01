@@ -45,6 +45,7 @@
   padding-left: 8px;
   padding-right: 8px;
   color: white;
+  z-index: 12000;
 
   opacity: 1;
   transform: translateY(0);
@@ -366,6 +367,82 @@
   color: white;
   opacity: 0.75;
   font-size: small;
+}
+
+/* Auth Dialog */
+
+.aura-config-page-auth-dialog-area {
+  position: absolute;
+  height: calc(100% - 40px);
+  width: 100%;
+  top: 40px;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  background-color: rgba(255, 255, 255, 0.35);
+
+  opacity: 1;
+  transition: all 0.5s;
+}
+
+.aura-config-page-auth-dialog-area.blur-enabled {
+  height: 100%;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(5px);
+  filter: blur(0.1px);
+  /* ↑ 似乎会导致性能问题 */
+}
+
+.acp-ada-hidden {
+  opacity: 0;
+}
+
+.acp-ada-hidden.blur-enabled {
+  backdrop-filter: blur(0.1px);
+  filter: unset;
+}
+
+.aura-config-page-auth-dialog {
+  height: 40%;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.625);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.acp-auth-dialog-title {
+  font-size: x-large;
+  margin-bottom: 1.5rem;
+}
+
+#acp-auth-user-input {
+  max-width: 50%;
+  /* background-color: rgba(255, 255, 255, 0.5); */
+  border-radius: 35px;
+  margin-bottom: 2rem;
+}
+
+#acp-auth-user-input.invalid {
+  animation: invalidShake 0.6s linear;
+}
+
+.acp-auth-confirm-btn {
+  background-color: transparent;
+  border-radius: 35px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 0.5rem;
+}
+
+.acp-auth-confirm-btn .layui-icon {
+  font-size: 24px;
+  margin-left: 2px;
 }
 
 /* Toast */

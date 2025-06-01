@@ -117,6 +117,48 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
 
     global.__HUGO_AURA_UI_REACTIVES__.config.isInSubPage = side;
   },
+
+  verifyAuthPassword: async () => {
+    const showFailedAnimation = async (el) => {
+      el.classList.remove("invalid");
+      await window.__HUGO_AURA_GLOBAL__.utils.sleep(50);
+      el.classList.add("invalid"); // Custom Anim
+      el.classList.add("is-invalid"); // Bootstrap
+    };
+
+    const inputEl = document.getElementById("acp-auth-user-input");
+    const userPasswdInput = inputEl.value;
+
+    if (!userPasswdInput || userPasswdInput.length < 8) {
+      showFailedAnimation(inputEl);
+      return false;
+    }
+
+    const crypto = require("crypto");
+    const encPasswd = crypto
+      .createHash("sha512")
+      .update(userPasswdInput + "EndlessX")
+      .digest("hex")
+      .toUpperCase();
+
+    if (
+      encPasswd ===
+      global.__HUGO_AURA_CONFIG__.auraSettings.settingsPasswordWithSalt
+    ) {
+      const acsDialogAreaEl = document.getElementsByClassName(
+        "aura-config-page-auth-dialog-area"
+      )[0];
+      acsDialogAreaEl.classList.add("acp-ada-hidden");
+      await window.__HUGO_AURA_GLOBAL__.utils.sleep(500);
+      acsDialogAreaEl.style = "display: none;";
+      await window.__HUGO_AURA_GLOBAL__.utils.sleep(250);
+      global.__HUGO_AURA_UI_FUNCTIONS__.config.showSecondPhaseAnim();
+      return true;
+    } else {
+      showFailedAnimation(inputEl);
+      return false;
+    }
+  },
 };
 
 (() => {
@@ -167,23 +209,51 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
     });
   };
 
-  const showAnimation = async () => {
-    const defaultHeader = document.getElementsByClassName(
-      "index__header__16DmR2a5"
-    )[0];
+  global.__HUGO_AURA_UI_FUNCTIONS__.config.showSecondPhaseAnim = () => {
+    showOperationsAnimation();
+  };
 
+  const handleSettingsAuth = async () => {
+    const isAuthEnabled =
+      global.__HUGO_AURA_CONFIG__.auraSettings.settingsPasswordEnabled;
+
+    if (!isAuthEnabled) {
+      showOperationsAnimation();
+    } else {
+      await window.__HUGO_AURA_GLOBAL__.utils.sleep(50);
+      const acsDialogAreaEl = document.getElementsByClassName(
+        "aura-config-page-auth-dialog-area"
+      )[0];
+      acsDialogAreaEl.style = "";
+      if (
+        global.__HUGO_AURA_CONFIG__.auraSettings.appearance
+          .enablePasswdDialogBlur
+      ) {
+        acsDialogAreaEl.classList.add("blur-enabled");
+      }
+      await window.__HUGO_AURA_GLOBAL__.utils.sleep(500);
+      acsDialogAreaEl.classList.remove("acp-ada-hidden");
+    }
+  };
+
+  const showAnimation = async () => {
     const auraConfigPageRoot = document.getElementsByClassName(
       "aura-config-page-root"
     )[0];
     await window.__HUGO_AURA_GLOBAL__.utils.sleep(200);
     auraConfigPageRoot.className = "aura-config-page-root";
 
+    const defaultHeader = document.getElementsByClassName(
+      "index__header__16DmR2a5"
+    )[0];
+
     await window.__HUGO_AURA_GLOBAL__.utils.sleep(500);
     defaultHeader.style = "display: none;";
     showVersionContainerAnimation();
     showHeaderAnimation();
     await window.__HUGO_AURA_GLOBAL__.utils.sleep(500);
-    showOperationsAnimation();
+
+    await handleSettingsAuth();
   };
 
   const onMounted = () => {

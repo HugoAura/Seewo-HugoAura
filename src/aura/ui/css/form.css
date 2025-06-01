@@ -68,3 +68,29 @@
 .aura-settings-entry-property-icon.layui-icon-refresh {
   color: rgb(0, 106, 188);
 }
+
+/* Animations */
+
+@keyframes invalidShake {
+  0% {
+    margin-left: calc(-10px * 2);
+  }
+  16% {
+    margin-left: calc(9px * 2);
+  }
+  33% {
+    margin-left: calc(-6px * 2);
+  }
+  50% {
+    margin-left: calc(5px * 2);
+  }
+  66% {
+    margin-left: calc(-2px * 2);
+  }
+  83% {
+    margin-left: calc(1px * 2);
+  }
+  100% {
+    margin-left: calc(0px * 2);
+  }
+}

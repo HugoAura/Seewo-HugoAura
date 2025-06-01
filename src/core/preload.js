@@ -1,4 +1,4 @@
-const __AURA_VERSION__ = "0.1.0-beta";
+const __AURA_VERSION__ = "0.1.1-pre-I";
 
 (() => {
   if (!global.__HUGO_AURA__) {

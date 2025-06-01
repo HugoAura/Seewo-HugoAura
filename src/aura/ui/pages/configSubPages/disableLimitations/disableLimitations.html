@@ -6,6 +6,20 @@
     <li class="nav-item" role="presentation">
       <button
         class="nav-link active"
+        id="aura-subpage-tab"
+        data-bs-toggle="pill"
+        data-bs-target="#aura-subpage"
+        type="button"
+        role="tab"
+        aria-controls="aura-subpage"
+        aria-selected="true"
+      >
+        Aura 设置
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
         id="auth-subpage-tab"
         data-bs-toggle="pill"
         data-bs-target="#auth-subpage"
@@ -14,7 +28,7 @@
         aria-controls="auth-subpage"
         aria-selected="true"
       >
-        认证与基础设施
+        认证与环境
       </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -35,6 +49,12 @@
   <div class="tab-content">
     <div
       class="tab-pane fade show active"
+      id="aura-subpage"
+      role="tabpanel"
+      aria-labelledby="aura-subpage-tab"
+    ></div>
+    <div
+      class="tab-pane fade show"
       id="auth-subpage"
       role="tabpanel"
       aria-labelledby="auth-subpage-tab"

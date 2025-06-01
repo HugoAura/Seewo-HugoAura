@@ -80,8 +80,10 @@
       </div>
       <div
         class="operation-el-hidden aura-config-page-operation-el"
-        onclick="window.__HUGO_AURA_UI_FUNCTIONS__.config.toggleSubConfig('behaviourCtrl', true)"
+        aura-disabled="true"
       >
+        <!-- Still WIP -->
+        <!-- onclick="window.__HUGO_AURA_UI_FUNCTIONS__.config.toggleSubConfig('behaviourCtrl', true)" -->
         <div class="aura-config-page-operation-body">
           <img src="../../aura/ui/static/config/behaviour_mon.svg" />
           <div>
@@ -111,6 +113,30 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div
+    class="aura-config-page-auth-dialog-area acp-ada-hidden"
+    style="display: none"
+  >
+    <div class="aura-config-page-auth-dialog">
+      <p class="acp-auth-dialog-title">验证您的身份</p>
+
+      <input
+        type="password"
+        class="form-control"
+        placeholder="请输入密码..."
+        aria-label="Aura Password"
+        id="acp-auth-user-input"
+      />
+
+      <button
+        class="acp-auth-confirm-btn"
+        onclick="global.__HUGO_AURA_UI_FUNCTIONS__.config.verifyAuthPassword()"
+      >
+        <i class="layui-icon layui-icon-right"></i>
+      </button>
     </div>
   </div>
 

@@ -5,8 +5,14 @@
   const {
     settingsRenderer,
   } = require("../../aura/ui/composables/settingsRenderer");
+  const { auraSettings } = require(`${pathBase}/aura`);
   const { authSettings } = require(`${pathBase}/auth`);
   const { banAuditSettings } = require(`${pathBase}/audit`);
+
+  const initAuraSubPage = () => {
+    const auraSettingsSubPageEl = document.getElementById("aura-subpage");
+    settingsRenderer(auraSettingsSubPageEl, auraSettings);
+  };
 
   const initAuthSubPage = () => {
     const authSubPageEl = document.getElementById("auth-subpage");
@@ -19,6 +25,7 @@
   };
 
   const onMounted = () => {
+    initAuraSubPage();
     initAuthSubPage();
     initBanAuditSubPage();
 

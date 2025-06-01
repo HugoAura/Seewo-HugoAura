@@ -1,7 +1,7 @@
 const authSettings = [
   {
     id: 0,
-    categoryName: "身份验证",
+    categoryName: "管家身份验证",
     child: [
       {
         index: 0,
