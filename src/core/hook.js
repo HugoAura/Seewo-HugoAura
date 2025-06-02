@@ -24,12 +24,17 @@ const util = require("util");
 const path = require("path");
 const os = require("os");
 
-const HooksManager = require("../aura/init/rendererHook/hooksManager");
+const MainProcessHooksManager = require("../aura/init/main/windowHooksManager");
+const RendererHooksManager = require("../aura/init/rendererHook/uiHooksManager");
 const NetworkHook = require("../aura/init/rendererHook/networkHook");
 const configManager = require("../aura/init/shared/configManager");
 const { buildIpcMain } = require("../aura/init/main/ipcHandler");
 
-const initLogger = () => {
+/**
+ *
+ * @param {import("../aura/types/main/core").WindowName} windowName
+ */
+const initLogger = (windowName) => {
   const logDir = path.join(os.homedir(), "Documents", "HugoAura", "logs");
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
@@ -37,7 +42,7 @@ const initLogger = () => {
 
   const logFile = path.join(
     logDir,
-    `main-process-${new Date().toISOString().replace(/:/g, "-")}.log`
+    `main-${windowName}-${new Date().toISOString().replace(/:/g, "-")}.log`
   );
   const logStream = fs.createWriteStream(logFile, { flags: "a" });
 
@@ -84,7 +89,10 @@ const initLogger = () => {
     console.error("UNCAUGHT EXCEPTION:", err);
   });
 
-  console.log("Logger initialized. Log file:", logFile);
+  console.log(
+    "[HugoAura / Init / Logger] Logger initialized. Log file:",
+    logFile
+  );
 };
 
 /**
@@ -96,6 +104,7 @@ const launcher = ({ central, windowName, config }) => {
   process.stdout.isTTY = true;
   process.stderr.isTTY = true;
 
+  /** @type {Electron} */
   const electron = central(1);
   const app = electron.app;
   if (!global.__HUGO_AURA__.central) global.__HUGO_AURA__.central = central;
@@ -105,9 +114,10 @@ const launcher = ({ central, windowName, config }) => {
     app.exit(0);
   };
 
-  initLogger();
+  initLogger(windowName);
 
   console.log("[HugoAura / Loaded] Aura is loaded!");
+  console.debug(`[HugoAura / Debug] curWindowName: ${windowName}`);
 
   configManager.ensureConfigExists();
   const loadedConfig = configManager.loadConfig();
@@ -120,16 +130,34 @@ const launcher = ({ central, windowName, config }) => {
     global.__HUGO_AURA__.ipcInit = true;
   }
 
-  const hooksManager = new HooksManager();
+  const mainProcessHooksManager = new MainProcessHooksManager();
 
-  const hooks = hooksManager.loadHooks();
+  const _windowHooks = mainProcessHooksManager.loadHooks();
+
+  const uiHooksManager = new RendererHooksManager();
+
+  const uiHooks = uiHooksManager.loadHooks();
 
   if (loadedConfig.devTools && !config.canOpenDevTool) {
     config.canOpenDevTool = true;
   }
 
+  const browserWindowCreatedListener = (_event, browserWindow) => {
+    mainProcessHooksManager.initHookForWindow(
+      windowName,
+      central,
+      app,
+      browserWindow
+    );
+  };
+
+  /**
+   *
+   * @param {Event} _event
+   * @param {import("electron").WebContents} webContents
+   */
   const webContentsCreatedListener = (_event, webContents) => {
-    const hookConfig = hooks.get(windowName);
+    const hookConfig = uiHooks.get(windowName.split("_")[0]);
 
     const initNetworkHook = () => {
       const networkHook = new NetworkHook();
@@ -143,17 +171,22 @@ const launcher = ({ central, windowName, config }) => {
     initNetworkHook();
 
     if (hookConfig) {
-      hooksManager.handleWindowHook(webContents, hookConfig, windowName);
+      uiHooksManager.handleWindowHook(webContents, hookConfig, windowName);
     } else {
-      console.debug(
-        `[HugoAura / Init] Window ${windowName} has no corresponding hook, ignoring...`
+      console.log(
+        `[HugoAura / Init / RDH] Window ${windowName} has no corresponding ui hooks, ignoring...`
       );
     }
   };
 
+  app.once("browser-window-created", browserWindowCreatedListener);
+  // @ts-expect-error
+  // ↑ idk why
   app.once("web-contents-created", webContentsCreatedListener);
 
   return () => {
+    app.removeListener("browser-window-created", browserWindowCreatedListener);
+    // @ts-expect-error
     app.removeListener("web-contents-created", webContentsCreatedListener);
   };
 };

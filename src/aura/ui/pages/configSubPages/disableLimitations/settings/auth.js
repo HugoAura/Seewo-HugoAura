@@ -131,6 +131,131 @@ const authSettings = [
   },
   {
     id: 1,
+    categoryName: "屏幕锁",
+    child: [
+      {
+        index: 0,
+        id: "enableScreenLockOverride",
+        type: "switch",
+        name: "启用屏幕锁覆写功能",
+        description: "覆写希沃管家的屏幕锁组件, 绕过限制",
+        restart: false,
+        reload: false,
+        associateVal: null,
+        auraIf: () => true,
+        defaultValue: true,
+        valueGetter: () => {
+          return global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"]
+            .enabled;
+        },
+        callbackFn: (newVal) => {
+          if (typeof newVal !== "boolean") return;
+          global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"].enabled =
+            newVal;
+        },
+      },
+      {
+        index: 1,
+        id: "disableKeyboardHook",
+        type: "switch",
+        name: "允许快捷键操作",
+        description: "屏蔽键盘 DLL Hook, 允许在屏幕锁中操作快捷键",
+        restart: false,
+        reload: false,
+        tip: true,
+        tipTitle: "此功能正在测试中, 可能并不稳定",
+        associateVal: ["rewrite.vendor/screenLock.enabled"],
+        auraIf: () => {
+          return global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"]
+            .enabled;
+        },
+        defaultValue: false,
+        valueGetter: () => {
+          return global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"]
+            .disableKeyboardHook;
+        },
+        callbackFn: (newVal) => {
+          if (typeof newVal !== "boolean") return;
+          global.__HUGO_AURA_CONFIG__.rewrite[
+            "vendor/screenLock"
+          ].disableKeyboardHook = newVal;
+        },
+      },
+      {
+        index: 2,
+        id: "screenLockAuthOverrideType",
+        type: "radio",
+        name: "覆写模式",
+        description: "选择一个认证覆写模式",
+        restart: false,
+        reload: false,
+        associateVal: ["rewrite.vendor/screenLock.enabled"],
+        auraIf: () => {
+          return global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"]
+            .enabled;
+        },
+        defaultValue: "none",
+        templates: ["customActivationCode", "none"],
+        templateLabels: ["自定义激活码", "不修改"],
+        valueGetter: () => {
+          return global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"]
+            .authRewriteType;
+        },
+        callbackFn: (newVal) => {
+          global.__HUGO_AURA_CONFIG__.rewrite[
+            "vendor/screenLock"
+          ].authRewriteType = newVal;
+        },
+      },
+      {
+        index: 3,
+        id: "customActivationCode",
+        type: "input",
+        subType: "password",
+        name: "自定义激活码",
+        description: '请在屏幕锁页面下方选择 "激活码解锁" 以使用',
+        restart: false,
+        reload: false,
+        warning: true,
+        warningContent: "密码为 6 位纯数字",
+        associateVal: [
+          "rewrite.vendor/screenLock.enabled",
+          "rewrite.vendor/screenLock.authRewriteType",
+        ],
+        auraIf: () => {
+          return (
+            global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"].enabled &&
+            global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"].authRewriteType ===
+              "customActivationCode"
+          );
+        },
+        defaultValue: "",
+        placeHolder: "留空表示不修改, 保留已设置值",
+        valueGetter: () => {
+          return "";
+        },
+        callbackFn: (newVal) => {
+          if (newVal === "" || !newVal) return { valid: true };
+          if (newVal.length !== 6)
+            return { valid: false, hint: "仅可输入 6 位密码" };
+          if (!/^\d+$/.test(newVal)) {
+            return { valid: false, hint: "仅允许纯数字密码" };
+          }
+          const __config =
+            global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"];
+          const crypto = require("crypto");
+          const result = crypto
+            .createHash("md5")
+            .update(newVal + "auraScreenLockCrack")
+            .digest("hex");
+          __config.customActivationCode.activationCodeWithSalt = result;
+          return { valid: true };
+        },
+      },
+    ],
+  },
+  {
+    id: 2,
     categoryName: "基础设施",
     child: [
       {
@@ -143,6 +268,9 @@ const authSettings = [
         reload: false,
         tip: true,
         tipTitle: "启用后, 按下 Ctrl + Shift + I 即可打开 DevTools",
+        warning: true,
+        warningContent:
+          "在操作不当的情况下, 有可能造成 DevTools 永久无法激活 (Electron 的 Bug), 此时请使用 Chrome 远程调试",
         associateVal: null,
         auraIf: () => true,
         defaultValue: false,

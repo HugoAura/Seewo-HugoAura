@@ -74,7 +74,7 @@
           <img src="../../aura/ui/static/config/no_limitations.svg" />
           <div>
             <p class="config-operation-title">限制解除</p>
-            <p class="config-operation-description">禁用密码、关闭冰点</p>
+            <p class="config-operation-description">禁用密码、关闭功能</p>
           </div>
         </div>
       </div>
@@ -104,12 +104,15 @@
           </div>
         </div>
       </div>
-      <div class="operation-el-hidden aura-config-page-operation-el">
+      <div
+        class="operation-el-hidden aura-config-page-operation-el"
+        onclick="window.__HUGO_AURA_UI_FUNCTIONS__.config.toggleSubConfig('preferences', true)"
+      >
         <div class="aura-config-page-operation-body">
           <img src="../../aura/ui/static/config/about.svg" />
           <div>
-            <p class="config-operation-title">关于项目</p>
-            <p class="config-operation-description">使用文档、获取帮助</p>
+            <p class="config-operation-title">偏好设置</p>
+            <p class="config-operation-description">Aura 设置、关于项目</p>
           </div>
         </div>
       </div>

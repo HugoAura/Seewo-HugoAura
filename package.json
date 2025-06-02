@@ -1,0 +1,21 @@
+{
+  "name": "HugoAura",
+  "version": "0.1.1-pre-II",
+  "description": "Aura for SeewoHugo",
+  "main": "app.asar/main.js",
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^36.3.2"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/HugoAura/Seewo-HugoAura.git"
+  },
+  "author": "Minoricew",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/HugoAura/Seewo-HugoAura/issues"
+  },
+  "homepage": "https://github.com/HugoAura/Seewo-HugoAura"
+}

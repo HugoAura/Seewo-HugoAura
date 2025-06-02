@@ -3,13 +3,13 @@
 const fs = require("fs");
 const path = require("path");
 
-class HooksManager {
+class RendererHooksManager {
   loadHooks() {
     if (
-      global.__HUGO_AURA__.hooks &&
-      Object.keys(global.__HUGO_AURA__.hooks).length !== 0
+      global.__HUGO_AURA__.uiHooks &&
+      Object.keys(global.__HUGO_AURA__.uiHooks).length !== 0
     ) {
-      return global.__HUGO_AURA__.hooks;
+      return global.__HUGO_AURA__.uiHooks;
     }
 
     const hooksPath = path.join(__dirname, "../../../aura/ui/hookDefinitions");
@@ -28,23 +28,23 @@ class HooksManager {
           const targetWindow = hook.windowName || path.basename(file, ".js");
           hooks.set(targetWindow, hook);
           console.log(
-            `[HugoAura / Init] Loaded hook for window: ${targetWindow}`
+            `[HugoAura / Init / RDH] Loaded ui hook for window: ${targetWindow}`
           );
         } catch (err) {
           console.error(
-            `[HugoAura / Init / Error] Failed to load hook ${file}:`,
+            `[HugoAura / Init / RDH / Error] Failed to load ui hook ${file}:`,
             err
           );
         }
       });
     } catch (err) {
       console.error(
-        "[HugoAura / Init / Error] Failed to read hooks directory:",
+        "[HugoAura / Init / RDH / Error] Failed to ui hooks directory:",
         err
       );
     }
 
-    global.__HUGO_AURA__.hooks = hooks;
+    global.__HUGO_AURA__.uiHooks = hooks;
     return hooks;
   }
 
@@ -55,7 +55,7 @@ class HooksManager {
    */
   cleanupWindow(windowKey, hookedWindowProps) {
     console.log(
-      `[HugoAura / Cleanup / ${windowKey}] Window destroyed, cleaning up...`
+      `[HugoAura / Cleanup / RDH / ${windowKey}] Window destroyed, cleaning up...`
     );
 
     if (hookedWindowProps) {
@@ -82,20 +82,20 @@ class HooksManager {
     const windowKey = `${hookConfig.windowName || windowName}`;
     if (global.__HUGO_AURA__.hookedWindows.has(windowKey)) {
       console.log(
-        `[HugoAura / Init] Duplicate hook for ${windowKey}, ignoring...`
+        `[HugoAura / Init / RDH] Duplicate ui hook for ${windowKey}, ignoring...`
       );
       return;
     }
 
-    console.log(`[HugoAura / Init] Hook is initializing for ${windowKey}...`);
+    console.log(`[HugoAura / Init / RDH] UI Hook is initializing for ${windowKey}...`);
     console.log(
-      `[HugoAura / Init] Hook loaded at: ${new Date().toISOString()}`
+      `[HugoAura / Init / RDH] UI Hook loaded at: ${new Date().toISOString()}`
     );
 
     const domReadyListener = () => {
       try {
         console.log(
-          `[HugoAura / UI / Verb / ${windowKey}] Loading injection script...`
+          `[HugoAura / RDH / Verb / ${windowKey}] Loading injection script...`
         );
 
         const injectionScript = fs
@@ -115,18 +115,18 @@ class HooksManager {
           .executeJavaScript(injectionScript, true)
           .then(() =>
             console.log(
-              `[HugoAura / UI / Done / ${windowKey}] Injection script executed`
+              `[HugoAura / RDH / Done / ${windowKey}] Injection script executed`
             )
           )
           .catch((err) =>
             console.error(
-              `[HugoAura / UI / Error / ${windowKey}] Failed to execute injection script:`,
+              `[HugoAura / RDH / Error / ${windowKey}] Failed to execute injection script:`,
               err
             )
           );
       } catch (err) {
         console.error(
-          `[HugoAura / UI / Error / ${windowKey}] Failed to load UI hook:`,
+          `[HugoAura / RDH / Error / ${windowKey}] Failed to load UI hook:`,
           err
         );
       }
@@ -149,9 +149,9 @@ class HooksManager {
     });
 
     console.log(
-      `[HugoAura / Init / Success / ${windowKey}] Hook initialized successfully!`
+      `[HugoAura / Init / RDH / Success / ${windowKey}] UI Hook initialized.`
     );
   }
 }
 
-module.exports = HooksManager;
+module.exports = RendererHooksManager;

@@ -7,7 +7,15 @@
         "passwordWithSalt": "89f6c4d57d0202a05c32d37cc6a2c6a0",
         "salt": "aura"
       },
-      "authModeRewrite": "default"
+      "authModeRewrite": "none"
+    },
+    "vendor/screenLock": {
+      "enabled": true,
+      "disableKeyboardHook": false,
+      "authRewriteType": "customActivationCode",
+      "customActivationCode": {
+        "activationCodeWithSalt": "cbbd87c419b1c2dbc412ae238f1f4be3"
+      }
     }
   },
   "networkRewrite": {

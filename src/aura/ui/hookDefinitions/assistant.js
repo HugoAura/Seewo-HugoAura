@@ -49,6 +49,14 @@ const def = {
       selectorMode: "appendChild",
       pageCSS: "ui/pages/configSubPages/behaviourCtrl/plsStatus.css",
     },
+    "Aura.UI.Assistant.Config.Preferences": {
+      active: false,
+      pageURI: "ui/pages/configSubPages/preferences/preferences.html",
+      pageScript: "ui/pages/configSubPages/preferences/preferences.js",
+      pageSelector: ".aura-config-page-subpage-container",
+      selectorMode: "appendChild",
+      pageCSS: "ui/pages/configSubPages/preferences/preferences.css",
+    },
   },
   globalStyles: [
     "ui/css/global.css",

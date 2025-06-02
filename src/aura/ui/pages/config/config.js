@@ -1,6 +1,7 @@
 global.__HUGO_AURA_UI_REACTIVES__.config = {
   isInSubPage: false,
   currentActiveSubPage: "",
+  authenticated: false,
 };
 
 global.__HUGO_AURA_UI_FUNCTIONS__.config = {
@@ -34,6 +35,7 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
 
   toggleSubConfig: (subPage, side) => {
     if (side === global.__HUGO_AURA_UI_REACTIVES__.config.isInSubPage) return;
+    if (!global.__HUGO_AURA_UI_REACTIVES__.config.authenticated) return;
     if (!side) {
       side = !global.__HUGO_AURA_UI_REACTIVES__.config.isInSubPage;
     }
@@ -65,6 +67,15 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
             ].active = false;
           }, 500);
         }
+        break;
+      case "plugins":
+        // To Be Done
+        preserveOperationIdx = 2;
+        pendingSubPageId = "Aura.UI.Assistant.Config.Plugins";
+        break;
+      case "preferences":
+        preserveOperationIdx = 3;
+        pendingSubPageId = "Aura.UI.Assistant.Config.Preferences";
         break;
       default:
         break;
@@ -152,6 +163,7 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
       await window.__HUGO_AURA_GLOBAL__.utils.sleep(500);
       acsDialogAreaEl.style = "display: none;";
       await window.__HUGO_AURA_GLOBAL__.utils.sleep(250);
+      global.__HUGO_AURA_UI_REACTIVES__.config.authenticated = true;
       global.__HUGO_AURA_UI_FUNCTIONS__.config.showSecondPhaseAnim();
       return true;
     } else {
@@ -218,6 +230,7 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
       global.__HUGO_AURA_CONFIG__.auraSettings.settingsPasswordEnabled;
 
     if (!isAuthEnabled) {
+      global.__HUGO_AURA_UI_REACTIVES__.config.authenticated = true;
       showOperationsAnimation();
     } else {
       await window.__HUGO_AURA_GLOBAL__.utils.sleep(50);

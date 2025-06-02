@@ -1,0 +1,8 @@
+.aura-config-subpage-preferences-root {
+  opacity: 1;
+  transition: opacity 0.5s;
+}
+
+.aura-config-subpage-preferences-root.acs-preferences-root-hidden {
+  opacity: 0;
+}

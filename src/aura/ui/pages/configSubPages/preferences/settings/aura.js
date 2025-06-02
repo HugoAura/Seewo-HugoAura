@@ -36,6 +36,8 @@ const auraSettings = [
         description: "此密码将用于访问 Aura 设置 UI",
         restart: false,
         reload: false,
+        tip: true,
+        tipTitle: "密码将在本地使用 SHA512 加盐存储",
         associateVal: ["auraSettings.settingsPasswordEnabled"],
         auraIf: () => {
           return global.__HUGO_AURA_CONFIG__.auraSettings
@@ -91,8 +93,8 @@ const auraSettings = [
         description: "启用后, 密码验证时, 背景将具有毛玻璃效果",
         restart: false,
         reload: false,
-        tip: true,
-        tipTitle: "不建议在较旧 (如 i5 8 代) 机型上开启, 可能导致性能问题",
+        warning: true,
+        warningContent: "不建议在较旧 (如 i5 8 代) 机型上开启, 可能导致性能问题",
         associateVal: null,
         auraIf: () => true,
         defaultValue: true,

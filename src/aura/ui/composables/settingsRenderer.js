@@ -25,7 +25,7 @@ const showRelaunchPLSToast = () => {
   if (global.__HUGO_AURA_GLOBAL__.plsStatus.detached) {
     const relaunchBtn = document.getElementById("plsRelaunchBtn");
     relaunchBtn.disabled = true;
-    relaunchBtn.textContent = "分离模式下无法执行"
+    relaunchBtn.textContent = "分离模式下无法执行";
   }
 
   if (!toastBs.isShown()) toastBs.show();
@@ -95,18 +95,31 @@ const settingsRenderer = (pendingEl, settingsObj, isPls = false) => {
         reloadIcon.setAttribute("data-bs-title", "需要重载页面");
         entryTitle.appendChild(reloadIcon);
       }
-      if (entry.tip) {
+
+      const createToolTipIcon = (type, content) => {
         const tipIcon = document.createElement("i");
         tipIcon.classList.add(
           "layui-icon",
           "layui-icon-tips",
           "aura-settings-entry-property-icon"
         );
+        if (type === "warning") {
+          tipIcon.classList.add("aura-settings-entry-warning-icon");
+        }
         tipIcon.setAttribute("data-bs-toggle", "tooltip");
         tipIcon.setAttribute("data-bs-placement", "top");
-        tipIcon.setAttribute("data-bs-title", entry.tipTitle);
+        tipIcon.setAttribute("data-bs-title", content);
         entryTitle.appendChild(tipIcon);
+      };
+
+      if (entry.tip) {
+        createToolTipIcon("tip", entry.tipTitle);
       }
+
+      if (entry.warning) {
+        createToolTipIcon("warning", entry.warningContent);
+      }
+
       const entryDescription = document.createElement("p");
       entryDescription.classList.add("aura-settings-entry-desc");
       entryDescription.textContent = entry.description;
