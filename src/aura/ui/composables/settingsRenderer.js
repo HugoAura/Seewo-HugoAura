@@ -141,9 +141,9 @@ const settingsRenderer = (pendingEl, settingsObj, isPls = false) => {
             const elValue = entry.valueGetter();
             switchEl.value = elValue;
             switchEl.checked = elValue;
-            switchEl.addEventListener("change", (event) => {
+            switchEl.addEventListener("change", async (event) => {
               showToast(entry);
-              entry.callbackFn(event.target.checked);
+              await entry.callbackFn(event.target.checked);
             });
             entryOperationArea.classList.add("form-check", "form-switch");
             entryOperationArea.appendChild(switchEl);
@@ -167,10 +167,10 @@ const settingsRenderer = (pendingEl, settingsObj, isPls = false) => {
                 template
               )}`;
               radioEl.checked = template === elValue ? true : false;
-              radioEl.addEventListener("change", (event) => {
+              radioEl.addEventListener("change", async (event) => {
                 if (event.target.checked) {
                   showToast(entry);
-                  entry.callbackFn(event.target.value);
+                  await entry.callbackFn(event.target.value);
                 }
               });
               inlineContainerEl.appendChild(radioEl);
@@ -192,8 +192,8 @@ const settingsRenderer = (pendingEl, settingsObj, isPls = false) => {
             inputEl.value = entry.valueGetter();
             inputEl.placeholder = entry.placeHolder;
             inputEl.id = entry.id;
-            inputEl.addEventListener("change", (event) => {
-              const result = entry.callbackFn(event.target.value);
+            inputEl.addEventListener("change", async (event) => {
+              const result = await entry.callbackFn(event.target.value);
               const success = result.valid;
               if (success) {
                 showToast(entry);

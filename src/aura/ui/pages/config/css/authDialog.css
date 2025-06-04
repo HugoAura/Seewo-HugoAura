@@ -1,0 +1,95 @@
+.aura-config-page-auth-dialog-area {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  background-color: rgba(255, 255, 255, 0.5);
+
+  opacity: 1;
+  transition: all 0.5s;
+}
+
+.acp-ada-hidden {
+  opacity: 0;
+}
+
+.aura-config-page-auth-dialog {
+  height: 40%;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.acp-auth-dialog-title {
+  font-size: x-large;
+  margin-bottom: 1.5rem;
+}
+
+#acp-auth-user-input {
+  max-width: 50%;
+  /* background-color: rgba(255, 255, 255, 0.5); */
+  border-radius: 35px;
+  margin-bottom: 2rem;
+}
+
+#acp-auth-user-input.invalid {
+  animation: invalidShake 0.6s linear;
+}
+
+.acp-auth-btns-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.acp-auth-btns-container button {
+  transition: all 0.25s;
+}
+
+.acp-auth-btns-container button:hover {
+  opacity: 0.5;
+}
+
+.acp-auth-btns-container button:active {
+  opacity: 0.25;
+}
+
+.acp-auth-confirm-btn,
+.acp-auth-cancel-btn {
+  border-radius: 35px;
+  padding: 0.5rem;
+}
+
+.acp-auth-confirm-btn {
+  background: linear-gradient(135deg, #218fff 0%, #3fbaff 100%);
+  border: 0;
+}
+
+.acp-auth-confirm-btn .layui-icon {
+  font-size: 24px;
+  color: white;
+}
+
+.acp-auth-cancel-btn .layui-icon {
+  font-size: 24px;
+}
+
+.acp-auth-cancel-btn {
+  background-color: transparent;
+  margin-right: 3rem;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.aura-config-page-auth-dialog-area[aura-cancel="false"] .acp-auth-cancel-btn {
+  display: none;
+}

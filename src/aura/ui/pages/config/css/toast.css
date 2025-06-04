@@ -1,0 +1,37 @@
+.aura-config-page-toast-area {
+  z-index: 20000;
+}
+
+.aura-config-page-toast-area .toast {
+  --bs-toast-border-width: 0 !important;
+  --bs-toast-bg: #fff !important;
+}
+
+.aura-config-page-toast-area .toast-header {
+  background-color: rgb(255, 234, 202);
+
+  border-top-left-radius: var(--bs-toast-border-radius);
+  border-top-right-radius: var(--bs-toast-border-radius);
+}
+
+.aura-config-page-toast-area .toast.acp-toast-emerg .toast-header {
+  background-color: rgb(255, 202, 202);
+}
+
+.aura-config-page-toast-area .toast-header * {
+  color: rgba(234, 126, 14, 0.85);
+}
+
+.aura-config-page-toast-area .toast.acp-toast-emerg .toast-header * {
+  color: rgba(234, 65, 14, 0.85);
+}
+
+.aura-config-page-toast-area .toast-body p {
+  margin-bottom: var(--bs-toast-padding-x);
+}
+
+.aura-config-page-toast-area .toast-header .layui-icon {
+  font-weight: bolder;
+  margin-right: 0.5rem;
+  font-size: 18px;
+}

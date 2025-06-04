@@ -1,0 +1,155 @@
+.aura-config-page-operation-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.aura-config-page-operation-area::-webkit-scrollbar {
+  display: none;
+}
+
+.aura-config-page-operation-area.subpage-expanded {
+  flex: 15;
+}
+
+.aura-config-page-subpage-container {
+  width: 100%;
+  height: 0;
+  background-color: rgba(255, 255, 255, 0.825);
+  z-index: 6000;
+  overflow-y: scroll;
+
+  opacity: 0;
+
+  transition: all 0.5s;
+}
+
+.aura-config-page-subpage-container::-webkit-scrollbar {
+  display: none;
+}
+
+.aura-config-page-operation-area.subpage-expanded
+  .aura-config-page-subpage-container {
+  height: calc(100% - 40px - 4rem);
+  opacity: 1;
+}
+
+.aura-config-page-operation-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.aura-config-page-operation-container.hide-other-operations
+  .aura-config-page-operation-el:not(.preserve-operation) {
+  max-width: 0;
+  opacity: 0;
+}
+
+.aura-config-page-operation-container.hide-other-operations
+  .aura-config-page-operation-el.preserve-operation {
+  flex: 0.25;
+}
+
+.aura-config-page-operation-el {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  overflow: hidden;
+  white-space: nowrap;
+
+  max-width: 25%;
+  opacity: 1;
+  transform: translateY(0);
+
+  transition: opacity 0.5s, transform 0.5s,
+    max-width cubic-bezier(0, 0.42, 0.18, 1) 0.5s;
+}
+
+.aura-config-page-operation-el.operation-el-show:hover {
+  cursor: pointer;
+}
+
+.aura-config-page-operation-el.operation-el-show[aura-disabled="true"]:hover {
+  cursor: not-allowed;
+}
+
+.aura-config-page-operation-el.operation-el-hidden {
+  transform: translateY(2rem);
+  opacity: 0;
+}
+
+.aura-config-page-operation-el.operation-el-show
+  .aura-config-page-operation-body {
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+.aura-config-page-operation-el.operation-el-show[aura-disabled="true"]
+  .aura-config-page-operation-body {
+  transition: opacity 0.5s;
+}
+
+.aura-config-page-operation-el.operation-el-show:not(.preserve-operation):hover
+  .aura-config-page-operation-body {
+  opacity: 0.625;
+}
+
+.aura-config-page-operation-el.operation-el-show[aura-disabled="true"]:hover
+  .aura-config-page-operation-body {
+  opacity: 0.25;
+}
+
+.aura-config-page-operation-el.operation-el-show:not(.preserve-operation):active
+  .aura-config-page-operation-body {
+  opacity: 0.25;
+}
+
+.aura-config-page-operation-el.operation-el-show[aura-disabled="true"]::after {
+  content: "别急嘛, 还在开发呢...";
+  font-size: 16px;
+  opacity: 0;
+  color: white;
+  position: absolute;
+
+  transition: all 0.5s;
+}
+
+.aura-config-page-operation-el.operation-el-show[aura-disabled="true"]:hover::after,
+.aura-config-page-operation-el.operation-el-show[aura-disabled="true"]:active::after {
+  opacity: 1;
+}
+
+.aura-config-page-operation-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aura-config-page-operation-el img {
+  max-width: 40px;
+  margin-right: 20px;
+}
+
+.aura-config-page-operation-el .config-operation-title {
+  color: white;
+  font-size: large;
+}
+
+.aura-config-page-operation-el .config-operation-description {
+  color: white;
+  opacity: 0.75;
+  font-size: small;
+}

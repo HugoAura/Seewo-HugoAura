@@ -52,7 +52,7 @@ const applyPlsIpcHandler = (ipcMain) => {
     `${methodBase}.getPlsStats`,
     /**
      *
-     * @returns {{ success: boolean; data: PLSStatus; }}
+     * @returns {{ success: boolean; data: PLSStatus | null | undefined; }}
      */
     (_event, _arg) => {
       return {
@@ -83,7 +83,7 @@ const applyPlsIpcHandler = (ipcMain) => {
     `${methodBase}.getPlsSettings`,
     /**
      *
-     * @returns {{ success: boolean; data: Record<any, any> }}
+     * @returns {{ success: boolean; data: Record<any, any> | null | undefined }}
      */
     (_event, _arg) => {
       return {
@@ -113,7 +113,7 @@ const applyPlsIpcHandler = (ipcMain) => {
     `${methodBase}.getPlsRules`,
     /**
      *
-     * @returns {{ success: boolean; data: Record<any, any> }}
+     * @returns {{ success: boolean; data: Record<any, any> | null | undefined }}
      */
     (_event, _arg) => {
       return {

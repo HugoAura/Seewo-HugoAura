@@ -21,13 +21,6 @@ type HookedWindowsMap = Map<WindowName, HookedWindow>;
 
 type HookRequire = any;
 
-type HooksMap = Map<WindowName, HookRequire>;
+type UIHooksMap = Map<WindowName, HookRequire>;
 
-interface MainProcessGlobal {
-  hookedWindows: HookedWindowsMap;
-  hooks: HooksMap;
-  configInit: boolean;
-  plsStats: PLSStatus | null;
-  plsSettings: Record<any, any> | null;
-  plsRules: Record<any, any> | null;
-}
+type WindowHooksMap = Map<WindowName, HookRequire>;

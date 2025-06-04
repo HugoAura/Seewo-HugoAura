@@ -11,7 +11,7 @@ const buildIpcMain = (electron) => {
   /**
    * @type {import("../../types/main/electron").AuraIPCMain}
    */
-  // @ts-ignore
+  // @ts-expect-error
   const ipcMain = electron.ipcMain;
 
   /**
@@ -28,11 +28,33 @@ const buildIpcMain = (electron) => {
      * @param {string} chan
      * @param {any} targetData
      */
+    if (!global.__HUGO_AURA__.hookedWindows) {
+      return {
+        success: false,
+      };
+    }
+
     const sendDataToWebContents = (key, chan, targetData) => {
       const webContents =
-        global.__HUGO_AURA__.hookedWindows.get(key).webContents;
+        // @ts-expect-error
+        global.__HUGO_AURA__.hookedWindows.get(key)?.webContents;
 
-      if (grep !== webContents) webContents.send(chan, targetData);
+      if (!webContents) {
+        console.error(
+          `[HugoAura / Main / IPC / ERROR] Failed sending data to ${key}: WebContents not found`
+        );
+        return {
+          success: false,
+        };
+      }
+
+      if (grep !== webContents) {
+        webContents.send(chan, targetData);
+      }
+
+      return {
+        success: true,
+      };
     };
 
     if (windowKey === "*") {
@@ -51,6 +73,7 @@ const buildIpcMain = (electron) => {
     }
   };
 
+  const { applyConfigIpcHandler } = require("./ipcModules/configIpcHandler");
   const { applyPlsIpcHandler } = require("./ipcModules/plsIpcHandler");
 
   ipcMain.handle("$aura.base.restartApplication", async () => {
@@ -58,6 +81,7 @@ const buildIpcMain = (electron) => {
     app.exit(0);
   });
 
+  applyConfigIpcHandler(ipcMain);
   applyPlsIpcHandler(ipcMain);
 };
 

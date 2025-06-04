@@ -2,11 +2,23 @@ global.__HUGO_AURA_UI_REACTIVES__.config = {
   isInSubPage: false,
   currentActiveSubPage: "",
   authenticated: false,
+  isConfigPendingWrite: false,
 };
 
 global.__HUGO_AURA_UI_FUNCTIONS__.config = {
   handleNavBack: () => {
     if (global.__HUGO_AURA_UI_REACTIVES__.config.isInSubPage) {
+      const acsDialogAreaEl = document.getElementsByClassName(
+        "aura-config-page-auth-dialog-area"
+      )[0];
+      if (!Array.from(acsDialogAreaEl.classList).includes("acp-ada-hidden")) {
+        global.__HUGO_AURA_UI_FUNCTIONS__.config.hideAndResetAuthDialog();
+        return;
+      }
+
+      if (global.__HUGO_AURA_UI_REACTIVES__.config.isConfigPendingWrite) {
+        global.__HUGO_AURA_UI_FUNCTIONS__.config.handleSaveConfig();
+      }
       global.__HUGO_AURA_UI_FUNCTIONS__.config.toggleSubConfig(
         global.__HUGO_AURA_UI_REACTIVES__.config.currentActiveSubPage,
         false
@@ -156,19 +168,99 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
       encPasswd ===
       global.__HUGO_AURA_CONFIG__.auraSettings.settingsPasswordWithSalt
     ) {
-      const acsDialogAreaEl = document.getElementsByClassName(
-        "aura-config-page-auth-dialog-area"
-      )[0];
-      acsDialogAreaEl.classList.add("acp-ada-hidden");
-      await window.__HUGO_AURA_GLOBAL__.utils.sleep(500);
-      acsDialogAreaEl.style = "display: none;";
-      await window.__HUGO_AURA_GLOBAL__.utils.sleep(250);
+      await global.__HUGO_AURA_UI_FUNCTIONS__.config.hideAndResetAuthDialog();
+      await global.__HUGO_AURA_GLOBAL__.utils.sleep(250);
       global.__HUGO_AURA_UI_REACTIVES__.config.authenticated = true;
       global.__HUGO_AURA_UI_FUNCTIONS__.config.showSecondPhaseAnim();
       return true;
     } else {
       showFailedAnimation(inputEl);
       return false;
+    }
+  },
+
+  hideAndResetAuthDialog: async () => {
+    const acsDialogAreaEl = document.getElementsByClassName(
+      "aura-config-page-auth-dialog-area"
+    )[0];
+    const acpAppBarEl = document.getElementsByClassName(
+      "aura-config-page-header-area"
+    )[0];
+    const acpDialogTitleEl = document.getElementsByClassName(
+      "acp-auth-dialog-title"
+    )[0];
+    const acpDialogConfirmBtnEl = document.getElementsByClassName(
+      "acp-auth-confirm-btn"
+    )[0];
+    const acpDialogCancelBtnEl = document.getElementsByClassName(
+      "acp-auth-cancel-btn"
+    )[0];
+    const inputEl = document.getElementById("acp-auth-user-input");
+    acsDialogAreaEl.classList.add("acp-ada-hidden");
+    acpAppBarEl.classList.remove("color-reverse");
+    await window.__HUGO_AURA_GLOBAL__.utils.sleep(500);
+    acsDialogAreaEl.style = "display: none;";
+    acpDialogTitleEl.textContent = "验证您的身份";
+    inputEl.value = "";
+    inputEl.classList.remove("invalid");
+    inputEl.classList.remove("is-invalid");
+    acpDialogConfirmBtnEl.onclick = (_evt) => {
+      global.__HUGO_AURA_UI_FUNCTIONS__.config.verifyAuthPassword();
+    };
+    acpDialogCancelBtnEl.onclick = (_evt) => {
+      global.__HUGO_AURA_UI_FUNCTIONS__.config.handleNavBack();
+    };
+  },
+
+  handleACSNShow: async () => {
+    const acsnRootEl = document.getElementsByClassName(
+      "acp-config-status-notify"
+    )[0];
+    acsnRootEl.classList.remove("fully-hidden");
+    await global.__HUGO_AURA_GLOBAL__.utils.sleep(10);
+    acsnRootEl.classList.remove("hidden");
+    return true;
+  },
+
+  handleSaveConfig: async () => {
+    const result = global.__HUGO_AURA_CONFIG_MGR__.writeConfig(
+      global.__HUGO_AURA_CONFIG__
+    );
+
+    if (result) {
+      global.__HUGO_AURA_UI_REACTIVES__.config.isConfigPendingWrite = false;
+      const acsnRootEl = document.getElementsByClassName(
+        "acp-config-status-notify"
+      )[0];
+      const acsnMainContentEl = document.getElementsByClassName(
+        "acp-config-status-notify-main-content"
+      )[0];
+      const acsnSuccessEl = document.getElementsByClassName(
+        "acp-config-status-notify-success"
+      )[0];
+      const acsnAreaEl = document.getElementsByClassName(
+        "acp-config-status-notify-area"
+      )[0];
+      acsnMainContentEl.classList.add("acsn-main-content-hidden");
+      acsnAreaEl.classList.add("transparent");
+      await global.__HUGO_AURA_GLOBAL__.utils.sleep(250);
+      acsnMainContentEl.classList.add("acsn-main-content-fully-hidden");
+      acsnSuccessEl.classList.remove("acsn-success-fully-hidden");
+      await global.__HUGO_AURA_GLOBAL__.utils.sleep(50);
+      acsnSuccessEl.classList.remove("acsn-success-hidden");
+      await global.__HUGO_AURA_GLOBAL__.utils.sleep(1500);
+      acsnRootEl.classList.add("hidden");
+      await global.__HUGO_AURA_GLOBAL__.utils.sleep(500);
+      acsnRootEl.classList.add("fully-hidden");
+      await global.__HUGO_AURA_GLOBAL__.utils.sleep(10);
+      // Reset class
+      acsnMainContentEl.className = "acp-config-status-notify-main-content";
+      acsnAreaEl.className = "acp-config-status-notify-area";
+      acsnSuccessEl.className =
+        "acp-config-status-notify-success acsn-success-hidden acsn-success-fully-hidden";
+      return true;
+    } else {
+      // TODO: Error handling
     }
   },
 };
@@ -237,15 +329,13 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
       const acsDialogAreaEl = document.getElementsByClassName(
         "aura-config-page-auth-dialog-area"
       )[0];
+      const acpAppBarEl = document.getElementsByClassName(
+        "aura-config-page-header-area"
+      )[0];
       acsDialogAreaEl.style = "";
-      if (
-        global.__HUGO_AURA_CONFIG__.auraSettings.appearance
-          .enablePasswdDialogBlur
-      ) {
-        acsDialogAreaEl.classList.add("blur-enabled");
-      }
       await window.__HUGO_AURA_GLOBAL__.utils.sleep(500);
       acsDialogAreaEl.classList.remove("acp-ada-hidden");
+      acpAppBarEl.classList.add("color-reverse");
     }
   };
 

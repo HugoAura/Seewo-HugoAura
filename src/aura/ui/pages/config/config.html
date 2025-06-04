@@ -1,4 +1,8 @@
-<div class="aura-config-page-root-inactive aura-config-page-root">
+<div
+  class="aura-config-page-root-inactive aura-config-page-root"
+  style="display: none"
+>
+  <!-- display: none 用于防止 CSS 还未加载完成时, 用户看到错乱的样式 -->
   <div class="header-collapsed aura-config-page-header-area">
     <div class="aura-config-page-app-bar" style="-webkit-app-region: drag">
       <div
@@ -66,6 +70,28 @@
   <div class="aura-config-page-operation-area">
     <div class="aura-config-page-subpage-container"></div>
     <div class="aura-config-page-operation-container">
+      <div class="acp-config-status-notify hidden fully-hidden">
+        <div class="acp-config-status-notify-area">
+          <div class="acp-config-status-notify-main-content">
+            <i class="layui-icon layui-icon-component acsn-main-icon"></i>
+            <p class="acsn-main-title">修改的配置暂未保存</p>
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm acsn-save-btn"
+              onclick="window.__HUGO_AURA_UI_FUNCTIONS__.config.handleSaveConfig()"
+            >
+              保存配置
+            </button>
+          </div>
+
+          <div
+            class="acp-config-status-notify-success acsn-success-hidden acsn-success-fully-hidden"
+          >
+            <i class="layui-icon layui-icon-release"></i>
+            <p>保存成功</p>
+          </div>
+        </div>
+      </div>
       <div
         class="operation-el-hidden aura-config-page-operation-el"
         onclick="window.__HUGO_AURA_UI_FUNCTIONS__.config.toggleSubConfig('disableLimitations', true)"
@@ -122,6 +148,7 @@
   <div
     class="aura-config-page-auth-dialog-area acp-ada-hidden"
     style="display: none"
+    aura-cancel="true"
   >
     <div class="aura-config-page-auth-dialog">
       <p class="acp-auth-dialog-title">验证您的身份</p>
@@ -134,12 +161,21 @@
         id="acp-auth-user-input"
       />
 
-      <button
-        class="acp-auth-confirm-btn"
-        onclick="global.__HUGO_AURA_UI_FUNCTIONS__.config.verifyAuthPassword()"
-      >
-        <i class="layui-icon layui-icon-right"></i>
-      </button>
+      <div class="acp-auth-btns-container">
+        <button
+          class="acp-auth-cancel-btn"
+          onclick="global.__HUGO_AURA_UI_FUNCTIONS__.config.handleNavBack()"
+        >
+          <i class="layui-icon layui-icon-return"></i>
+        </button>
+
+        <button
+          class="acp-auth-confirm-btn"
+          onclick="global.__HUGO_AURA_UI_FUNCTIONS__.config.verifyAuthPassword()"
+        >
+          <i class="layui-icon layui-icon-ok"></i>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -157,10 +193,14 @@
         </div>
         <div class="toast-body">
           <p>请重载当前窗口以应用修改的设置</p>
+          <p>已修改的配置将自动保存</p>
           <button
             type="button"
             class="btn btn-primary btn-sm"
-            onclick="window.location.reload()"
+            onclick="(() => {
+              global.__HUGO_AURA_CONFIG_MGR__.writeConfig(global.__HUGO_AURA_CONFIG__);
+              window.location.reload();
+            })()"
           >
             重载页面
           </button>
@@ -181,10 +221,14 @@
         </div>
         <div class="toast-body">
           <p>请重启 Electron 进程以应用修改的设置</p>
+          <p>已修改的配置将自动保存</p>
           <button
             type="button"
             class="btn btn-primary btn-sm"
-            onclick="ipcRenderer.invoke('$aura.base.restartApplication')"
+            onclick="(() => {
+              global.__HUGO_AURA_CONFIG_MGR__.writeConfig(global.__HUGO_AURA_CONFIG__);
+              ipcRenderer.invoke('$aura.base.restartApplication')
+            })()"
           >
             重启进程
           </button>
@@ -205,6 +249,7 @@
         </div>
         <div class="toast-body">
           <p>请重启 PLS 进程以应用修改的设置</p>
+          <p>已修改的配置将自动保存</p>
           <button
             type="button"
             class="btn btn-primary btn-sm"

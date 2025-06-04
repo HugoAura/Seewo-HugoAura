@@ -12,3 +12,6 @@ interface DesktopAssistantHugoAuraGlobal extends HugoAuraGlobal {
   plsWs: WebSocket | null;
   plsStats: PLSStatus;
 }
+
+type UIFunctionsObject = Record<string, any>;
+type UIReactivesObject = Record<string, any>;

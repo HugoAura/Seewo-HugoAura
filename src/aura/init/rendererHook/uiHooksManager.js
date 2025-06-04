@@ -87,7 +87,9 @@ class RendererHooksManager {
       return;
     }
 
-    console.log(`[HugoAura / Init / RDH] UI Hook is initializing for ${windowKey}...`);
+    console.log(
+      `[HugoAura / Init / RDH] UI Hook is initializing for ${windowKey}...`
+    );
     console.log(
       `[HugoAura / Init / RDH] UI Hook loaded at: ${new Date().toISOString()}`
     );

@@ -1,0 +1,33 @@
+#aura-container-Aura-UI-Assistant-Config {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1000;
+}
+
+.aura-config-page-root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: url("../../../../../app.asar/public/ae247697b4639c92bd008d0ea7d13b53.png");
+  /* 这里不用 background-size: cover; 的效果反而更舒服一些... */
+
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 1;
+  transform: scale(1);
+
+  transition: all 0.5s;
+}
+
+.aura-config-page-root-inactive {
+  opacity: 0;
+  transform: scale(1.5);
+}

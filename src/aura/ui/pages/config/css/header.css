@@ -1,0 +1,50 @@
+.aura-config-page-header-area {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: white;
+  z-index: 12000;
+
+  opacity: 1;
+  transform: translateY(0);
+
+  transition: all 0.5s;
+}
+
+.aura-config-page-header-area.color-reverse {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.aura-config-page-header-area .iconfont {
+  font-size: 24px;
+}
+
+.aura-config-page-header-area .iconfont:hover {
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+.aura-config-page-header-area .iconfont:active {
+  opacity: 0.375;
+}
+
+.aura-config-page-header-area p {
+  margin-top: -1px;
+}
+
+.aura-config-page-header-area.header-collapsed {
+  transform: translateY(-1rem);
+  opacity: 0;
+}
+
+.aura-config-page-app-bar {
+  height: 40px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}

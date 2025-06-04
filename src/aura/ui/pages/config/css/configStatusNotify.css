@@ -1,0 +1,114 @@
+.acp-config-status-notify {
+  position: absolute;
+  height: calc(40px + 4rem);
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  filter: blur(0.1px);
+  z-index: 15000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  transition: all 0.5s;
+}
+
+.acp-config-status-notify.hidden {
+  backdrop-filter: blur(0.1px);
+  filter: unset;
+  opacity: 0;
+}
+
+.acp-config-status-notify.fully-hidden {
+  display: none;
+}
+
+.acp-config-status-notify-area {
+  height: 100%;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: rgba(0, 0, 0, 0.6);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  transition: background-color 0.25s;
+}
+
+.acp-config-status-notify-area.transparent {
+  background-color: transparent;
+}
+
+.acp-config-status-notify-main-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  /* margin-bottom: 0.75rem; */
+
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+.acp-config-status-notify-main-content.acsn-main-content-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.acp-config-status-notify-main-content.acsn-main-content-fully-hidden {
+  display: none;
+}
+
+.acp-config-status-notify-area .acsn-main-icon {
+  font-size: 24px;
+}
+
+.acp-config-status-notify-area .acsn-main-title {
+  font-size: large;
+  margin-left: 0.5rem;
+  margin-right: 2.25rem;
+}
+
+.acp-config-status-notify-area .acsn-save-btn {
+  margin-top: 2px; /* 可能是中文导致的 */
+
+  opacity: 1;
+  transition: all 0.25s;
+}
+
+.acp-config-status-notify-area .acsn-save-btn:active {
+  opacity: 0.625;
+}
+
+.acp-config-status-notify-success {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+
+  color: white;
+
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+.acp-config-status-notify-success.acsn-success-hidden {
+  opacity: 0;
+}
+
+.acp-config-status-notify-success.acsn-success-fully-hidden {
+  display: none;
+}
+
+.acp-config-status-notify-success .layui-icon {
+  font-size: 26px;
+}
+
+.acp-config-status-notify-success p {
+  font-size: large;
+  margin-top: 0.2rem;
+}

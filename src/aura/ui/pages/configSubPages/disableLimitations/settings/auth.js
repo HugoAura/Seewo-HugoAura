@@ -225,8 +225,8 @@ const authSettings = [
         auraIf: () => {
           return (
             global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"].enabled &&
-            global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"].authRewriteType ===
-              "customActivationCode"
+            global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"]
+              .authRewriteType === "customActivationCode"
           );
         },
         defaultValue: "",

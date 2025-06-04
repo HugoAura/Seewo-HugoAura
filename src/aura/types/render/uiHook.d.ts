@@ -23,3 +23,5 @@ interface UIHookConfig {
 interface UIHookConfigFin extends UIHookConfig {
   windowName: WindowName;
 }
+
+type UIHooksObject = Record<AuraElementUID, UIHookConfigFin>;

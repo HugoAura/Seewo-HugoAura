@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 
 class WebpackHook {
   #ruleCache = new Map();
@@ -19,7 +19,7 @@ class WebpackHook {
         if (!rule) {
           rule = require(path.join(
             __dirname,
-            '../../../aura/jsRewrite/',
+            "../../../aura/jsRewrite/",
             rulePath
           ));
           this.#ruleCache.set(rulePath, rule);
@@ -49,7 +49,7 @@ class WebpackHook {
 
   patchModules(modules, rewrites) {
     modules.forEach((mod, index) => {
-      if (typeof mod !== 'function') return;
+      if (typeof mod !== "function") return;
       const stringifyFunc = mod.toString();
 
       rewrites.forEach((rewrite) => {
@@ -67,14 +67,14 @@ class WebpackHook {
             let rewrittenFunction = mod;
 
             switch (method) {
-              case 'reactComponent':
+              case "reactComponent":
                 window.__HUGO_AURA_HOOK__[ruleId] = {
                   feature: rewrite.feature,
-                  newFunction: rewrite.newFunction
-                }
+                  newFunction: rewrite.newFunction,
+                };
                 rewrittenFunction = rewrite.preHook(mod);
                 break;
-              case 'legacy':
+              case "legacy":
               default:
                 rewrittenFunction = rewrite.newFunction;
                 break;
@@ -95,7 +95,7 @@ class WebpackHook {
       });
     });
 
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.__HUGO_AURA_DEBUG__ = {
         getRuleCache: () => Array.from(this.#ruleCache.keys()),
       };
@@ -105,7 +105,7 @@ class WebpackHook {
   installHook(window, config) {
     let realWebpackJsonp = window.webpackJsonp;
 
-    Object.defineProperty(window, 'webpackJsonp', {
+    Object.defineProperty(window, "webpackJsonp", {
       get: () => realWebpackJsonp,
       set: (value) => {
         console.log(
@@ -119,7 +119,7 @@ class WebpackHook {
             if (args[0] && Array.isArray(args[0][1])) {
               const [chunkIds, modules] = args[0];
               console.log(
-                `[HugoAura / AppHook] Intercepting chunk ${chunkIds.join(', ')}`
+                `[HugoAura / AppHook] Intercepting chunk ${chunkIds.join(", ")}`
               );
 
               const rewrites = this.loadRewriteRules(config);

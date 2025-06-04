@@ -1,16 +1,17 @@
 // @ts-check
 
 if (!global.__HUGO_AURA__) {
-  /**
-   * @type {import("../aura/types/main/core").MainProcessGlobal}
-   */
   const __HUGO_AURA__ = {
     hookedWindows: new Map(),
-    hooks: new Map(),
     configInit: false,
+    central: () => {},
+    ipcInit: false,
     plsStats: null,
     plsSettings: null,
     plsRules: null,
+    uiHooks: new Map(),
+    windowHooks: new Map(),
+    version: require("./preload").__AURA_VERSION__,
   };
   global.__HUGO_AURA__ = __HUGO_AURA__;
 }
@@ -26,8 +27,9 @@ const os = require("os");
 
 const MainProcessHooksManager = require("../aura/init/main/windowHooksManager");
 const RendererHooksManager = require("../aura/init/rendererHook/uiHooksManager");
+const EventBus = require("../aura/utils/eventBus");
 const NetworkHook = require("../aura/init/rendererHook/networkHook");
-const configManager = require("../aura/init/shared/configManager");
+const ConfigManager = require("../aura/init/shared/configManager");
 const { buildIpcMain } = require("../aura/init/main/ipcHandler");
 
 /**
@@ -101,9 +103,11 @@ const initLogger = (windowName) => {
  * @returns
  */
 const launcher = ({ central, windowName, config }) => {
+  // >>> Init STD <<< //
   process.stdout.isTTY = true;
   process.stderr.isTTY = true;
 
+  // >>> Basic Config <<< //
   /** @type {Electron} */
   const electron = central(1);
   const app = electron.app;
@@ -114,34 +118,58 @@ const launcher = ({ central, windowName, config }) => {
     app.exit(0);
   };
 
+  // >>> Init Logger <<< //
   initLogger(windowName);
 
   console.log("[HugoAura / Loaded] Aura is loaded!");
   console.debug(`[HugoAura / Debug] curWindowName: ${windowName}`);
 
+  // >>> Init EventBus <<< //
+  if (!global.__HUGO_AURA_EVENT_BUS__)
+    global.__HUGO_AURA_EVENT_BUS__ = new EventBus();
+
+  // >>> Init Config <<< //
+  const configManager = new ConfigManager();
+  configManager.side = "main";
   configManager.ensureConfigExists();
   const loadedConfig = configManager.loadConfig();
   if (!global.__HUGO_AURA__.configInit) global.__HUGO_AURA__.configInit = true;
+  if (!global.__HUGO_AURA_CONFIG_MGR__) global.__HUGO_AURA_CONFIG_MGR__ = configManager;
 
   global.__HUGO_AURA_CONFIG__ = loadedConfig;
 
+  global.__HUGO_AURA_EVENT_BUS__.on("$aura.config.refreshConfig", () => {
+    global.__HUGO_AURA_CONFIG__ = configManager.loadConfig();
+  });
+
+  // >>> Init IPC Main <<< //
   if (!global.__HUGO_AURA__.ipcInit) {
     buildIpcMain(electron);
     global.__HUGO_AURA__.ipcInit = true;
   }
 
+  // >>> Init Main Process Hooks <<< //
   const mainProcessHooksManager = new MainProcessHooksManager();
 
   const _windowHooks = mainProcessHooksManager.loadHooks();
 
+  // >>> Init Renderer Process Hooks <<< //
   const uiHooksManager = new RendererHooksManager();
 
   const uiHooks = uiHooksManager.loadHooks();
 
+  // >>> Activate DevTools <<< //
   if (loadedConfig.devTools && !config.canOpenDevTool) {
     config.canOpenDevTool = true;
   }
 
+  // >>> Listeners <<< //
+
+  /**
+   *
+   * @param {any} _event
+   * @param {import("electron").BrowserWindow} browserWindow
+   */
   const browserWindowCreatedListener = (_event, browserWindow) => {
     mainProcessHooksManager.initHookForWindow(
       windowName,
@@ -153,7 +181,7 @@ const launcher = ({ central, windowName, config }) => {
 
   /**
    *
-   * @param {Event} _event
+   * @param {any} _event
    * @param {import("electron").WebContents} webContents
    */
   const webContentsCreatedListener = (_event, webContents) => {
@@ -180,13 +208,10 @@ const launcher = ({ central, windowName, config }) => {
   };
 
   app.once("browser-window-created", browserWindowCreatedListener);
-  // @ts-expect-error
-  // ↑ idk why
   app.once("web-contents-created", webContentsCreatedListener);
 
   return () => {
     app.removeListener("browser-window-created", browserWindowCreatedListener);
-    // @ts-expect-error
     app.removeListener("web-contents-created", webContentsCreatedListener);
   };
 };

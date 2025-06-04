@@ -7,7 +7,7 @@
         "passwordWithSalt": "89f6c4d57d0202a05c32d37cc6a2c6a0",
         "salt": "aura"
       },
-      "authModeRewrite": "none"
+      "authModeRewrite": "default"
     },
     "vendor/screenLock": {
       "enabled": true,
@@ -30,9 +30,8 @@
   "auraSettings": {
     "settingsPasswordEnabled": false,
     "settingsPasswordWithSalt": "32703D292460CC9A3B867494D6AD9A8E4A3ADF0FAA4D6867BC4D412CC3927D02E47C6D0B1763BB53E57B2241C6193433561CDA09D7C48CA03983072B876F0965",
-    "appearance": {
-      "enablePasswdDialogBlur": true
-    }
+    "encryptConfig": false,
+    "appearance": {}
   },
   "devTools": false
 }
