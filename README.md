@@ -1,12 +1,10 @@
 <center><img src="https://s2.loli.net/2025/04/18/IpZL7qMw2KFEi8o.png" /></center>
 
-
 <h1 align="center">HugoAura</h1>
 <h4 align="center">下一代希沃管家注入式修改方案</h4>
 <div align="center">
   <a href="https://github.com/HugoAura/HugoAura">首页</a> · <a href="https://hugoaura.org/about">关于</a> · <a href="https://github.com/HugoAura/HugoAura/wiki">文档</a> · <a href="https://github.com/HugoAura/HugoAura/issues">反馈</a>
 </div>
-
 
 <br />
 
@@ -14,7 +12,7 @@
 > HugoAura 的首个预览版已发布! [查看安装教程](https://github.com/HugoAura/HugoAura/wiki)
 
 > [!IMPORTANT]
-> 已经过测试的希沃管家版本: v1.5.4.3822
+> 已经过测试的希沃管家版本: v1.5.4.3824
 
 ## ✨ 概览
 
@@ -32,8 +30,8 @@
 
 - [x] 修改希沃管家密码认证组件 (自定义密码 / 解除密码 / 重设认证方式 / ...)
 - [x] 阻止希沃管家前端 Audit 上报行为
+- [x] 屏蔽屏幕锁 / 自定义屏幕锁行为
 - [ ] Aura 代理层服务 (篡改上报数据 / 欺骗冰冻状态)
-- [ ] 屏蔽屏幕锁 / 自定义屏幕锁行为
 - [ ] 窥屏提醒
 - [ ] 插件功能
 
