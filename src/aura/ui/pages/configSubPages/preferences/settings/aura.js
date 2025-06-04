@@ -49,7 +49,14 @@ const auraSettings = [
           return "";
         },
         callbackFn: (newVal) => {
-          if (newVal === "" || !newVal) return { valid: true };
+          if (newVal === "" || !newVal) {
+            const confirmInput = document.getElementById("auraSettingsPasswdConfirm");
+            if (confirmInput) {
+              confirmInput.value = "";
+              confirmInput.classList.remove("is-invalid");
+            }
+            return { valid: true };
+          }
           if (newVal.length < 8)
             return { valid: false, hint: "请输入至少 8 位密码" };
 
@@ -68,6 +75,11 @@ const auraSettings = [
             };
           }
 
+          const confirmInput = document.getElementById("auraSettingsPasswdConfirm");
+          if (confirmInput && confirmInput.value && confirmInput.value !== newVal) {
+            return { valid: false, hint: "两次输入的密码不一致" };
+          }
+
           const crypto = require("crypto");
           const result = crypto
             .createHash("sha512")
@@ -76,6 +88,42 @@ const auraSettings = [
             .toUpperCase();
           global.__HUGO_AURA_CONFIG__.auraSettings.settingsPasswordWithSalt =
             result;
+          return { valid: true };
+        },
+      },
+      {
+        index: 1.5,
+        id: "auraSettingsPasswdConfirm",
+        type: "input",
+        subType: "password",
+        name: "确认访问密码",
+        description: "请再次输入上面的密码以确认",
+        restart: false,
+        reload: false,
+        tip: true,
+        tipTitle: "确保两次输入的密码完全一致",
+        associateVal: ["auraSettings.settingsPasswordEnabled"],
+        auraIf: () => {
+          return global.__HUGO_AURA_CONFIG__.auraSettings
+            .settingsPasswordEnabled;
+        },
+        defaultValue: "",
+        placeHolder: "请再次输入密码",
+        valueGetter: () => {
+          return "";
+        },
+        callbackFn: (newVal) => {
+          if (newVal === "" || !newVal) return { valid: true };
+
+          const originalInput = document.getElementById("auraSettingsPasswd");
+          if (!originalInput || !originalInput.value) {
+            return { valid: false, hint: "请先输入密码" };
+          }
+          
+          if (newVal !== originalInput.value) {
+            return { valid: false, hint: "两次输入的密码不一致" };
+          }
+          
           return { valid: true };
         },
       },

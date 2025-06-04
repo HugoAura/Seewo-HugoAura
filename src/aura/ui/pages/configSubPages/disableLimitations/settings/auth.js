@@ -83,9 +83,22 @@ const authSettings = [
           return "";
         },
         callbackFn: (newVal) => {
-          if (newVal === "" || !newVal) return { valid: true };
+          if (newVal === "" || !newVal) {
+            const confirmInput = document.getElementById("customPasswordConfirm");
+            if (confirmInput) {
+              confirmInput.value = "";
+              confirmInput.classList.remove("is-invalid");
+            }
+            return { valid: true };
+          }
           if (newVal.length < 6)
             return { valid: false, hint: "请输入至少 6 位密码" };
+
+          const confirmInput = document.getElementById("customPasswordConfirm");
+          if (confirmInput && confirmInput.value && confirmInput.value !== newVal) {
+            return { valid: false, hint: "两次输入的密码不一致" };
+          }
+          
           const __config =
             global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"];
           const crypto = require("crypto");
@@ -94,6 +107,47 @@ const authSettings = [
             .update(newVal + __config.customPassword.salt)
             .digest("hex");
           __config.customPassword.passwordWithSalt = result;
+          return { valid: true };
+        },
+      },
+      {
+        index: 1.5,
+        id: "customPasswordConfirm",
+        type: "input",
+        subType: "password",
+        name: "确认自定义密码",
+        description: "请再次输入上面的密码以确认",
+        restart: false,
+        reload: false,
+        associateVal: [
+          "rewrite.vendor/passwordValidation.enabled",
+          "rewrite.vendor/passwordValidation.type",
+        ],
+        auraIf: () => {
+          return (
+            global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"]
+              .enabled &&
+            global.__HUGO_AURA_CONFIG__.rewrite["vendor/passwordValidation"]
+              .type === "customPassword"
+          );
+        },
+        defaultValue: "",
+        placeHolder: "请再次输入密码",
+        valueGetter: () => {
+          return "";
+        },
+        callbackFn: (newVal) => {
+          if (newVal === "" || !newVal) return { valid: true };
+
+          const originalInput = document.getElementById("customPassword");
+          if (!originalInput || !originalInput.value) {
+            return { valid: false, hint: "请先输入密码" };
+          }
+          
+          if (newVal !== originalInput.value) {
+            return { valid: false, hint: "两次输入的密码不一致" };
+          }
+          
           return { valid: true };
         },
       },
@@ -235,11 +289,23 @@ const authSettings = [
           return "";
         },
         callbackFn: (newVal) => {
-          if (newVal === "" || !newVal) return { valid: true };
+          if (newVal === "" || !newVal) {
+            const confirmInput = document.getElementById("customActivationCodeConfirm");
+            if (confirmInput) {
+              confirmInput.value = "";
+              confirmInput.classList.remove("is-invalid");
+            }
+            return { valid: true };
+          }
           if (newVal.length !== 6)
             return { valid: false, hint: "仅可输入 6 位密码" };
           if (!/^\d+$/.test(newVal)) {
             return { valid: false, hint: "仅允许纯数字密码" };
+          }
+
+          const confirmInput = document.getElementById("customActivationCodeConfirm");
+          if (confirmInput && confirmInput.value && confirmInput.value !== newVal) {
+            return { valid: false, hint: "两次输入的激活码不一致" };
           }
           const __config =
             global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"];
@@ -249,6 +315,54 @@ const authSettings = [
             .update(newVal + "auraScreenLockCrack")
             .digest("hex");
           __config.customActivationCode.activationCodeWithSalt = result;
+          return { valid: true };
+        },
+      },
+      {
+        index: 3.5,
+        id: "customActivationCodeConfirm",
+        type: "input",
+        subType: "password",
+        name: "确认自定义激活码",
+        description: "请再次输入上面的6位数字激活码以确认",
+        restart: false,
+        reload: false,
+        warning: true,
+        warningContent: "激活码为 6 位纯数字",
+        associateVal: [
+          "rewrite.vendor/screenLock.enabled",
+          "rewrite.vendor/screenLock.authRewriteType",
+        ],
+        auraIf: () => {
+          return (
+            global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"].enabled &&
+            global.__HUGO_AURA_CONFIG__.rewrite["vendor/screenLock"].authRewriteType ===
+              "customActivationCode"
+          );
+        },
+        defaultValue: "",
+        placeHolder: "请再次输入6位数字激活码",
+        valueGetter: () => {
+          return "";
+        },
+        callbackFn: (newVal) => {
+          if (newVal === "" || !newVal) return { valid: true };
+
+          const originalInput = document.getElementById("customActivationCode");
+          if (!originalInput || !originalInput.value) {
+            return { valid: false, hint: "请先输入激活码" };
+          }
+          
+          if (newVal.length !== 6)
+            return { valid: false, hint: "仅可输入 6 位激活码" };
+          if (!/^\d+$/.test(newVal)) {
+            return { valid: false, hint: "仅允许纯数字激活码" };
+          }
+          
+          if (newVal !== originalInput.value) {
+            return { valid: false, hint: "两次输入的激活码不一致" };
+          }
+          
           return { valid: true };
         },
       },
