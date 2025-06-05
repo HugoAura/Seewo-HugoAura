@@ -1,29 +1,24 @@
-# Dependencies
+# SSA Defaults
 
+_extraResources
+addons/
+app.asar/addons
+app.asar/assets
+app.asar/config
+app.asar/node_modules
+app.asar/public
+app.asar/main.js
+app.asar/package.json
+assets/
+
+autoConfiguration.json
+
+# NPM Packages
 node_modules/
-.npm
-.yarn
 
-# ESLint Cache
-
-.eslintcache
-
-# NYC Test Output
-
-.nyc_output
-
-# Build Artifacts
-
-/dist
-/buikd
-
-# dotEnv Files
-
-.env
-.env*
-
-# Misc
-
+# OS Files
+desktop.ini
 .DS_Store
-*.log
-*.bak
+
+# Editor Files
+.vscode/

@@ -1,3 +1,5 @@
+import { RendererProcessOnlyVal } from "../global";
+
 interface PLSStatus {
   installed: boolean;
   detached: boolean;

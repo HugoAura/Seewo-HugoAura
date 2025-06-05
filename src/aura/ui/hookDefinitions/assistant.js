@@ -65,7 +65,7 @@ const def = {
     "ui/layui/css/layui.css",
     "ui/bootstrap/bootstrap.min.css",
   ],
-  globalJS: ["ui/js/global.js", "ui/bootstrap/bootstrap.bundle.min.js"],
+  globalJS: ["ui/js/global.js", "ui/js/plsListener.js", "ui/bootstrap/bootstrap.bundle.min.js"],
   onLoaded: `
     console.log('[HugoAura / UI / Hooks / Assistant] Page loaded.');
   `,

@@ -46,6 +46,15 @@
   flex: 0.75;
 }
 
+.aura-settings-entry-operation-area.ase-operation-area-disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.aura-settings-entry-operation-area.ase-operation-area-disabled * {
+  pointer-events: none;
+}
+
 .aura-settings-entry-operation-area.form-switch {
   transform: scale(1.2);
 }

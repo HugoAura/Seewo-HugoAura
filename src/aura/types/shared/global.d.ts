@@ -3,6 +3,7 @@ import type EventBus from "../../utils/eventBus";
 import { HookedWindowsMap, UIHooksMap, WindowHooksMap } from "../main/core";
 import { UIHooksObject } from "../render/uiHook";
 import ConfigManager from "../../init/shared/configManager";
+import { PLSStatus } from "./pls/status";
 
 type MainProcessOnlyVal<T> = T;
 type RendererProcessOnlyVal<T> = T;
@@ -15,6 +16,7 @@ interface GlobalHugoAuraInfo {
   plsRules?: Record<any, any> | null;
   plsSettings?: Record<any, any> | null;
   plsStats?: PLSStatus | null;
+  plsWs?: RendererProcessOnlyVal<WebSocket>;
   uiHooks?: MainProcessOnlyVal<UIHooksMap>;
   windowHooks?: MainProcessOnlyVal<WindowHooksMap>;
   version: RendererProcessOnlyVal<string>;

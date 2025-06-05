@@ -18,10 +18,71 @@
 }
 
 .acs-bc-pls-status-page-main-logo {
-  max-width: 13.5%;
+  max-width: 11%;
   opacity: 0.45;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
+}
+
+.acs-bc-psp-operations-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.acs-bc-psp-operation-btn {
+  --svg-color: rgb(17, 140, 255);
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
+
+  transition: opacity 0.25s, color 0.5s;
+}
+
+.acs-bc-psp-operation-btn p {
+  font-size: normal;
+  margin-left: 5px;
+  margin-top: -1px;
+  color: var(--svg-color);
+}
+
+.acs-bc-psp-operation-btn svg {
+  max-width: 16px;
+  max-height: 16px;
+}
+
+.acs-bc-psp-operation-btn.acs-bc-psp-o-btn-dangerous {
+  --svg-color: rgb(244, 8, 8);
+}
+
+.acs-bc-psp-operation-btn[aura-disabled="true"] {
+  --svg-color: rgba(0, 0, 0, 0.25);
+}
+
+.acs-bc-psp-operation-btn[aura-disabled="true"]:hover,
+.acs-bc-psp-operation-btn[aura-disabled="true"]:active {
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+}
+
+.acs-bc-psp-operation-btn:hover,
+.acs-bc-psp-operation-btn:active {
+  cursor: pointer;
+}
+
+.acs-bc-psp-operation-btn:hover {
+  opacity: 0.6;
+}
+
+.acs-bc-psp-operation-btn:active {
+  opacity: 0.3;
 }
 
 .acs-bc-pls-status-page-status-el {

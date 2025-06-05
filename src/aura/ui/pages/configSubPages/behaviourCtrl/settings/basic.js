@@ -9,6 +9,7 @@ const basicSettings = [
     id: 0,
     categoryName: "可访问性",
     child: [
+      /*
       {
         index: 0,
         id: "authToken",
@@ -18,7 +19,7 @@ const basicSettings = [
         description: "选择一个安全的密钥, 用于 PLS 侧验证 Aura 前端身份",
         restart: true,
         reload: false,
-        restartPLS: false,
+        restartPLS: true,
         associateVal: null,
         auraIf: () => true,
         defaultValue: "",
@@ -35,6 +36,39 @@ const basicSettings = [
           }
 
           global.__HUGO_AURA_CONFIG__.plsToken = newVal;
+          return { valid: true };
+        },
+      },
+      */
+      {
+        index: 0,
+        id: "plsListenPort",
+        type: "input",
+        subType: "text",
+        name: "PLS WS 监听端口",
+        description: "PLS 的 WebSocket 服务器将监听指定的端口",
+        restart: false,
+        reload: false,
+        PLSRequired: true,
+        restartPLS: true,
+        associateVal: null,
+        auraIf: () => true,
+        defaultValue: "",
+        placeHolder: "输入端口号 (10000 ~ 65535)",
+        valueGetter: () => {
+          if (!global.__HUGO_AURA__.plsSettings) return "";
+          return global.__HUGO_AURA__.plsSettings.wsPort;
+        },
+        callbackFn: (newVal) => {
+          if (newVal === "" || !newVal)
+            return { valid: false, hint: "请输入端口号" };
+
+          const numberNewVal = Number(newVal);
+          if (numberNewVal === NaN || !(10000 <= numberNewVal <= 65535)) {
+            return { valid: false, hint: "请输入合法的端口号 (10000 ~ 65535)" };
+          }
+
+          global.__HUGO_AURA__.plsSettings.wsPort = numberNewVal;
           return { valid: true };
         },
       },

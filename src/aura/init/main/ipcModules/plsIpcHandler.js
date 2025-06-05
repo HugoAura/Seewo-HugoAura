@@ -2,6 +2,7 @@
 
 const __SCOPE = "main";
 
+const os = require("os");
 const fs = require("fs");
 const path = require("path");
 
@@ -31,7 +32,7 @@ const applyPlsIpcHandler = (ipcMain) => {
      * @returns {{ success: boolean; data: { isExists: boolean }; error?: Error }}
      */
     (_event, _arg) => {
-      const plsFolderPath = path.join(__dirname, "../../../proxy");
+      const plsFolderPath = path.join("C:\\Program Files", "HugoAura PLS");
       try {
         const result = fs.existsSync(plsFolderPath);
         return {
@@ -52,7 +53,7 @@ const applyPlsIpcHandler = (ipcMain) => {
     `${methodBase}.getPlsStats`,
     /**
      *
-     * @returns {{ success: boolean; data: PLSStatus | null | undefined; }}
+     * @returns {{ success: boolean; data: import("../../../types/shared/pls/status").PLSStatus | null | undefined; }}
      */
     (_event, _arg) => {
       return {
@@ -67,7 +68,7 @@ const applyPlsIpcHandler = (ipcMain) => {
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} _event
-     * @param {PLSStatus} arg
+     * @param {import("../../../types/shared/pls/status").PLSStatus} arg
      * @returns
      */
     (_event, arg) => {
@@ -103,6 +104,7 @@ const applyPlsIpcHandler = (ipcMain) => {
      */
     (_event, arg) => {
       global.__HUGO_AURA__.plsSettings = arg;
+      ipcMain.send("assistant", `${methodBase}.post.onPlsSettingsUpdate`, arg);
       return {
         success: true,
       };
@@ -133,6 +135,7 @@ const applyPlsIpcHandler = (ipcMain) => {
      */
     (_event, arg) => {
       global.__HUGO_AURA__.plsRules = arg;
+      ipcMain.send("assistant", `${methodBase}.post.onPlsRulesUpdate`, arg);
       return {
         success: true,
       };
@@ -179,6 +182,48 @@ const applyPlsIpcHandler = (ipcMain) => {
       global.__HUGO_AURA__.plsSettings = arg.basic;
 
       ipcMain.send("*", `${methodBase}.syncPlsConfig`, arg, event.sender);
+
+      return {
+        success: true,
+      };
+    }
+  );
+
+  ipcMain.handle(
+    `${methodBase}.retryPlsConnect`,
+    /**
+     *
+     * @param {import("electron").IpcMainInvokeEvent} _event
+     * @param {any} arg
+     * @returns {{ success: boolean, status: "Already" | "Retrying" }}
+     */
+    (_event, arg) => {
+      if (global.__HUGO_AURA__.plsStats?.connected) {
+        return {
+          success: true,
+          status: "Already",
+        };
+      } else {
+        ipcMain.send("desktopAssistant", `${methodBase}.retryPlsConnect`, arg);
+
+        return {
+          success: true,
+          status: "Retrying",
+        };
+      }
+    }
+  );
+
+  ipcMain.handle(
+    `${methodBase}.post.updateRetryStatus`,
+
+    /**
+     *
+     * @param {import("electron").IpcMainInvokeEvent} _event
+     * @param {{ success: boolean }} arg
+     */
+    (_event, arg) => {
+      ipcMain.send("assistant", `${methodBase}.post.updateRetryStatus`, arg);
 
       return {
         success: true,

@@ -22,7 +22,7 @@ const showRelaunchPLSToast = () => {
   const toast = document.getElementById("relaunchPlsNotifyToast");
   const toastBs = bootstrap.Toast.getOrCreateInstance(toast);
 
-  if (global.__HUGO_AURA_GLOBAL__.plsStatus.detached) {
+  if (global.__HUGO_AURA__.plsStats.detached) {
     const relaunchBtn = document.getElementById("plsRelaunchBtn");
     relaunchBtn.disabled = true;
     relaunchBtn.textContent = "分离模式下无法执行";
@@ -70,6 +70,18 @@ const settingsRenderer = (pendingEl, settingsObj, isPls = false) => {
         powerIcon.setAttribute("data-bs-placement", "top");
         powerIcon.setAttribute("data-bs-title", "需要重启 Electron 进程");
         entryTitle.appendChild(powerIcon);
+      }
+      if (entry.PLSRequired) {
+        const plsIcon = document.createElement("i");
+        plsIcon.classList.add(
+          "layui-icon",
+          "layui-icon-component",
+          "aura-settings-entry-property-icon"
+        );
+        plsIcon.setAttribute("data-bs-toggle", "tooltip");
+        plsIcon.setAttribute("data-bs-placement", "top");
+        plsIcon.setAttribute("data-bs-title", "需要 PLS 支持");
+        entryTitle.appendChild(plsIcon);
       }
       if (entry.restartPLS) {
         const plsIcon = document.createElement("i");
@@ -217,6 +229,35 @@ const settingsRenderer = (pendingEl, settingsObj, isPls = false) => {
           break;
       }
 
+      const setDisableStatus = (el, isDisable, hint = null) => {
+        if (isDisable) {
+          el.classList.add("ase-operation-area-disabled");
+          if (hint) {
+            el.setAttribute("data-bs-toggle", "tooltip");
+            el.setAttribute("data-bs-placement", "top");
+            el.setAttribute("data-bs-title", hint);
+          }
+        } else {
+          el.setAttribute("data-bs-toggle", "");
+          el.setAttribute("data-bs-placement", "");
+          el.setAttribute("data-bs-title", "");
+          el.classList.remove("ase-operation-area-disabled");
+        }
+      };
+
+      if (entry.PLSRequired) {
+        if (!global.__HUGO_AURA__.plsStats.connected) {
+          setDisableStatus(entryOperationArea, true, "连接至 PLS 以继续");
+        }
+
+        document.addEventListener("onPLSStatsUpdate", (event) => {
+          if (event.detail.connected) {
+            setDisableStatus(entryOperationArea, false);
+          } else {
+            setDisableStatus(entryOperationArea, true, "连接至 PLS 以继续");
+          }
+        });
+      }
       entryContainerEl.appendChild(entryOperationArea);
       const isShow = entry.auraIf();
       if (!isShow) entryContainerEl.classList.add("aura-settings-entry-hidden");
@@ -245,12 +286,7 @@ const settingsRenderer = (pendingEl, settingsObj, isPls = false) => {
   }
   pendingEl.appendChild(formEl);
 
-  const tooltipTriggerList = document.querySelectorAll(
-    '[data-bs-toggle="tooltip"]'
-  );
-  [...tooltipTriggerList].map(
-    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
-  );
+  global.__HUGO_AURA_GLOBAL__.utils.refreshBsTooltip();
 };
 
 module.exports = { settingsRenderer };
