@@ -14,6 +14,8 @@
 > [!IMPORTANT]
 > 已经过测试的希沃管家版本: v1.5.4.3824
 
+![Repobeats](https://repobeats.axiom.co/api/embed/69b5be5daacef624b8f5e4b8966a0b5898439a22.svg "Repobeats analytics image")
+
 ## ✨ 概览
 
 [天下](https://www.bilibili.com/video/BV1UN4y1k7bA) [苦希沃管家](https://www.bilibili.com/video/BV18Z421j7Lf) [久矣](https://github.com/255doesnotexist/SeewoAssistantPasswordRecovery), 如此~~好用~~的一款集控软件, 让广大电教委员对它~~爱不释手~~。
