@@ -14,6 +14,13 @@
       `${IPC_METHOD_BASE}.post.onPlsStatsUpdate`,
       (_event, arg) => {
         global.__HUGO_AURA__.plsStats = arg;
+        document.dispatchEvent(
+          new CustomEvent("onPLSStatsUpdate", {
+            detail: {
+              connected: arg.connected,
+            },
+          })
+        );
       }
     );
 
@@ -21,6 +28,14 @@
       `${IPC_METHOD_BASE}.post.onPlsSettingsUpdate`,
       (_event, arg) => {
         global.__HUGO_AURA__.plsSettings = arg;
+        document.dispatchEvent(
+          new CustomEvent("onPLSConfigUpdate", {
+            detail: {
+              path: ["root", "settings"],
+              value: arg,
+            },
+          })
+        );
       }
     );
 
@@ -28,6 +43,14 @@
       `${IPC_METHOD_BASE}.post.onPlsRulesUpdate`,
       (_event, arg) => {
         global.__HUGO_AURA__.plsRules = arg;
+        document.dispatchEvent(
+          new CustomEvent("onPLSConfigUpdate", {
+            detail: {
+              path: ["root", "ruleSettings"],
+              value: arg,
+            },
+          })
+        );
       }
     );
 

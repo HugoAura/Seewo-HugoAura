@@ -2,9 +2,63 @@
 
 const __SCOPE = "main";
 
-const os = require("os");
+const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
+
+const functions = {
+  querySvcDetail: (
+    /** @type {string} */ svcName,
+    /** @type {string} */ findTarget
+  ) => {
+    return new Promise((resolve) => {
+      exec(
+        `sc query ${svcName}`,
+        { encoding: "utf8" },
+        (error, stdout, stderr) => {
+          if (error) {
+            resolve({
+              success: true,
+              result: false,
+            });
+            return;
+          }
+          if (stdout.includes(findTarget)) {
+            resolve({
+              success: true,
+              result: true,
+            });
+          } else {
+            resolve({
+              success: true,
+              result: false,
+            });
+          }
+        }
+      );
+    });
+  },
+
+  /**
+   *
+   * @param {string} logHeader
+   * @param {string} binPath
+   * @param {string} command
+   * @returns {Promise<{ success: boolean, errorObj?: Error }>}
+   */
+  execCommand: (logHeader, binPath, command) => {
+    return new Promise((resolve) => {
+      exec(`"${binPath}" ${command}`, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`${logHeader} Failed to execute command:`, error);
+          resolve({ success: false, errorObj: error });
+          return;
+        }
+        resolve({ success: true });
+      });
+    });
+  },
+};
 
 /**
  *
@@ -12,6 +66,10 @@ const path = require("path");
  */
 const applyPlsIpcHandler = (ipcMain) => {
   const methodBase = "$aura.pls";
+
+  const PLS_INSTALL_DIR = path.join("C:\\Program Files", "HugoAura PLS");
+  const PLS_BIN_PATH = path.join(PLS_INSTALL_DIR, "bin", "HugoAura-PLS.exe");
+  const PLS_SVC_NAME = "HugoAuraPLS";
 
   const isPlsDetached = process.argv.includes("--pls-detach");
 
@@ -26,15 +84,14 @@ const applyPlsIpcHandler = (ipcMain) => {
   };
 
   ipcMain.handle(
-    `${methodBase}.getPlsFolderExists`,
+    `${methodBase}.getPlsBinExists`,
     /**
      *
      * @returns {{ success: boolean; data: { isExists: boolean }; error?: Error }}
      */
     (_event, _arg) => {
-      const plsFolderPath = path.join("C:\\Program Files", "HugoAura PLS");
       try {
-        const result = fs.existsSync(plsFolderPath);
+        const result = fs.existsSync(PLS_BIN_PATH);
         return {
           success: true,
           data: { isExists: result },
@@ -186,6 +243,68 @@ const applyPlsIpcHandler = (ipcMain) => {
       return {
         success: true,
       };
+    }
+  );
+
+  ipcMain.handle(
+    `${methodBase}.plsLifecycleQuery`,
+    /**
+     *
+     * @param {import("electron").IpcMainInvokeEvent} _event
+     * @param {{ target: import("../../../types/shared/pls/status").PLSLifecycleType }} arg
+     * @returns {Promise<{ success: boolean, result: boolean }>}
+     */
+    async (_event, arg) => {
+      switch (arg.target) {
+        case "isDetached":
+          return { success: true, result: isPlsDetached };
+        case "isSvcInstalled":
+          return await functions.querySvcDetail(PLS_SVC_NAME, "SERVICE_NAME");
+        case "isSvcStart":
+          return await functions.querySvcDetail(PLS_SVC_NAME, "RUNNING");
+        default:
+          console.warn(
+            `[HugoAura / IPC / PLS] <plsLifecycleQuery> Invalid arg.target: ${arg.target}`
+          );
+          return {
+            success: false,
+            result: false,
+          };
+      }
+    }
+  );
+
+  ipcMain.handle(
+    `${methodBase}.plsLifecycleControl`,
+    /**
+     *
+     * @param {*} _event
+     * @param {{ target: import("../../../types/shared/pls/status").PLSLifecycleControlType }} arg
+     * @returns {Promise<{ success: boolean, errorObj?: Error }>}
+     */
+    async (_event, arg) => {
+      const logHeader = "[HugoAura / IPC / PLS] <plsLifecycleControl>";
+
+      if (!global.__HUGO_AURA__.plsStats?.installed) {
+        return { success: false, errorObj: new Error("PLS not installed") };
+      }
+
+      switch (arg.target) {
+        case "instSvc":
+          return await functions.execCommand(
+            logHeader,
+            PLS_BIN_PATH,
+            "install"
+          );
+        case "rmSvc":
+          return await functions.execCommand(logHeader, PLS_BIN_PATH, "remove");
+        case "startSvc":
+          return await functions.execCommand(logHeader, PLS_BIN_PATH, "start");
+        case "stopSvc":
+          return await functions.execCommand(logHeader, PLS_BIN_PATH, "stop");
+        default:
+          return { success: false, errorObj: new Error("Method not found") };
+      }
     }
   );
 

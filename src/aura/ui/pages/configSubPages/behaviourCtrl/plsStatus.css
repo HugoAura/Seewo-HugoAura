@@ -137,3 +137,62 @@
 .acs-bc-pls-status-page-status-area.failed p {
   color: rgb(175, 0, 0);
 }
+
+.acs-bc-pls-status-page-status-area.warning
+  .acs-bc-pls-status-page-status-area-circle {
+  background-color: rgb(212, 127, 0);
+}
+
+.acs-bc-pls-status-page-status-area.warning p {
+  color: rgb(212, 127, 0);
+}
+
+.acs-bc-pls-status-page-status-area.info
+  .acs-bc-pls-status-page-status-area-circle {
+  background-color: #3d78ff;
+}
+
+.acs-bc-pls-status-page-status-area.info p {
+  color: #3d78ff;
+}
+
+.acs-bc-psp-toast.body-display-none .toast-body {
+  display: none;
+}
+
+.acs-bc-psp-toast.body-display-none .toast-header {
+  border-bottom: none;
+}
+
+.acs-bc-psp-toast[closable="false"] .btn-close {
+  display: none;
+}
+
+.acs-bc-psp-toast[variant="success"] .toast-header {
+  background-color: rgb(6, 196, 65);
+  color: rgb(255, 255, 255);
+}
+
+.acs-bc-psp-toast[variant="warning"] .toast-header {
+  background-color: rgb(225, 178, 44);
+  color: rgb(255 255 255);
+}
+
+.acs-bc-psp-toast[variant="error"] .toast-header {
+  background-color: rgb(217, 57, 4);
+  color: rgb(255 255 255);
+}
+
+.acs-bc-psp-toast[variant="info"] .toast-header {
+  background-color: rgb(0, 149, 222);
+  color: rgb(255 255 255);
+}
+
+.acs-bc-psp-toast[variant="success"] .btn-close,
+.acs-bc-psp-toast[variant="warning"] .btn-close,
+.acs-bc-psp-toast[variant="error"] .btn-close,
+.acs-bc-psp-toast[variant="info"] .btn-close {
+  color: rgb(255, 255, 255);
+  filter: invert(1);
+  opacity: 0.95;
+}

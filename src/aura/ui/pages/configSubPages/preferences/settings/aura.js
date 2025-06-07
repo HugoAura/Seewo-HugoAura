@@ -30,7 +30,7 @@ const functions = {
         );
         break;
       case "update":
-        const result = global.__HUGO_AURA_CONFIG_MGR__.switchToDecConfig(
+        const result = await global.__HUGO_AURA_CONFIG_MGR__.switchToDecConfig(
           global.__HUGO_AURA_CONFIG__,
           null
         );
@@ -179,7 +179,7 @@ const auraSettings = [
           return global.__HUGO_AURA_CONFIG__.auraSettings
             .settingsPasswordEnabled;
         },
-        callbackFn: (newVal) => {
+        callbackFn: async (newVal) => {
           if (typeof newVal !== "boolean") return;
           global.__HUGO_AURA_CONFIG__.auraSettings.settingsPasswordEnabled =
             newVal;
@@ -192,7 +192,7 @@ const auraSettings = [
             !newVal &&
             global.__HUGO_AURA_CONFIG__.auraSettings.encryptConfig
           ) {
-            global.__HUGO_AURA_CONFIG_MGR__.switchToDecConfig(
+            await global.__HUGO_AURA_CONFIG_MGR__.switchToDecConfig(
               global.__HUGO_AURA_CONFIG__,
               null
             );
@@ -220,13 +220,13 @@ const auraSettings = [
         valueGetter: () => {
           return global.__HUGO_AURA_CONFIG__.auraSettings.encryptConfig;
         },
-        callbackFn: (newVal) => {
+        callbackFn: async (newVal) => {
           if (typeof newVal !== "boolean") return;
           global.__HUGO_AURA_CONFIG__.auraSettings.encryptConfig = newVal;
           if (newVal) {
             functions.handleEnableConfigEncryption("enc", null);
           } else {
-            global.__HUGO_AURA_CONFIG_MGR__.switchToDecConfig(
+            await global.__HUGO_AURA_CONFIG_MGR__.switchToDecConfig(
               global.__HUGO_AURA_CONFIG__,
               null
             );

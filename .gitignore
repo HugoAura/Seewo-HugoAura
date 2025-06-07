@@ -22,7 +22,3 @@ desktop.ini
 
 # Editor Files
 .vscode/
-
-# Misc
-*.bak
-*.log

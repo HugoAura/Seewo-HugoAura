@@ -164,12 +164,12 @@ class ConfigManager {
   /**
    *
    * @param {Record<any, any>} config
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
-  writeConfig(config) {
+  async writeConfig(config) {
     try {
       if (this.useEncConfig) {
-        const hashedPasswdResultObj = this.retrieveEncPassword();
+        const hashedPasswdResultObj = await this.retrieveEncPasswordAsync();
         if (hashedPasswdResultObj.success && hashedPasswdResultObj.data) {
           this.encryptConfig(config, hashedPasswdResultObj.data);
         } else {
@@ -261,7 +261,7 @@ class ConfigManager {
    *
    * @param {SHA256EncryptedPassword} password
    */
-  saveEncPassword(password) {
+  async saveEncPassword(password) {
     let macAddr = this.priv_getMacAddr();
     let fallbackToStaticKey = false;
 
@@ -290,25 +290,25 @@ class ConfigManager {
     const ivHex = iv.toString("hex");
     const saltHex = randomSalt.toString("hex");
 
-    registryManager.createOrUpdateRegKey(
+    await registryManager.createOrUpdateRegKey(
       LMAK_SETTINGS_BASE,
       "LMAK_Value",
       encryptedPassword,
       true
     );
-    registryManager.createOrUpdateRegKey(
+    await registryManager.createOrUpdateRegKey(
       LMAK_SETTINGS_BASE,
       "LMAK_IV",
       ivHex,
       true
     );
-    registryManager.createOrUpdateRegKey(
+    await registryManager.createOrUpdateRegKey(
       LMAK_SETTINGS_BASE,
       "LMAK_Salt",
       saltHex,
       true
     );
-    registryManager.createOrUpdateRegKey(
+    await registryManager.createOrUpdateRegKey(
       LMAK_SETTINGS_BASE,
       "LMAK_AuthTag",
       authTagHex,
@@ -316,7 +316,7 @@ class ConfigManager {
     );
 
     if (fallbackToStaticKey) {
-      registryManager.createOrUpdateRegKey(
+      await registryManager.createOrUpdateRegKey(
         LMAK_SETTINGS_BASE,
         "LMAK_FakeMac",
         macAddr,
@@ -329,22 +329,22 @@ class ConfigManager {
 
   retrieveEncPassword() {
     try {
-      const authTagHex = registryManager.readRegKey(
+      const authTagHex = registryManager.readRegKeySync(
         LMAK_SETTINGS_BASE,
         "LMAK_AuthTag",
         true
       )?.data;
-      const ivHex = registryManager.readRegKey(
+      const ivHex = registryManager.readRegKeySync(
         LMAK_SETTINGS_BASE,
         "LMAK_IV",
         true
       )?.data;
-      const saltHex = registryManager.readRegKey(
+      const saltHex = registryManager.readRegKeySync(
         LMAK_SETTINGS_BASE,
         "LMAK_Salt",
         true
       )?.data;
-      const encPasswdHex = registryManager.readRegKey(
+      const encPasswdHex = registryManager.readRegKeySync(
         LMAK_SETTINGS_BASE,
         "LMAK_Value",
         true
@@ -353,7 +353,7 @@ class ConfigManager {
       let macAddr = null;
 
       try {
-        macAddr = registryManager.readRegKey(
+        macAddr = registryManager.readRegKeySync(
           LMAK_SETTINGS_BASE,
           "LMAK_FakeMac",
           true
@@ -433,8 +433,112 @@ class ConfigManager {
     }
   }
 
-  clearEncPasswdRegKey() {
-    registryManager.delRegKey(LMAK_SETTINGS_BASE, null);
+  async retrieveEncPasswordAsync() {
+    try {
+      const authTagHex = (
+        await registryManager.readRegKey(
+          LMAK_SETTINGS_BASE,
+          "LMAK_AuthTag",
+          true
+        )
+      ).data;
+      const ivHex = (
+        await registryManager.readRegKey(LMAK_SETTINGS_BASE, "LMAK_IV", true)
+      ).data;
+      const saltHex = (
+        await registryManager.readRegKey(LMAK_SETTINGS_BASE, "LMAK_Salt", true)
+      ).data;
+      const encPasswdHex = (
+        await registryManager.readRegKey(LMAK_SETTINGS_BASE, "LMAK_Value", true)
+      ).data;
+      let isStaticKey = false;
+      let macAddr = null;
+
+      try {
+        macAddr = (
+          await registryManager.readRegKey(
+            LMAK_SETTINGS_BASE,
+            "LMAK_FakeMac",
+            true
+          )
+        ).data;
+        if (!macAddr) {
+          isStaticKey = false;
+        } else {
+          isStaticKey = true;
+        }
+      } catch {
+        isStaticKey = false;
+      }
+
+      if (!isStaticKey) {
+        macAddr = this.priv_getMacAddr();
+
+        if (!macAddr) {
+          console.error(
+            "[HugoAura / Config / ERROR] Failed to retrieve password from reg: MAC Address invalid."
+          );
+          return {
+            success: false,
+            data: null,
+            error: new Error("Mac is null or undefined"),
+          };
+        }
+      }
+
+      if (!saltHex || !ivHex || !authTagHex || !encPasswdHex) {
+        console.error(
+          "[HugoAura / Config / ERROR] Failed to retrieve password from reg: Reg keys invalid."
+        );
+        return {
+          success: false,
+          data: null,
+          error: new Error("Reg key invalid"),
+        };
+      }
+      const salt = Buffer.from(saltHex, "hex");
+      const iv = Buffer.from(ivHex, "hex");
+      const authTag = Buffer.from(authTagHex, "hex");
+      const encPasswd = Buffer.from(encPasswdHex, "utf-8").toString();
+
+      const key = crypto.scryptSync(macAddr, salt, 32);
+      const decipherIns = crypto.createDecipheriv(
+        CRYPTO_SETTINGS_AES.mode,
+        key,
+        iv,
+        {
+          // @ts-expect-error
+          authTagLength: CRYPTO_SETTINGS_AES.tagLength,
+        }
+      );
+
+      decipherIns.setAuthTag(authTag);
+
+      const result = Buffer.concat([
+        decipherIns.update(encPasswd, "hex"),
+        decipherIns.final(),
+      ]).toString();
+
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (e) {
+      console.error(
+        "[HugoAura / Config / ERROR] Unexpected error occurred while retrieving password from reg, error:",
+        e
+      );
+      return {
+        success: false,
+        data: null,
+        error: e,
+      };
+    }
+  }
+
+  async clearEncPasswdRegKey() {
+    await registryManager.delRegKey(LMAK_SETTINGS_BASE, null);
   }
 
   /**
@@ -443,7 +547,7 @@ class ConfigManager {
    * @param {SHA256EncryptedPassword} passwd
    */
   encryptConfig(configData, passwd) {
-    registryManager.initRegistry();
+    registryManager.initRegistrySync();
     const salt = crypto.randomBytes(CRYPTO_SETTINGS_AES.saltLength);
     const key = crypto.pbkdf2Sync(
       passwd,
@@ -617,9 +721,9 @@ class ConfigManager {
    *
    * @param {Record<any, any> | null} curConfig
    * @param {SHA256EncryptedPassword | undefined | null} passwd
-   * @returns {{success: boolean}}
+   * @returns {Promise<{success: boolean}>}
    */
-  switchToDecConfig(curConfig, passwd = null) {
+  async switchToDecConfig(curConfig, passwd = null) {
     let decConfig = null;
     if (!curConfig && passwd) {
       const getDecConfigResult = this.decryptConfig(passwd);
@@ -639,7 +743,7 @@ class ConfigManager {
     }
 
     this.useEncConfig = false;
-    this.clearEncPasswdRegKey();
+    await this.clearEncPasswdRegKey();
     // @ts-expect-error
     this.writeConfig(curConfig ? curConfig : decConfig);
     try {

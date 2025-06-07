@@ -9,3 +9,7 @@ interface PLSStatus {
   version: string;
   authToken: string;
 }
+
+type PLSLifecycleType = "isDetached" | "isSvcInstalled" | "isSvcStart";
+
+type PLSLifecycleControlType = "instSvc" | "rmSvc" | "startSvc" | "stopSvc";

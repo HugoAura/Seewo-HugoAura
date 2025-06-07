@@ -61,7 +61,7 @@ const updatePlsConfigToRemote = async (configKey, configValue) => {
 
   const plsConfigUpdateEvent = new CustomEvent("onPLSConfigUpdate", {
     detail: {
-      path: configKey,
+      path: configLevels,
       value: configValue,
     },
   });

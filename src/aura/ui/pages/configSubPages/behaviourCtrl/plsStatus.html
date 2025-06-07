@@ -92,6 +92,36 @@
       </svg>
       <p>卸载服务</p>
     </div>
+
+    <div class="acs-bc-psp-operation-btn" id="acsBcPsp-operBtn-Start">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+      >
+        <path
+          fill="var(--svg-color)"
+          d="M7 28a1 1 0 0 1-1-1V5a1 1 0 0 1 1.482-.876l20 11a1 1 0 0 1 0 1.752l-20 11A1 1 0 0 1 7 28M8 6.69v18.62L24.925 16Z"
+        />
+      </svg>
+      <p>启动服务</p>
+    </div>
+
+    <div class="acs-bc-psp-operation-btn" id="acsBcPsp-operBtn-Stop">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+      >
+        <path
+          fill="var(--svg-color)"
+          d="M24 8v16H8V8zm0-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2"
+        />
+      </svg>
+      <p>停止服务</p>
+    </div>
   </div>
 
   <div class="acs-bc-pls-status-page-status-el">
@@ -131,6 +161,20 @@
     <p>版本</p>
     <div class="acs-bc-pls-status-page-status-area">
       <p id="acs-bc-psp-version-text">不可用</p>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="plsStatusNotifyToast" class="acs-bc-psp-toast toast" data-bs-autohide="false">
+      <div class="toast-header">
+        <strong class="me-auto" id="plsStatusNotifyToastTitle"></strong>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="toast"
+        ></button>
+      </div>
+      <div class="toast-body" id="plsStatusNotifyToastBody"></div>
     </div>
   </div>
 </div>

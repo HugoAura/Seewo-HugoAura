@@ -25,3 +25,7 @@ button.nav-link {
 .nav-underline {
   --bs-nav-underline-link-active-color: #0d6efd !important;
 }
+
+.tooltip {
+  --bs-tooltip-max-width: 400px !important;
+}

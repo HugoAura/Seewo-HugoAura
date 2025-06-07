@@ -26,6 +26,7 @@ type GlobalHugoAuraConfig = AuraConfig;
 
 declare global {
   var ipcRenderer: RendererProcessOnlyVal<IpcRenderer>;
+  var _ACCEPT_DATA: any;
   var __HUGO_AURA__: GlobalHugoAuraInfo;
   var __HUGO_AURA_CONFIG__: GlobalHugoAuraConfig;
   var __HUGO_AURA_CONFIG_MGR__: ConfigManager;
