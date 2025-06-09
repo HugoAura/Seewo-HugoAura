@@ -7,6 +7,7 @@
   } = require(`${REQUIRE_BASE}/../../../../composables/settingsRenderer`);
 
   const { basicSettings } = require(`${REQUIRE_BASE}/basic`);
+  const { deviceSecuritySettings } = require(`${REQUIRE_BASE}/deviceSecurity`);
 
   const {
     updatePlsSettingsFromLocal,
@@ -24,19 +25,27 @@
     settingsRenderer(basicSubPageEl, basicSettings);
   };
 
+  const initDeviceSecuritySettingsPage = () => {
+    const deviceSecuritySubPageEl = document.getElementById(
+      "security-config-subpage"
+    );
+    settingsRenderer(deviceSecuritySubPageEl, deviceSecuritySettings);
+  };
+
   const renderSubPages = async () => {
     await updatePlsSettingsFromLocal();
     await updatePlsRulesFromLocal();
 
     initBasicSettingsPage();
+    initDeviceSecuritySettingsPage();
   };
 
   const onMounted = () => {
     const rootEl = document.getElementById("acs-behaviour-control-el");
     initStatusPage();
-    renderSubPages();
     setTimeout(() => {
       rootEl.classList.remove("acs-behaviour-control-hidden");
+      renderSubPages(); // 如果立即渲染子页面, 此时 plsRules 还未初始化, 会导致子页面 auraIf 失效
     }, 500);
   };
 

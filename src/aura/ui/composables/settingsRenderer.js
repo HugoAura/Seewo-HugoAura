@@ -51,6 +51,9 @@ const insertOrRemoveEl = (parent, child, isInsert = true) => {
   }
 };
 
+const createOnLeaveEvtListener =
+  global.__HUGO_AURA_GLOBAL__.utils.createOnLeaveEvtListener;
+
 const renderInputArea = (entry, operationArea, descriptionArea) => {
   switch (entry.type) {
     case "switch": {
@@ -131,7 +134,7 @@ const renderInputArea = (entry, operationArea, descriptionArea) => {
   }
 };
 
-const renderChild = (entry, formEl) => {
+const renderNormalSettingsItem = (entry, formEl) => {
   const entryContainerEl = document.createElement("div");
   entryContainerEl.classList.add("aura-settings-entry");
   entryContainerEl.id = `${entry.id}Container`;
@@ -216,7 +219,7 @@ const renderChild = (entry, formEl) => {
 
   const entryDescription = document.createElement("p");
   entryDescription.classList.add("aura-settings-entry-desc");
-  entryDescription.textContent = entry.description;
+  entryDescription.innerHTML = entry.description;
   entryInfoContainerEl.appendChild(entryTitle);
   entryInfoContainerEl.appendChild(entryDescription);
 
@@ -229,20 +232,18 @@ const renderChild = (entry, formEl) => {
   insertOrRemoveEl(entryOperationArea, targetEl, true);
 
   if (entry.reactive) {
-    document.addEventListener(
-      entry.PLSRequired ? "onPLSConfigUpdate" : "onHugoAuraConfigUpdate",
-      (event) => {
-        if (entry.reactiveVal.includes(event.detail.path.join("."))) {
-          insertOrRemoveEl(entryOperationArea, targetEl, false);
-          targetEl = renderInputArea(
-            entry,
-            entryOperationArea,
-            entryDescription
-          );
-          insertOrRemoveEl(entryOperationArea, targetEl, true);
-        }
+    const evtListener = (event) => {
+      if (entry.reactiveVal.includes(event.detail.path.join("."))) {
+        insertOrRemoveEl(entryOperationArea, targetEl, false);
+        targetEl = renderInputArea(entry, entryOperationArea, entryDescription);
+        insertOrRemoveEl(entryOperationArea, targetEl, true);
       }
-    );
+    };
+    const channel = entry.PLSRequired
+      ? "onPLSConfigUpdate"
+      : "onHugoAuraConfigUpdate";
+    entryContainerEl.addEventListener(channel, evtListener);
+    // createOnLeaveEvtListener(channel, evtListener);
   }
 
   const setDisableStatus = (el, isDisable, hint = null) => {
@@ -266,33 +267,93 @@ const renderChild = (entry, formEl) => {
       setDisableStatus(entryOperationArea, true, "连接至 PLS 以继续");
     }
 
-    document.addEventListener("onPLSStatsUpdate", (event) => {
+    const evtListener = (event) => {
       if (event.detail.connected) {
         setDisableStatus(entryOperationArea, false);
       } else {
         setDisableStatus(entryOperationArea, true, "连接至 PLS 以继续");
       }
-    });
+    };
+    entryContainerEl.addEventListener("onPLSStatsUpdate", evtListener);
+    // createOnLeaveEvtListener("onPLSStatsUpdate", evtListener);
   }
   entryContainerEl.appendChild(entryOperationArea);
   const isShow = entry.auraIf();
   if (!isShow) entryContainerEl.classList.add("aura-settings-entry-hidden");
 
   if (entry.associateVal) {
-    document.addEventListener(
-      entry.PLSRequired ? "onPLSConfigUpdate" : "onHugoAuraConfigUpdate",
-      (event) => {
-        if (!entry.associateVal.includes(event.detail.path.join("."))) return;
-        const cls = entryContainerEl.classList;
-        const isShow = entry.auraIf();
-        isShow
-          ? cls.remove("aura-settings-entry-hidden")
-          : cls.add("aura-settings-entry-hidden");
-      }
-    );
+    const evtListener = (event) => {
+      if (!entry.associateVal.includes(event.detail.path.join("."))) return;
+      const cls = entryContainerEl.classList;
+      const isShow = entry.auraIf();
+      isShow
+        ? cls.remove("aura-settings-entry-hidden")
+        : cls.add("aura-settings-entry-hidden");
+    };
+    const channel = entry.PLSRequired
+      ? "onPLSConfigUpdate"
+      : "onHugoAuraConfigUpdate";
+    entryContainerEl.addEventListener(channel, evtListener);
+    // createOnLeaveEvtListener(channel, evtListener);
   }
 
   formEl.appendChild(entryContainerEl);
+};
+
+const renderPreviewItem = (entry, formEl) => {
+  const elementId = entry.customId ? entry.customId : `${entry.id}Container`;
+  const eventChannel = entry.listenerType;
+
+  const separateHrContainer = document.createElement("div");
+  separateHrContainer.classList.add("aura-settings-preview-area-hr-container");
+
+  const hrTitle = document.createElement("p");
+  hrTitle.textContent = "预览";
+
+  const hrElement = document.createElement("hr");
+  hrElement.classList.add("aura-settings-preview-hr");
+
+  separateHrContainer.appendChild(hrElement);
+  separateHrContainer.appendChild(hrTitle);
+  separateHrContainer.appendChild(hrElement.cloneNode());
+
+  formEl.appendChild(separateHrContainer);
+
+  const previewContainerEl = document.createElement("div");
+  previewContainerEl.classList.add("aura-settings-preview-area-container");
+  previewContainerEl.id = elementId;
+
+  const eventListener = (event) => {
+    const childs = previewContainerEl.querySelectorAll("*");
+    Array.from(childs).forEach((el) => {
+      el.dispatchEvent(
+        new CustomEvent("onAssociateValueUpdated", { detail: event.detail })
+      );
+    });
+  };
+
+  document.addEventListener(
+    eventChannel === "pls" ? "onPLSConfigUpdate" : "onHugoAuraConfigUpdate",
+    eventListener
+  );
+  createOnLeaveEvtListener(eventListener); // Clean up
+
+  formEl.appendChild(previewContainerEl);
+
+  setTimeout(() => {
+    global.__HUGO_AURA_LOADER__[entry.loaderTarget].active = true;
+  }, 50);
+};
+
+const renderChild = (entry, formEl) => {
+  switch (entry.type) {
+    case "preview":
+      renderPreviewItem(entry, formEl);
+      break;
+    default:
+      renderNormalSettingsItem(entry, formEl);
+      break;
+  }
 };
 
 const settingsRenderer = (pendingEl, settingsObj) => {

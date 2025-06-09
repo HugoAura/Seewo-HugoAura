@@ -14,7 +14,7 @@ class RendererHooksManager {
 
     const hooksPath = path.join(__dirname, "../../../aura/ui/hookDefinitions");
 
-    /** @type {import("../../types/main/core").HooksMap} */
+    /** @type {import("../../types/main/core").UIHooksMap} */
     const hooks = new Map();
 
     try {
@@ -65,6 +65,7 @@ class RendererHooksManager {
       webContents.removeListener("destroyed", destroyedListener);
     }
 
+    // @ts-expect-error
     global.__HUGO_AURA__.hookedWindows.delete(windowKey);
   }
 
@@ -80,6 +81,7 @@ class RendererHooksManager {
 
     /** @type {import("../../types/main/core").WindowName} */
     const windowKey = `${hookConfig.windowName || windowName}`;
+    // @ts-expect-error
     if (global.__HUGO_AURA__.hookedWindows.has(windowKey)) {
       console.log(
         `[HugoAura / Init / RDH] Duplicate ui hook for ${windowKey}, ignoring...`
@@ -137,6 +139,7 @@ class RendererHooksManager {
     const destroyedListener = () => {
       this.cleanupWindow(
         windowKey,
+        // @ts-expect-error
         global.__HUGO_AURA__.hookedWindows.get(windowKey)
       );
     };
@@ -144,6 +147,7 @@ class RendererHooksManager {
     webContents.on("dom-ready", domReadyListener);
     webContents.on("destroyed", destroyedListener);
 
+    // @ts-expect-error
     global.__HUGO_AURA__.hookedWindows.set(windowKey, {
       webContents,
       domReadyListener,

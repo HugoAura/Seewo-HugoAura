@@ -24,46 +24,69 @@
     });
   };
 
-  const createStore = () => {
-    const store = {
-      router: "/",
-    };
-    const internal = {
-      get: (key) => store[key],
-      set: (key, value) => {
-        store[key] = value;
-        return true;
-      },
-    };
-
-    window.$store = {
-      get: (key) => {
-        const stack = new Error().stack;
-        if (stack.includes("aura/ui/pages/")) {
-          return internal.get(key);
-        }
-        return undefined;
-      },
-      set: (key, value) => {
-        const stack = new Error().stack;
-        if (stack.includes("aura/ui/pages/")) {
-          return internal.set(key, value);
-        }
-        return false;
-      },
-    };
-
-    return internal;
-  };
-
-  const store = createStore();
-
   const createUILoader = () => {
     const modules = "__TEMPLATE_TARGETS__";
     const containers = new Map();
     const observers = new Map();
     const moduleResources = new Map();
     const globalScripts = new Set();
+
+    const flattenTargets = (targets, parentKey = "") => {
+      const flattened = {};
+
+      for (const [key, config] of Object.entries(targets)) {
+        const fullKey = parentKey ? `${parentKey}.${key}` : key;
+        flattened[fullKey] = { ...config };
+
+        if (
+          config.childs &&
+          typeof config.childs === "object" &&
+          !Array.isArray(config.childs)
+        ) {
+          const childTargets = flattenTargets(config.childs, fullKey);
+          Object.assign(flattened, childTargets);
+          delete flattened[fullKey].childs;
+        }
+      }
+
+      return flattened;
+    };
+
+    const flatModules = flattenTargets(modules);
+
+    const createAccessProxy = (originalModules, flatModules) => {
+      const createNestedProxy = (target, path = []) => {
+        return new Proxy(target, {
+          get(target, prop) {
+            const currentPath = [...path, prop].join(".");
+
+            if (flatModules[currentPath]) {
+              return flatModules[currentPath];
+            }
+
+            const value = Reflect.get(target, prop);
+            if (typeof value === "object" && value !== null) {
+              return createNestedProxy(value, [...path, prop]);
+            }
+
+            return value;
+          },
+          set(target, prop, value) {
+            const currentPath = [...path, prop].join(".");
+
+            if (flatModules[currentPath]) {
+              flatModules[currentPath] = value;
+            }
+
+            return Reflect.set(target, prop, value);
+          },
+        });
+      };
+
+      return createNestedProxy(originalModules);
+    };
+
+    const accessibleModules = createAccessProxy(modules, flatModules);
 
     const insertElement = (target, element, mode = "appendChild") => {
       const elementId = element.id;
@@ -120,12 +143,12 @@
       const observer = new MutationObserver((_mutations) => {
         if (!document.getElementById(elementId)) {
           let targetElement = document.querySelector(
-            modules[moduleKey].pageSelector
+            flatModules[moduleKey].pageSelector
           );
           if (
             targetElement &&
-            modules[moduleKey].active &&
-            modules[moduleKey].revive
+            flatModules[moduleKey].active &&
+            flatModules[moduleKey].revive
           ) {
             if (!document.getElementById(elementId)) {
               console.log(
@@ -145,12 +168,53 @@
       observers.set(moduleKey, observer);
     };
 
+    const loadResources = async (resources, type, moduleKey, isRevive) => {
+      if (!resources || isRevive) return [];
+
+      const resourceArray = Array.isArray(resources) ? resources : [resources];
+      const loadedResources = [];
+
+      for (const resource of resourceArray) {
+        try {
+          let element;
+          if (type === "css") {
+            element = document.createElement("link");
+            element.rel = "stylesheet";
+            element.href = `../../aura/${resource}`;
+            document.head.appendChild(element);
+          } else if (type === "js") {
+            element = document.createElement("script");
+            element.src = `../../aura/${resource}`;
+            document.body.appendChild(element);
+            await new Promise((resolve, reject) => {
+              element.onload = resolve;
+              element.onerror = reject;
+            });
+          }
+
+          if (element) {
+            loadedResources.push(element);
+            console.log(
+              `[HugoAura / UI / ${moduleKey}] Loaded ${type}: ${resource}`
+            );
+          }
+        } catch (err) {
+          console.error(
+            `[HugoAura / UI / Error] Failed to load ${type} ${resource} for ${moduleKey}:`,
+            err
+          );
+        }
+      }
+
+      return loadedResources;
+    };
+
     const loader = {
       async loadModule(moduleKey, isRevive = false) {
-        if (!modules[moduleKey]?.active) return;
+        if (!flatModules[moduleKey]?.active) return;
 
         try {
-          const config = modules[moduleKey];
+          const config = flatModules[moduleKey];
           const target = await waitForElement(config.pageSelector);
           const elementId = `aura-container-${moduleKey.replace(/\./g, "-")}`;
 
@@ -168,12 +232,14 @@
           const resources = new Set();
           moduleResources.set(moduleKey, resources);
 
-          if (config.pageCSS && !isRevive) {
-            const link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = `../../aura/${config.pageCSS}`;
-            document.head.appendChild(link);
-            resources.add(link);
+          if (config.pageCSS) {
+            const cssResources = await loadResources(
+              config.pageCSS,
+              "css",
+              moduleKey,
+              isRevive
+            );
+            cssResources.forEach((resource) => resources.add(resource));
           }
 
           const html = await fetch(`../../aura/${config.pageURI}`).then((r) =>
@@ -184,18 +250,21 @@
           insertElement(target, container, config.selectorMode);
           monitorParent(moduleKey, target, container, config.selectorMode);
 
-          if (config.pageScript && !isRevive) {
-            const script = document.createElement("script");
-            script.src = `../../aura/${config.pageScript}`;
-            document.body.appendChild(script);
-            resources.add(script);
+          if (config.pageScript) {
+            const jsResources = await loadResources(
+              config.pageScript,
+              "js",
+              moduleKey,
+              isRevive
+            );
+            jsResources.forEach((resource) => resources.add(resource));
           }
 
           const observer = new MutationObserver(() => {
             if (
               !document.contains(container) &&
-              modules[moduleKey].active &&
-              modules[moduleKey].revive
+              flatModules[moduleKey].active &&
+              flatModules[moduleKey].revive
             ) {
               this.loadModule(moduleKey, true);
             }
@@ -238,13 +307,13 @@
 
       handleModuleChange(moduleKey, path = []) {
         const fullPath = [...path, moduleKey].join(".");
-        if (path.length === 0 && modules[moduleKey].active) {
+        if (path.length === 0 && flatModules[moduleKey].active) {
           this.loadModule(moduleKey);
         } else if (path.length === 0) {
           this.unloadModule(moduleKey);
         } else {
           if (moduleKey === "active") {
-            if (modules[path[0]].active) {
+            if (flatModules[path[0]].active) {
               this.loadModule(path[0]);
             } else {
               this.unloadModule(path[0]);
@@ -297,7 +366,7 @@
       try {
         await loadGlobalJS();
 
-        for (const [key, config] of Object.entries(modules)) {
+        for (const [key, config] of Object.entries(flatModules)) {
           if (config.active) {
             await loader.loadModule(key);
           }
@@ -309,7 +378,7 @@
 
     initialLoad();
 
-    return createDeepProxy(modules, (path, prop, value) => {
+    return createDeepProxy(accessibleModules, (path, prop, value) => {
       loader.handleModuleChange(prop, path);
     });
   };

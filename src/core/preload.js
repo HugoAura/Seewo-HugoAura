@@ -63,6 +63,15 @@ const __AURA_VERSION__ = "0.1.1-pre-IV";
         });
         const pathName = [...path, prop].join(".");
         document.dispatchEvent(configUpdateEvent);
+
+        const settingsEntries = document.getElementsByClassName(
+          "aura-settings-entry"
+        );
+        if (settingsEntries.length > 0) {
+          Array.from(settingsEntries).forEach((entry) => {
+            entry.dispatchEvent(configUpdateEvent);
+          });
+        }
         console.log(
           `[HugoAura / Config] Config changed at path: ${[...path, prop].join(
             "."

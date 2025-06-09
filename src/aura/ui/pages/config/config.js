@@ -23,6 +23,8 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
         global.__HUGO_AURA_UI_REACTIVES__.config.currentActiveSubPage,
         false
       );
+      const onLeaveEvent = new CustomEvent("onCurConfigPageLeave");
+      document.dispatchEvent(onLeaveEvent);
     } else {
       global.__HUGO_AURA_UI_FUNCTIONS__.config.hideConfigPage();
     }

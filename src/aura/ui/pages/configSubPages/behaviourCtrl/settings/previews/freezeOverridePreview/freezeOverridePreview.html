@@ -1,0 +1,91 @@
+<div class="acs-bc-dsc-fop-container">
+  <div class="acs-bc-dsc-fop-please-wait" auraIf="true">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+    >
+      <path
+        fill="currentColor"
+        d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14m0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4"
+      />
+      <path fill="currentColor" d="M20.59 22L15 16.41V7h2v8.58l5 5.01z" />
+    </svg>
+
+    <p>请稍候...</p>
+  </div>
+
+  <div class="acs-bc-dsc-fop-on-req-error" auraIf="false">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+    >
+      <path fill="currentColor" d="M9 10.555L10.555 9L23 21.444L21.444 23z" />
+      <path
+        fill="currentColor"
+        d="M16 2A13.914 13.914 0 0 0 2 16a13.914 13.914 0 0 0 14 14a13.914 13.914 0 0 0 14-14A13.914 13.914 0 0 0 16 2m0 26a12 12 0 1 1 12-12a12.035 12.035 0 0 1-12 12"
+      />
+    </svg>
+
+    <p>获取磁盘信息失败: <font id="acsBcDscFopOnReqErrorDetail"></font></p>
+  </div>
+
+  <div class="acs-bc-dsc-fop-on-not-bind" auraIf="false">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+    >
+      <path
+        fill="currentColor"
+        d="M31.324 11.261A14.27 14.27 0 0 0 22.25 8H22v2h.25c2.608 0 5.155.837 7.246 2.372a12.18 12.18 0 0 1-7.548 7.036q.052-.605.052-1.22C22 10.366 15.635 4 7.812 4c-.929 0-1.856.09-2.757.268l-.657.13l-.13.657A14.3 14.3 0 0 0 4 7.812c0 4.124 1.78 7.831 4.598 10.426A14.2 14.2 0 0 0 8 22.254l.001.001a14.27 14.27 0 0 0 3.261 9.07l.439.53l.652-.22a14.18 14.18 0 0 0 9.237-10.046a14.18 14.18 0 0 0 10.045-9.237l.22-.652zM12.372 29.496A12.27 12.27 0 0 1 10 22.251c0-.912.113-1.796.303-2.652a14.1 14.1 0 0 0 9.105 2.349a12.18 12.18 0 0 1-7.036 7.548m7.51-9.613q-.833.116-1.694.117c-2.715 0-5.218-.904-7.247-2.412a12.4 12.4 0 0 1 4.048-5.204l-1.28-1.53A14.3 14.3 0 0 0 9.37 16.2A12.14 12.14 0 0 1 6.117 6.117A12 12 0 0 1 7.812 6C14.532 6 20 11.468 20 18.188q0 .862-.117 1.695Z"
+      />
+      <circle cx="20" cy="2" r="2" fill="currentColor" />
+      <circle cx="27" cy="26" r="2" fill="currentColor" />
+      <circle cx="2" cy="20" r="2" fill="currentColor" />
+    </svg>
+
+    <p>当前设备暂未绑定学校, 无法查询冰点信息</p>
+  </div>
+
+  <div class="acs-bc-dsc-fop-main" auraIf="false">
+    <div class="disks-container">
+      <p class="acs-bc-dsc-fop-disk-el">C 盘</p>
+    </div>
+
+    <div class="acs-bc-dsc-fop-main-hint-area">
+      <div class="acs-bc-dsc-fop-main-hint-freeze">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 32 32"
+        >
+          <path
+            fill="currentColor"
+            d="M21.415 12H28v-2h-4.585L28 5.415L26.586 4L22 8.587V4h-2v6.587L18.587 12H17V8h-2v4h-1.587L12 10.587V4h-2v4.587L5.414 4L4 5.415L8.585 10H4v2h6.585L12 13.415V15H8v2h4v1.587L10.587 20H4v2h4.587L4 26.586l1.414 1.415L10 23.415V28h2v-6.585L13.415 20H15v4h2v-4h1.585L20 21.415V28h2v-4.585l4.585 4.586L28 26.586L23.413 22H28v-2h-6.587L20 18.587V17h4v-2h-4v-1.585ZM18 18h-4v-4h4Z"
+          />
+        </svg>
+        <p>已冻结</p>
+      </div>
+      <div class="acs-bc-dsc-fop-main-hint-unfreeze">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 32 32"
+        >
+          <path
+            fill="currentColor"
+            d="M16 12.005a4 4 0 1 1-4 4a4.005 4.005 0 0 1 4-4m0-2a6 6 0 1 0 6 6a6 6 0 0 0-6-6M5.394 6.813L6.81 5.399l3.505 3.506L8.9 10.319zM2 15.005h5v2H2zm3.394 10.193L8.9 21.692l1.414 1.414l-3.505 3.506zM15 25.005h2v5h-2zm6.687-1.9l1.414-1.414l3.506 3.506l-1.414 1.414zm3.313-8.1h5v2h-5zm-3.313-6.101l3.506-3.506l1.414 1.414l-3.506 3.506zM15 2.005h2v5h-2z"
+          />
+        </svg>
+        <p>未冻结</p>
+      </div>
+    </div>
+  </div>
+</div>

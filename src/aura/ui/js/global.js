@@ -20,10 +20,24 @@
     );
   };
 
+  const createOnLeaveEvtListener = (
+    channel,
+    pendingRmEvtListener,
+    leaveEvt = "onCurConfigPageLeave"
+  ) => {
+    const rmEvtListener = (event) => {
+      document.removeEventListener(channel, pendingRmEvtListener);
+      document.removeEventListener(leaveEvt, rmEvtListener);
+    };
+    document.addEventListener(leaveEvt, rmEvtListener);
+    return rmEvtListener;
+  };
+
   if (!window.__HUGO_AURA_GLOBAL__) window.__HUGO_AURA_GLOBAL__ = {};
 
   window.__HUGO_AURA_GLOBAL__.utils = {
     sleep,
     refreshBsTooltip,
+    createOnLeaveEvtListener,
   };
 })();

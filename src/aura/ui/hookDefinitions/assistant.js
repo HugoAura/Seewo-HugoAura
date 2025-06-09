@@ -21,41 +21,60 @@ const def = {
       pageSelector: "#root",
       selectorMode: "appendChild",
       pageCSS: "ui/pages/config/config.css",
-    },
-    "Aura.UI.Assistant.Config.DisableLimitations": {
-      active: false,
-      pageURI:
-        "ui/pages/configSubPages/disableLimitations/disableLimitations.html",
-      pageScript:
-        "ui/pages/configSubPages/disableLimitations/disableLimitations.js",
-      pageSelector: ".aura-config-page-subpage-container",
-      selectorMode: "appendChild",
-      pageCSS:
-        "ui/pages/configSubPages/disableLimitations/disableLimitations.css",
-    },
-    "Aura.UI.Assistant.Config.BehaviourCtrl": {
-      active: false,
-      pageURI: "ui/pages/configSubPages/behaviourCtrl/behaviourCtrl.html",
-      pageScript: "ui/pages/configSubPages/behaviourCtrl/behaviourCtrl.js",
-      pageSelector: ".aura-config-page-subpage-container",
-      selectorMode: "appendChild",
-      pageCSS: "ui/pages/configSubPages/behaviourCtrl/behaviourCtrl.css",
-    },
-    "Aura.UI.Assistant.Config.BehaviourCtrl.PlsStatus": {
-      active: false,
-      pageURI: "ui/pages/configSubPages/behaviourCtrl/plsStatus.html",
-      pageScript: "ui/pages/configSubPages/behaviourCtrl/plsStatus.js",
-      pageSelector: "#status-subpage",
-      selectorMode: "appendChild",
-      pageCSS: "ui/pages/configSubPages/behaviourCtrl/plsStatus.css",
-    },
-    "Aura.UI.Assistant.Config.Preferences": {
-      active: false,
-      pageURI: "ui/pages/configSubPages/preferences/preferences.html",
-      pageScript: "ui/pages/configSubPages/preferences/preferences.js",
-      pageSelector: ".aura-config-page-subpage-container",
-      selectorMode: "appendChild",
-      pageCSS: "ui/pages/configSubPages/preferences/preferences.css",
+      childs: {
+        DisableLimitations: {
+          active: false,
+          pageURI:
+            "ui/pages/configSubPages/disableLimitations/disableLimitations.html",
+          pageScript:
+            "ui/pages/configSubPages/disableLimitations/disableLimitations.js",
+          pageSelector: ".aura-config-page-subpage-container",
+          selectorMode: "appendChild",
+          pageCSS:
+            "ui/pages/configSubPages/disableLimitations/disableLimitations.css",
+        },
+        BehaviourCtrl: {
+          active: false,
+          pageURI: "ui/pages/configSubPages/behaviourCtrl/behaviourCtrl.html",
+          pageScript: "ui/pages/configSubPages/behaviourCtrl/behaviourCtrl.js",
+          pageSelector: ".aura-config-page-subpage-container",
+          selectorMode: "appendChild",
+          pageCSS: "ui/pages/configSubPages/behaviourCtrl/behaviourCtrl.css",
+          childs: {
+            PlsStatus: {
+              active: false,
+              pageURI: "ui/pages/configSubPages/behaviourCtrl/plsStatus.html",
+              pageScript: "ui/pages/configSubPages/behaviourCtrl/plsStatus.js",
+              pageSelector: "#status-subpage",
+              selectorMode: "appendChild",
+              pageCSS: "ui/pages/configSubPages/behaviourCtrl/plsStatus.css",
+            },
+            DeviceSecurity: {
+              childs: {
+                FreezeOverridePreview: {
+                  active: false,
+                  pageURI:
+                    "ui/pages/configSubPages/behaviourCtrl/settings/previews/freezeOverridePreview/freezeOverridePreview.html",
+                  pageScript:
+                    "ui/pages/configSubPages/behaviourCtrl/settings/previews/freezeOverridePreview/freezeOverridePreview.js",
+                  pageSelector: "#freezeInfoReportOverridePreviewContainer",
+                  selectorMode: "appendChild",
+                  pageCSS:
+                    "ui/pages/configSubPages/behaviourCtrl/settings/previews/freezeOverridePreview/freezeOverridePreview.css",
+                },
+              },
+            },
+          },
+        },
+        Preferences: {
+          active: false,
+          pageURI: "ui/pages/configSubPages/preferences/preferences.html",
+          pageScript: "ui/pages/configSubPages/preferences/preferences.js",
+          pageSelector: ".aura-config-page-subpage-container",
+          selectorMode: "appendChild",
+          pageCSS: "ui/pages/configSubPages/preferences/preferences.css",
+        },
+      },
     },
   },
   globalStyles: [
@@ -65,7 +84,11 @@ const def = {
     "ui/layui/css/layui.css",
     "ui/bootstrap/bootstrap.min.css",
   ],
-  globalJS: ["ui/js/global.js", "ui/js/plsListener.js", "ui/bootstrap/bootstrap.bundle.min.js"],
+  globalJS: [
+    "ui/js/global.js",
+    "ui/js/plsListener.js",
+    "ui/bootstrap/bootstrap.bundle.min.js",
+  ],
   onLoaded: `
     console.log('[HugoAura / UI / Hooks / Assistant] Page loaded.');
   `,

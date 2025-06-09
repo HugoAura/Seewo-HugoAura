@@ -37,16 +37,6 @@ const { genRandomHex } = require("../../utils/crypto");
  */
 const updatePlsConfigToRemote = async (configKey, configValue) => {
   const configLevels = configKey.split(".");
-  /** @type {Record<any, any>} */
-  // @ts-expect-error
-  let localUpdateTarget =
-    configLevels[0] === "ruleSettings"
-      ? global.__HUGO_AURA__.plsRules
-      : global.__HUGO_AURA__.plsSettings;
-  for (const level of configLevels.slice(0, -1)) {
-    localUpdateTarget = localUpdateTarget[level];
-  }
-  localUpdateTarget[configLevels.slice(-1)[0]] = configValue;
 
   const plsConfigUpdateEvent = new CustomEvent("onPLSConfigUpdate", {
     detail: {
@@ -55,6 +45,14 @@ const updatePlsConfigToRemote = async (configKey, configValue) => {
     },
   });
   document.dispatchEvent(plsConfigUpdateEvent);
+  const settingsEntries = document.getElementsByClassName(
+    "aura-settings-entry"
+  );
+  if (settingsEntries.length > 0) {
+    Array.from(settingsEntries).forEach((entry) => {
+      entry.dispatchEvent(plsConfigUpdateEvent);
+    });
+  }
 
   /**
    * @type {ClientPLSRequest}

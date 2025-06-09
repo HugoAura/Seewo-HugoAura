@@ -655,9 +655,15 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
     initBsTooltip();
     GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
     GLOBAL_FUNCTIONS.refreshPlsStatus(true);
-    document.addEventListener("onPLSStatsUpdate", () => {
+
+    const eventListener = () => {
       GLOBAL_FUNCTIONS.updateStatusContent();
-    });
+    };
+    document.addEventListener("onPLSStatsUpdate", eventListener);
+    global.__HUGO_AURA_GLOBAL__.utils.createOnLeaveEvtListener(
+      "onPLSStatsUpdate",
+      eventListener
+    );
   };
 
   onMounted();

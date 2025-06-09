@@ -1,12 +1,13 @@
 import { WindowName } from "../main/core";
 
 interface UIHookTarget {
-  active: boolean;
-  pageURI: string;
-  pageScript: string;
-  pageSelector: string;
-  selectorMode: "insertAfter" | "insertBefore" | "appendChild";
-  pageCSS: string;
+  active?: boolean;
+  pageURI?: string;
+  pageScript?: string;
+  pageSelector?: string;
+  selectorMode?: "insertAfter" | "insertBefore" | "appendChild";
+  pageCSS?: string;
+  childs?: Record<AuraElementUID, UIHookTarget>;
   revive?: boolean;
 }
 

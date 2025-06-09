@@ -65,6 +65,33 @@
   border-bottom: 0.75px solid rgba(0, 0, 0, 0.25);
 }
 
+.aura-settings-preview-area-hr-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.aura-settings-preview-hr {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 0.75px solid rgba(0, 0, 0, 0.25);
+  width: -webkit-fill-available;
+}
+
+.aura-settings-preview-area-hr-container p {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  min-width: 2rem;
+  opacity: 0.75;
+  text-align: center;
+}
+
+.aura-settings-preview-area-container {
+  width: 100%;
+  padding-bottom: 0.5rem;
+}
+
 .aura-settings-entry-property-icon {
   margin-left: 0.5rem;
   font-size: 15px;
