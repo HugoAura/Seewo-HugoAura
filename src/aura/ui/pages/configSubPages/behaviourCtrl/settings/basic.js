@@ -83,7 +83,7 @@ const basicSettings = [
         restartPLS: true,
         tip: true,
         tipTitle:
-          '路径相对于 "%USERPROFILE%\\Documents\\HugoAura\\Aura-PLS\\", 使用 "/" 作为路径符',
+          '路径相对于 "%PROGRAMDATA%\\HugoAura\\Aura-PLS\\", 使用 "/" 作为路径符',
         associateVal: null,
         auraIf: () => true,
         defaultValue: "",
@@ -118,7 +118,7 @@ const basicSettings = [
         restartPLS: true,
         tip: true,
         tipTitle:
-          '路径相对于 "%USERPROFILE%\\Documents\\HugoAura\\Aura-PLS\\", 使用 "/" 作为路径符',
+          '路径相对于 "%PROGRAMDATA%\\HugoAura\\Aura-PLS\\", 使用 "/" 作为路径符',
         warning: true,
         warningContent: "请使用 PEM 格式的密钥",
         associateVal: null,

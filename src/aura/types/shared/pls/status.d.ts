@@ -12,4 +12,4 @@ interface PLSStatus {
 
 type PLSLifecycleType = "isDetached" | "isSvcInstalled" | "isSvcStart";
 
-type PLSLifecycleControlType = "instSvc" | "rmSvc" | "startSvc" | "stopSvc";
+type PLSLifecycleControlType = "instSvc" | "rmSvc" | "startSvc" | "stopSvc" | "rmBin" | "dlBin";

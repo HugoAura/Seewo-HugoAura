@@ -5,6 +5,8 @@ const __SCOPE = "main";
 const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
+const nodeHttps = require("https");
+const { fsComposables } = require("./fsIpcHandler");
 
 const functions = {
   querySvcDetail: (
@@ -47,8 +49,9 @@ const functions = {
    * @returns {Promise<{ success: boolean, errorObj?: Error }>}
    */
   execCommand: (logHeader, binPath, command) => {
+    const processedPath = binPath.includes(" ") ? `"${binPath}"` : binPath;
     return new Promise((resolve) => {
-      exec(`"${binPath}" ${command}`, (error, stdout, stderr) => {
+      exec(`${processedPath} ${command}`, (error, stdout, stderr) => {
         if (error) {
           console.error(`${logHeader} Failed to execute command:`, error);
           resolve({ success: false, errorObj: error });
@@ -57,6 +60,103 @@ const functions = {
         resolve({ success: true });
       });
     });
+  },
+
+  /**
+   *
+   * @param {"stable" | "alpha"} channel
+   * @param {(arg: DownloadTask) => any} callbackFn
+   * @param {string} binPath
+   */
+  handlePLSDownload: async (channel, callbackFn, binPath) => {
+    // TODO: Channel selection
+    const apiInfo = global.__HUGO_AURA_API__;
+    let plsVersionInfo = {};
+
+    const getVerPromise = new Promise((resolve) => {
+      // ↓ 目前 channel param 没有什么用处
+      nodeHttps
+        .get(
+          `${apiInfo.baseUrl}${apiInfo.plsUpdate}?channel=${channel}`,
+          (rep) => {
+            let dataChunk = "";
+            rep.on("data", (chunk) => {
+              dataChunk += chunk;
+            });
+
+            rep.on("end", () => {
+              resolve({
+                success: true,
+                data: dataChunk,
+              });
+            });
+          }
+        )
+        .on("error", (e) => {
+          resolve({
+            success: false,
+            data: null,
+            errorObj: e,
+          });
+        });
+    });
+
+    const rawResInfo = await getVerPromise;
+    if (!rawResInfo.success) {
+      callbackFn({
+        id: "",
+        progress: 0,
+        status: "failed",
+        dlUrl: null,
+        savePath: null,
+        message: "未能获取 PLS 版本信息",
+        errorObj: rawResInfo.errorObj ? rawResInfo.errorObj : null,
+      });
+      return false;
+    }
+
+    try {
+      plsVersionInfo = JSON.parse(rawResInfo.data);
+    } catch (e) {
+      callbackFn({
+        id: "",
+        progress: 0,
+        status: "failed",
+        dlUrl: null,
+        savePath: null,
+        message: "PLS 版本信息解析失败",
+        errorObj: e,
+      });
+      console.error(
+        "[HugoAura / IPC / PLS] Error querying PLS version info:",
+        e
+      );
+      return false;
+    }
+
+    let deviceArch = process.env.PROCESSOR_ARCHITEW6432
+      ? process.env.PROCESSOR_ARCHITEW6432
+      : process.env.PROCESSOR_ARCHITECTURE;
+    // @ts-expect-error
+    deviceArch = deviceArch.toLowerCase();
+
+    if (!Object.keys(plsVersionInfo.data.downloadUrl).includes(deviceArch)) {
+      callbackFn({
+        id: "",
+        progress: 0,
+        status: "failed",
+        dlUrl: null,
+        savePath: null,
+        message: `处理器架构识别失败, 检测到的架构: ${deviceArch}`,
+      });
+      return false;
+    }
+
+    fsComposables.downloadFile(
+      plsVersionInfo.data.downloadUrl[deviceArch],
+      binPath,
+      callbackFn
+    );
   },
 };
 
@@ -67,8 +167,8 @@ const functions = {
 const applyPlsIpcHandler = (ipcMain) => {
   const methodBase = "$aura.pls";
 
-  const PLS_INSTALL_DIR = path.join("C:\\Program Files", "HugoAura PLS");
-  const PLS_BIN_PATH = path.join(PLS_INSTALL_DIR, "bin", "HugoAura-PLS.exe");
+  const PLS_INSTALL_DIR = path.join("C:\\Program Files", "HugoAura PLS", "bin");
+  const PLS_BIN_PATH = path.join(PLS_INSTALL_DIR, "HugoAura-PLS.exe");
   const PLS_SVC_NAME = "HugoAuraPLS";
 
   const isPlsDetached = process.argv.includes("--pls-detach");
@@ -101,6 +201,48 @@ const applyPlsIpcHandler = (ipcMain) => {
           success: false,
           data: { isExists: false },
           error: e,
+        };
+      }
+    }
+  );
+
+  ipcMain.handle(
+    `${methodBase}.ensurePlsInstallDir`,
+    /**
+     *
+     * @param {import("electron").IpcMainInvokeEvent} _event
+     * @param {any} _arg
+     * @returns {{ success: boolean; data: { alreadyExists: boolean; createdDir: string; }; error?: Error }}
+     */
+    (_event, _arg) => {
+      const alreadyExists = fs.existsSync(PLS_INSTALL_DIR);
+      if (alreadyExists) {
+        return {
+          success: true,
+          data: {
+            alreadyExists: true,
+            createdDir: PLS_INSTALL_DIR,
+          },
+        };
+      }
+
+      try {
+        fs.mkdirSync(PLS_INSTALL_DIR);
+        return {
+          success: true,
+          data: {
+            alreadyExists: false,
+            createdDir: PLS_INSTALL_DIR,
+          },
+        };
+      } catch (error) {
+        return {
+          success: false,
+          data: {
+            alreadyExists: false,
+            createdDir: PLS_INSTALL_DIR,
+          },
+          error: error,
         };
       }
     }
@@ -294,7 +436,7 @@ const applyPlsIpcHandler = (ipcMain) => {
           return await functions.execCommand(
             logHeader,
             PLS_BIN_PATH,
-            "install"
+            "--startup auto install"
           );
         case "rmSvc":
           return await functions.execCommand(logHeader, PLS_BIN_PATH, "remove");
@@ -302,9 +444,56 @@ const applyPlsIpcHandler = (ipcMain) => {
           return await functions.execCommand(logHeader, PLS_BIN_PATH, "start");
         case "stopSvc":
           return await functions.execCommand(logHeader, PLS_BIN_PATH, "stop");
+        case "rmBin":
+          const unlinkPromise = new Promise((resolve) => {
+            fs.unlink(PLS_BIN_PATH, (error) => {
+              if (error) {
+                resolve({
+                  success: false,
+                  errorObj: error,
+                });
+                return false;
+              }
+
+              resolve({
+                success: true,
+                errorObj: null,
+              });
+              return true;
+            });
+          });
+
+          const unlinkRet = await unlinkPromise;
+
+          return unlinkRet;
         default:
           return { success: false, errorObj: new Error("Method not found") };
       }
+    }
+  );
+
+  ipcMain.handle(
+    `${methodBase}.downloadPls`,
+    /**
+     *
+     * @param {import("electron").IpcMainInvokeEvent} _evt
+     * @param {{channel?: "stable" | "alpha", reportTo?: import("../../../types/main/core").WindowName}} arg
+     * @returns {void}
+     */
+    (_evt, arg) => {
+      const channel = arg.channel ? arg.channel : "stable";
+      const reportWin = arg.reportTo ? arg.reportTo : "assistant";
+      functions.handlePLSDownload(
+        channel,
+        (status) => {
+          ipcMain.send(
+            reportWin,
+            `${methodBase}.post.reportPlsDownloadStatus`,
+            status
+          );
+        },
+        PLS_BIN_PATH
+      );
     }
   );
 

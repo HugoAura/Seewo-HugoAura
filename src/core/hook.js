@@ -16,6 +16,16 @@ if (!global.__HUGO_AURA__) {
   global.__HUGO_AURA__ = __HUGO_AURA__;
 }
 
+if (!global.__HUGO_AURA_API__) {
+  /** @type {import("../aura/types/shared/global").GlobalHugoAuraApiInfo} */
+  const __HUGO_AURA_API__ = {
+    baseUrl: "https://api-aura.xwx.li",
+    plsUpdate: "/api/v1/getPLSLatestVersion",
+    auraUpdate: "/api/v1/getAuraLatestVersion",
+  };
+  global.__HUGO_AURA_API__ = __HUGO_AURA_API__;
+}
+
 if (!global.__HUGO_AURA_CONFIG__) {
   global.__HUGO_AURA_CONFIG__ = {};
 }
@@ -134,7 +144,8 @@ const launcher = ({ central, windowName, config }) => {
   configManager.ensureConfigExists();
   const loadedConfig = configManager.loadConfig();
   if (!global.__HUGO_AURA__.configInit) global.__HUGO_AURA__.configInit = true;
-  if (!global.__HUGO_AURA_CONFIG_MGR__) global.__HUGO_AURA_CONFIG_MGR__ = configManager;
+  if (!global.__HUGO_AURA_CONFIG_MGR__)
+    global.__HUGO_AURA_CONFIG_MGR__ = configManager;
 
   global.__HUGO_AURA_CONFIG__ = loadedConfig;
 

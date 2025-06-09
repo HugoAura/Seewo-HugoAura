@@ -96,11 +96,19 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             };
             break;
           case "Download":
+            btnEl.onclick = async () => {
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.downloadPLSBin();
+            };
             break;
 
           // ↓ 这边的确可以把这些全都合并到一个可复用 fn 里去, 但没必要
+          // 如果后续要引入错误视觉反馈, 合并到单个 fn 反而会增加实现复杂度
           case "Install":
             btnEl.onclick = async () => {
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateOperationBtnStatus(
+                "Install",
+                true
+              );
               global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
                 "info",
                 "正在请求安装",
@@ -137,44 +145,116 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             };
             break;
           case "Uninstall":
-            btnEl.onclick = async () => {
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
-                "info",
-                "正在请求卸载",
-                null,
-                false,
-                false,
-                null
-              );
-              const ret = await ipcRenderer.invoke(
-                `${IPC_METHOD_BASE}.plsLifecycleControl`,
-                { target: "rmSvc" }
-              );
-              if (ret.success) {
-                lifecycleStatus.svcInstalled = false;
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
-                  "success",
-                  "服务卸载成功",
-                  null,
-                  true,
-                  true,
-                  2000
+            if (btnContent === "删除内核") {
+              btnEl.onclick = async () => {
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateOperationBtnStatus(
+                  "Uninstall",
+                  true
                 );
-              } else {
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
-                  "error",
-                  "服务卸载失败",
-                  "<p>检查日志以获取详细信息</p>",
-                  true,
+                  "warning",
+                  "正在删除内核",
+                  null,
+                  false,
                   false,
                   null
                 );
-              }
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
-            };
+                const ret = await ipcRenderer.invoke(
+                  `${IPC_METHOD_BASE}.plsLifecycleControl`,
+                  { target: "rmBin" }
+                );
+                if (ret.success) {
+                  lifecycleStatus.installed = false;
+                  lifecycleStatus.svcInstalled = false;
+                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                    "success",
+                    "内核已删除",
+                    null,
+                    true,
+                    true,
+                    2000
+                  );
+                } else {
+                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                    "error",
+                    "内核删除失败",
+                    "<p>检查日志以获取详细信息</p>",
+                    true,
+                    false,
+                    null
+                  );
+                }
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
+              };
+            } else {
+              btnEl.onclick = async () => {
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateOperationBtnStatus(
+                  "Uninstall",
+                  true
+                );
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                  "info",
+                  lifecycleStatus.svcRunning
+                    ? "正在停止服务并卸载"
+                    : "正在请求卸载",
+                  null,
+                  false,
+                  false,
+                  null
+                );
+                if (lifecycleStatus.svcRunning) {
+                  const stopRet = await ipcRenderer.invoke(
+                    `${IPC_METHOD_BASE}.plsLifecycleControl`,
+                    { target: "stopSvc" }
+                  );
+                  if (!stopRet.success) {
+                    global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                      "error",
+                      "服务卸载失败: 无法停止服务",
+                      "<p>检查日志以获取详细信息</p><p>您可以尝试手动停止 PLS 服务</p>",
+                      true,
+                      false,
+                      null
+                    );
+                  } else {
+                    lifecycleStatus.svcRunning = false;
+                  }
+                }
+                const ret = await ipcRenderer.invoke(
+                  `${IPC_METHOD_BASE}.plsLifecycleControl`,
+                  { target: "rmSvc" }
+                );
+                if (ret.success) {
+                  lifecycleStatus.svcInstalled = false;
+                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                    "success",
+                    "服务卸载成功",
+                    null,
+                    true,
+                    true,
+                    2000
+                  );
+                } else {
+                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                    "error",
+                    "服务卸载失败",
+                    "<p>检查日志以获取详细信息</p>",
+                    true,
+                    false,
+                    null
+                  );
+                }
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
+              };
+            }
+
             break;
           case "Start":
             btnEl.onclick = async () => {
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateOperationBtnStatus(
+                "Start",
+                true
+              );
               global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
                 "info",
                 "正在请求启动",
@@ -202,6 +282,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 await ipcRenderer.invoke(`${IPC_METHOD_BASE}.retryPlsConnect`);
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
               } else {
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
                   "error",
                   "PLS 启动失败",
@@ -215,6 +296,10 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             break;
           case "Stop":
             btnEl.onclick = async () => {
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateOperationBtnStatus(
+                "Stop",
+                true
+              );
               global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
                 "info",
                 "正在请求停止",
@@ -229,7 +314,6 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               );
               if (ret.success) {
                 lifecycleStatus.svcRunning = false;
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
                   "success",
                   "PLS 已停止",
@@ -247,6 +331,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                   false,
                   null
                 );
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
               }
             };
             break;
@@ -267,17 +352,26 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
           if (!lifecycleStatus.svcInstalled) {
             updateStatusEl(acIdInst, atIdInst, "WARNING", "已下载, 服务未安装");
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Install", false);
-            GLOBAL_FUNCTIONS.updateOperationBtnStatus("Uninstall", true);
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus(
+              "Uninstall",
+              false,
+              "删除内核"
+            );
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Start", true);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Stop", true);
           } else {
             updateStatusEl(acIdInst, atIdInst, "SUCCESS", "已安装");
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Install", true);
-            GLOBAL_FUNCTIONS.updateOperationBtnStatus("Uninstall", false);
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus(
+              "Uninstall",
+              false,
+              "卸载服务"
+            );
           }
           break;
         case false:
           updateStatusEl(acIdInst, atIdInst, "PENDING", "未下载");
+          GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", false);
           GLOBAL_FUNCTIONS.updateOperationBtnStatus("Install", true);
           GLOBAL_FUNCTIONS.updateOperationBtnStatus("Uninstall", true);
           GLOBAL_FUNCTIONS.updateOperationBtnStatus("Start", true);
@@ -343,6 +437,14 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
         lifecycleStatus.installed = true;
       } else {
         lifecycleStatus.installed = false;
+        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+          "error",
+          "请下载 PLS 内核以继续",
+          null,
+          true,
+          true,
+          3000
+        );
         global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
         return;
       }
@@ -410,7 +512,92 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
         );
       } else if (result.success && result.status === "Already") {
         updateOperationBtnStatus("Refresh", false, "刷新状态");
+        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+          "success",
+          "更新成功",
+          null,
+          true,
+          true,
+          3000
+        );
       }
+    },
+
+    downloadPLSBin: async () => {
+      const GLOBAL_FUNCTIONS =
+        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus;
+      GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", true, "正在检查");
+      GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", true);
+      const CUR_CHANNEL = `${IPC_METHOD_BASE}.post.reportPlsDownloadStatus`;
+      await ipcRenderer.invoke(`${IPC_METHOD_BASE}.ensurePlsInstallDir`);
+      GLOBAL_FUNCTIONS.updateToast(
+        "info",
+        "准备开始下载...",
+        null,
+        true,
+        true,
+        2000
+      );
+      GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", true, "等待下载");
+
+      const callbackFn = (_evt, info) => {
+        switch (info.status) {
+          case "failed":
+            GLOBAL_FUNCTIONS.updateToast(
+              "error",
+              "下载失败",
+              `<p>${
+                info.message ? info.message : "检查日志以获取错误信息"
+              }</p>`,
+              true,
+              true,
+              5000
+            );
+            ipcRenderer.off(CUR_CHANNEL, callbackFn);
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
+            break;
+          case "done":
+            GLOBAL_FUNCTIONS.updateToast(
+              "success",
+              "下载成功",
+              null,
+              true,
+              true,
+              2500
+            );
+            ipcRenderer.off(CUR_CHANNEL, callbackFn);
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus(
+              "Download",
+              true,
+              "下载内核"
+            );
+            lifecycleStatus.installed = true;
+            GLOBAL_FUNCTIONS.updateStatusContent();
+            break;
+          case "waiting":
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus(
+              "Download",
+              true,
+              "等待中..."
+            );
+            break;
+          case "progressing":
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus(
+              "Download",
+              true,
+              `下载 ${Math.round(info.progress)}%`
+            );
+            break;
+        }
+      };
+
+      ipcRenderer.on(CUR_CHANNEL, callbackFn);
+
+      ipcRenderer.invoke(`$aura.pls.downloadPls`, {
+        channel: "stable",
+        reportTo: "assistant",
+      });
     },
   };
 
