@@ -33,6 +33,7 @@ const deviceSecuritySettings = [
         },
         callbackFn: (newVal) => {
           if (typeof newVal !== "boolean") return;
+          if (!global.__HUGO_AURA__.plsRules) return;
 
           global.__HUGO_AURA__.plsRules.client.security.uploadFreezeInfo.enable =
             newVal;
@@ -48,7 +49,8 @@ const deviceSecuritySettings = [
         id: "freezeInfoReportOverrideType",
         type: "radio",
         name: "篡改模式",
-        description: "选择一种篡改模式, 选中的磁盘范围会<b>被上报</b>为冻结 (不是实际行为)",
+        description:
+          "选择一种篡改模式, 选中的磁盘范围会<b>被上报</b>为冻结 (不是实际行为)",
         restart: false,
         reload: false,
         PLSRequired: true,
@@ -57,6 +59,8 @@ const deviceSecuritySettings = [
         reactiveVal: ["root.ruleSettings"],
         associateVal: ["ruleSettings.client.security.uploadFreezeInfo.enable"],
         auraIf: () => {
+          if (!global.__HUGO_AURA__.plsRules) return true;
+
           return global.__HUGO_AURA__.plsRules.client.security.uploadFreezeInfo
             .enable;
         },
@@ -64,6 +68,8 @@ const deviceSecuritySettings = [
         templates: ["allFreeze", "systemOnly", "exceptSecondDisk"],
         templateLabels: ["全部冻结", "仅系统盘", "第二磁盘除外"],
         valueGetter: () => {
+          if (!global.__HUGO_AURA__.plsRules) return;
+
           return global.__HUGO_AURA__.plsRules.client.security.uploadFreezeInfo
             .rewriteMode;
         },
@@ -84,7 +90,7 @@ const deviceSecuritySettings = [
         loaderTarget:
           "Aura.UI.Assistant.Config.BehaviourCtrl.DeviceSecurity.FreezeOverridePreview",
         associateVal: ["ruleSettings.client.security.uploadFreezeInfo"],
-        listenerType: "pls"
+        listenerType: "pls",
       },
     ],
   },
