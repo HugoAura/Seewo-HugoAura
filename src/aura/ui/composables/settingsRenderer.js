@@ -36,9 +36,13 @@ const showToast = (entry) => {
     showReloadToast();
   } else if (entry.restart) {
     showRelaunchToast();
-  } else if (entry.restartPLS) {
+  }
+
+  /*
+  else if (entry.restartPLS) {
     showRelaunchPLSToast();
   }
+  */
 };
 
 const insertOrRemoveEl = (parent, child, isInsert = true) => {

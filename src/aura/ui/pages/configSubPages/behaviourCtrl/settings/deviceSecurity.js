@@ -62,7 +62,7 @@ const deviceSecuritySettings = [
         },
         defaultValue: "allFreeze",
         templates: ["allFreeze", "systemOnly", "exceptSecondDisk"],
-        templateLabels: ["全部冻结", "仅系统盘", "仅第二磁盘"],
+        templateLabels: ["全部冻结", "仅系统盘", "第二磁盘除外"],
         valueGetter: () => {
           return global.__HUGO_AURA__.plsRules.client.security.uploadFreezeInfo
             .rewriteMode;

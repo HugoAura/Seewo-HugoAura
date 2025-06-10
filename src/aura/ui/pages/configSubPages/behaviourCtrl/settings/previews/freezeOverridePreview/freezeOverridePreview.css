@@ -56,7 +56,7 @@
   margin-left: 0.375rem;
   margin-right: 0.375rem;
 
-  /* transition: all 0.5s; */
+  transition: all 0.5s;
   /* 没有用, 因为元素全被重新创建了 */
 }
 
@@ -64,6 +64,10 @@
   background-color: #1d70f2;
   color: white;
   border: 0.5px solid rgba(0, 0, 0, 0.125);
+}
+
+.acs-bc-dsc-fop-disk-el.active:hover {
+  background-color: #4e8df2;
 }
 
 .acs-bc-dsc-fop-main-hint-area {
