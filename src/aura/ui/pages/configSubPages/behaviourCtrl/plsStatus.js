@@ -135,7 +135,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
                   "error",
                   "服务安装失败",
-                  "<p>检查日志以获取详细信息</p>",
+                  `<p>${ret.errorObj}</p>`,
                   true,
                   false,
                   null
@@ -166,6 +166,13 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 if (ret.success) {
                   lifecycleStatus.installed = false;
                   lifecycleStatus.svcInstalled = false;
+                  global.__HUGO_AURA__.plsStats.installed = false;
+                  global.__HUGO_AURA__.plsStats.connected = false;
+                  global.__HUGO_AURA__.plsStats.launched = false;
+                  ipcRenderer.invoke(
+                    `${IPC_METHOD_BASE}.updatePlsStats`,
+                    global.__HUGO_AURA__.plsStats
+                  );
                   global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
                     "success",
                     "内核已删除",
@@ -435,8 +442,18 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       );
       if (binExistsRet.success && binExistsRet.data.isExists) {
         lifecycleStatus.installed = true;
+        global.__HUGO_AURA__.plsStats.installed = true;
+        ipcRenderer.invoke(
+          `${IPC_METHOD_BASE}.updatePlsStats`,
+          global.__HUGO_AURA__.plsStats
+        );
       } else {
         lifecycleStatus.installed = false;
+        global.__HUGO_AURA__.plsStats.installed = false;
+        ipcRenderer.invoke(
+          `${IPC_METHOD_BASE}.updatePlsStats`,
+          global.__HUGO_AURA__.plsStats
+        );
         global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
           "error",
           "请下载 PLS 内核以继续",
@@ -573,6 +590,11 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               "下载内核"
             );
             lifecycleStatus.installed = true;
+            global.__HUGO_AURA__.plsStats.installed = true;
+            ipcRenderer.invoke(
+              `${IPC_METHOD_BASE}.updatePlsStats`,
+              global.__HUGO_AURA__.plsStats
+            );
             GLOBAL_FUNCTIONS.updateStatusContent();
             break;
           case "waiting":
