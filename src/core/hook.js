@@ -30,11 +30,6 @@ if (!global.__HUGO_AURA_CONFIG__) {
   global.__HUGO_AURA_CONFIG__ = {};
 }
 
-const fs = require("fs");
-const util = require("util");
-const path = require("path");
-const os = require("os");
-
 const MainProcessHooksManager = require("../aura/init/main/windowHooksManager");
 const RendererHooksManager = require("../aura/init/rendererHook/uiHooksManager");
 const EventBus = require("../aura/utils/eventBus");
@@ -42,70 +37,7 @@ const NetworkHook = require("../aura/init/rendererHook/networkHook");
 const ConfigManager = require("../aura/init/shared/configManager");
 const { buildIpcMain } = require("../aura/init/main/ipcHandler");
 
-/**
- *
- * @param {import("../aura/types/main/core").WindowName} windowName
- */
-const initLogger = (windowName) => {
-  const logDir = path.join(os.homedir(), "Documents", "HugoAura", "logs");
-  if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir, { recursive: true });
-  }
-
-  const logFile = path.join(
-    logDir,
-    `main-${windowName}-${new Date().toISOString().replace(/:/g, "-")}.log`
-  );
-  const logStream = fs.createWriteStream(logFile, { flags: "a" });
-
-  const originalConsole = {
-    log: console.log,
-    error: console.error,
-    warn: console.warn,
-    info: console.info,
-    debug: console.debug,
-  };
-
-  console.log = function (...args) {
-    const msg = util.format("[LOG] ", ...args) + "\n";
-    logStream.write(msg);
-    originalConsole.log.apply(console, args);
-  };
-
-  console.error = function (...args) {
-    const msg = util.format("[ERROR] ", ...args) + "\n";
-    logStream.write(msg);
-    originalConsole.error.apply(console, args);
-  };
-
-  console.warn = function (...args) {
-    const msg = util.format("[WARN] ", ...args) + "\n";
-    logStream.write(msg);
-    originalConsole.warn.apply(console, args);
-  };
-
-  console.info = function (...args) {
-    const msg = util.format("[INFO] ", ...args) + "\n";
-    logStream.write(msg);
-    originalConsole.info.apply(console, args);
-  };
-
-  console.debug = function (...args) {
-    if (!process.argv.includes("--aura-debug")) return;
-    const msg = util.format("[DEBUG] ", ...args) + "\n";
-    logStream.write(msg);
-    originalConsole.debug.apply(console, args);
-  };
-
-  process.on("uncaughtException", (err) => {
-    console.error("UNCAUGHT EXCEPTION:", err);
-  });
-
-  console.log(
-    "[HugoAura / Init / Logger] Logger initialized. Log file:",
-    logFile
-  );
-};
+const { initLogger } = require("../aura/init/main/logger");
 
 /**
  *

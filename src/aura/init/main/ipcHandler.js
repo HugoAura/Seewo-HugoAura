@@ -64,9 +64,12 @@ const buildIpcMain = (electron) => {
     } else {
       const isWindowValid = global.__HUGO_AURA__.hookedWindows.has(windowKey);
       if (!isWindowValid) {
-        throw new Error(
-          `[HugoAura / Main / IPC / ERROR] Unknown windowKey: ${windowKey}`
+        console.warn(
+          `[HugoAura / Main / IPC / WARN] Unknown windowKey: ${windowKey}, window may not have started yet.`
         );
+        return {
+          success: false,
+        };
       }
 
       sendDataToWebContents(windowKey, channel, data);
