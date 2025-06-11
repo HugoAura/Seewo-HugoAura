@@ -43,6 +43,46 @@ const ConfigManager = require("../aura/init/shared/configManager");
 const { buildIpcMain } = require("../aura/init/main/ipcHandler");
 
 /**
+ * 清理旧的日志文件，保留最近30天的日志
+ * @param {string} logDir 日志目录路径
+ */
+const cleanupOldLogs = (logDir) => {
+  try {
+    const files = fs.readdirSync(logDir);
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    
+    files.forEach(file => {
+      if (file.endsWith('.log')) {
+        const filePath = path.join(logDir, file);
+        const stats = fs.statSync(filePath);
+        
+        // 如果文件创建时间超过30天，则删除
+        if (stats.birthtime < sevenDaysAgo) {
+          fs.unlinkSync(filePath);
+          console.log(`[HugoAura / Logger / Cleanup] 已删除旧日志文件: ${file}`);
+        }
+      }
+    });
+  } catch (error) {
+    console.error('[HugoAura / Logger / Cleanup] 清理日志文件时出错:', error);
+  }
+};
+
+/**
+ * 获取或创建当日的日志文件路径
+ * @param {string} logDir 日志目录路径
+ * @param {string} windowName 窗口名称
+ * @returns {string} 日志文件路径
+ */
+const getDailyLogFile = (logDir, windowName) => {
+  const today = new Date();
+  const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD 格式
+  const logFileName = `hugo-aura-${dateStr}.log`;
+  return path.join(logDir, logFileName);
+};
+
+/**
  *
  * @param {import("../aura/types/main/core").WindowName} windowName
  */
@@ -52,11 +92,17 @@ const initLogger = (windowName) => {
     fs.mkdirSync(logDir, { recursive: true });
   }
 
-  const logFile = path.join(
-    logDir,
-    `main-${windowName}-${new Date().toISOString().replace(/:/g, "-")}.log`
-  );
+  // 清理旧的日志文件
+  cleanupOldLogs(logDir);
+
+  // 获取当日的日志文件路径
+  const logFile = getDailyLogFile(logDir, windowName);
   const logStream = fs.createWriteStream(logFile, { flags: "a" });
+  
+  // 在日志文件中添加窗口启动标记
+  const timestamp = new Date().toISOString();
+  const startupMsg = `\n=== [${timestamp}] HugoAura 窗口启动: ${windowName} ===\n`;
+  logStream.write(startupMsg);
 
   const originalConsole = {
     log: console.log,
