@@ -427,10 +427,6 @@ const applyPlsIpcHandler = (ipcMain) => {
     async (_event, arg) => {
       const logHeader = "[HugoAura / IPC / PLS] <plsLifecycleControl>";
 
-      if (!global.__HUGO_AURA__.plsStats?.installed) {
-        return { success: false, errorObj: new Error("PLS not installed") };
-      }
-
       switch (arg.target) {
         case "instSvc":
           return await functions.execCommand(
@@ -452,6 +448,10 @@ const applyPlsIpcHandler = (ipcMain) => {
                   success: false,
                   errorObj: error,
                 });
+                console.error(
+                  `${logHeader} Failed to remove PLS bin, error:`,
+                  error
+                );
                 return false;
               }
 

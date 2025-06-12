@@ -185,7 +185,9 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                   global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
                     "error",
                     "内核删除失败",
-                    "<p>检查日志以获取详细信息</p>",
+                    `<p>
+                      ${ret.errorObj ? ret.errorObj : "检查日志以获取详细信息"}
+                    </p>`,
                     true,
                     false,
                     null
@@ -218,7 +220,14 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                     global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
                       "error",
                       "服务卸载失败: 无法停止服务",
-                      "<p>检查日志以获取详细信息</p><p>您可以尝试手动停止 PLS 服务</p>",
+                      `<p>${
+                        stopRet.errorObj
+                          ? stopRet.errorObj
+                          : "检查日志以获取详细信息"
+                      }</p>
+                      <p>
+                        您可以尝试手动停止 PLS 服务
+                      </p>`,
                       true,
                       false,
                       null
@@ -565,7 +574,9 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               "下载失败",
               `<p>${
                 info.message ? info.message : "检查日志以获取错误信息"
-              }</p>`,
+              }</p><p>
+              ${info.errorObj ? info.errorObj : ""}
+              </p>`,
               true,
               true,
               5000

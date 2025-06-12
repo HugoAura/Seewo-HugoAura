@@ -123,6 +123,7 @@ const composableFunctions = {
       failedTemplate.message =
         "Request error: Unexpected error while downloading file";
       failedTemplate.errorObj = e;
+      console.error(`[HugoAura / IPC / FS / ERROR] Error downloading file from ${url}, errorObj:`, e);
       progressCallback(failedTemplate);
       global.__HUGO_AURA__.fsTasks?.downloadTasks.delete(taskId);
       return false;

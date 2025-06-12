@@ -19,7 +19,7 @@ if (!global.__HUGO_AURA__) {
 if (!global.__HUGO_AURA_API__) {
   /** @type {import("../aura/types/shared/global").GlobalHugoAuraApiInfo} */
   const __HUGO_AURA_API__ = {
-    baseUrl: "https://api-aura.xwx.li",
+    baseUrl: "https://api.aura.vim.moe",
     plsUpdate: "/api/v1/getPLSLatestVersion",
     auraUpdate: "/api/v1/getAuraLatestVersion",
   };
