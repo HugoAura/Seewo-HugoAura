@@ -170,8 +170,6 @@ const auraSettings = [
         description: "启用后, Aura 设置 UI 需要输入密码才可访问",
         restart: false,
         reload: false,
-        tip: true,
-        tipTitle: "启用访问密码将自动加密配置文件",
         associateVal: null,
         auraIf: () => true,
         defaultValue: false,
