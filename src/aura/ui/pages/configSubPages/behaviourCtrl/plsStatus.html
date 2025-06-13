@@ -124,6 +124,37 @@
     </div>
   </div>
 
+  <div class="acs-bc-psp-download-progress-area acs-bc-psp-dl-pbar-hidden">
+    <div class="progress" role="progressbar">
+      <div class="progress-bar" id="acsBcPspDownloadPbarEl"></div>
+    </div>
+    <div class="acs-bc-psp-download-progress-info-area">
+      <p id="acsBcPspDownloadPbarDesc">等待中...</p>
+      <div
+        class="acs-bc-psp-operation-btn hidden"
+        id="acsBcPspDownloadPbarCancelBtn"
+        onclick="global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.cancelDownloadTask()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 32 32"
+        >
+          <path
+            fill="var(--svg-color)"
+            d="M9 10.555L10.555 9L23 21.444L21.444 23z"
+          />
+          <path
+            fill="var(--svg-color)"
+            d="M16 2A13.914 13.914 0 0 0 2 16a13.914 13.914 0 0 0 14 14a13.914 13.914 0 0 0 14-14A13.914 13.914 0 0 0 16 2m0 26a12 12 0 1 1 12-12a12.035 12.035 0 0 1-12 12"
+          />
+        </svg>
+        <p>取消操作</p>
+      </div>
+    </div>
+  </div>
+
   <div class="acs-bc-pls-status-page-status-el">
     <p>安装状态</p>
     <div
@@ -165,7 +196,11 @@
   </div>
 
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="plsStatusNotifyToast" class="acs-bc-psp-toast toast" data-bs-autohide="false">
+    <div
+      id="plsStatusNotifyToast"
+      class="acs-bc-psp-toast toast"
+      data-bs-autohide="false"
+    >
       <div class="toast-header">
         <strong class="me-auto" id="plsStatusNotifyToastTitle"></strong>
         <button

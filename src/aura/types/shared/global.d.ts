@@ -24,7 +24,7 @@ interface GlobalHugoAuraInfo {
 }
 
 interface GlobalHugoAuraApiInfo {
-  baseUrl: string;
+  domains: string[];
   plsUpdate: string;
   auraUpdate: string;
 }

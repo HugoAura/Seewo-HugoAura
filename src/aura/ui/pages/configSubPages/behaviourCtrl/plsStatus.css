@@ -33,6 +33,10 @@
   margin-bottom: 1rem;
 }
 
+.acs-bc-psp-operations-container.acs-bc-psp-oper-ctnr-hidden {
+  display: none;
+}
+
 .acs-bc-psp-operation-btn {
   --svg-color: rgb(17, 140, 255);
 
@@ -83,6 +87,50 @@
 
 .acs-bc-psp-operation-btn:active {
   opacity: 0.3;
+}
+
+.acs-bc-psp-download-progress-area {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  justify-content: center;
+  align-items: center;
+}
+
+.acs-bc-psp-download-progress-area.acs-bc-psp-dl-pbar-hidden {
+  display: none;
+}
+
+.acs-bc-psp-download-progress-area .progress {
+  height: 2px;
+  width: 80%;
+  margin-bottom: 0.6rem;
+}
+
+.acs-bc-psp-download-progress-area .progress-bar {
+  transition: all 0.15s;
+}
+
+.acs-bc-psp-download-progress-area #acsBcPspDownloadPbarDesc {
+  opacity: 0.6;
+  margin-bottom: 0.25rem;
+}
+
+.acs-bc-psp-download-progress-info-area {
+  display: flex;
+}
+
+.acs-bc-psp-download-progress-info-area .acs-bc-psp-operation-btn {
+  margin-left: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.acs-bc-psp-download-progress-info-area .acs-bc-psp-operation-btn.hidden {
+  display: none;
+}
+
+.acs-bc-psp-download-progress-info-area .acs-bc-psp-operation-btn svg {
+  margin-top: 1px;
 }
 
 .acs-bc-pls-status-page-status-el {

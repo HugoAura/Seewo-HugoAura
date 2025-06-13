@@ -38,15 +38,26 @@ const composableFunctions = {
       progressCallback(failedTemplate);
       return false;
     }
-    if (!fs.existsSync(path.dirname(targetPath))) {
-      failedTemplate.message = "Path not exists";
-      progressCallback(failedTemplate);
+
+    const dirName = path.dirname(targetPath);
+
+    if (!fs.existsSync(dirName)) {
+      fs.mkdirSync(dirName);
     }
+
     const httpModuleIns = url.startsWith("https") ? nodeHttps : nodeHttp;
 
     global.__HUGO_AURA__.fsTasks?.downloadTasks.set(taskId, {
       status: "waiting",
       cancelReq: null,
+    });
+
+    progressCallback({
+      id: taskId,
+      progress: 0,
+      status: "waiting",
+      dlUrl: url,
+      savePath: targetPath,
     });
 
     const fsStream = fs.createWriteStream(targetPath);
@@ -64,9 +75,12 @@ const composableFunctions = {
       const totalBytes = parseInt(contentLength, 10) || 0; // No error handling 😆
       let curRecvBytes = 0;
 
+      let hasCancelled = false;
+
       global.__HUGO_AURA__.fsTasks?.downloadTasks.set(taskId, {
         status: "progressing",
         cancelReq: () => {
+          hasCancelled = true;
           dlReq.destroy();
           fsStream.close();
           fs.unlink(targetPath, () => {});
@@ -102,6 +116,9 @@ const composableFunctions = {
 
       fsStream.on("finish", () => {
         fsStream.close();
+        if (hasCancelled) {
+          return;
+        }
         progressCallback({
           id: taskId,
           progress: (100).toFixed(2),
@@ -111,9 +128,9 @@ const composableFunctions = {
           dlUrl: url,
           savePath: targetPath,
         });
+        global.__HUGO_AURA__.fsTasks?.downloadTasks.delete(taskId);
       });
 
-      global.__HUGO_AURA__.fsTasks?.downloadTasks.delete(taskId);
       return true;
     });
 
@@ -123,7 +140,10 @@ const composableFunctions = {
       failedTemplate.message =
         "Request error: Unexpected error while downloading file";
       failedTemplate.errorObj = e;
-      console.error(`[HugoAura / IPC / FS / ERROR] Error downloading file from ${url}, errorObj:`, e);
+      console.error(
+        `[HugoAura / IPC / FS / ERROR] Error downloading file from ${url}, errorObj:`,
+        e
+      );
       progressCallback(failedTemplate);
       global.__HUGO_AURA__.fsTasks?.downloadTasks.delete(taskId);
       return false;

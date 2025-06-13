@@ -19,9 +19,15 @@ if (!global.__HUGO_AURA__) {
 if (!global.__HUGO_AURA_API__) {
   /** @type {import("../aura/types/shared/global").GlobalHugoAuraApiInfo} */
   const __HUGO_AURA_API__ = {
-    baseUrl: "https://api.aura.vim.moe",
-    plsUpdate: "/api/v1/getPLSLatestVersion",
-    auraUpdate: "/api/v1/getAuraLatestVersion",
+    domains: [
+      "https://api-aura-projekts.delta.ooo",
+      "https://api-aura.asaka.site",
+      "https://api.hugoaura.dpdns.org",
+      "https://api-aura-projekts.minorice.moe",
+      "https://api.aura.vim.moe"
+    ],
+    plsUpdate: "/api/getPLSLatestVersion",
+    auraUpdate: "/api/getAuraLatestVersion",
   };
   global.__HUGO_AURA_API__ = __HUGO_AURA_API__;
 }

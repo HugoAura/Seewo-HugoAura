@@ -6,7 +6,7 @@
       detached: false,
       connected: false,
       launched: false,
-      status: "unknown",
+      status: "dead",
       version: "未知",
       authToken: "",
     };
@@ -259,7 +259,10 @@
       `${IPC_METHOD_BASE}.getPlsStats`
     );
     let updatedPlsStats = {};
-    if (curPlsStats === null || !curPlsStats.success) {
+    if (
+      (curPlsStats === null || !curPlsStats.success) &&
+      curPlsStats.status !== "downloading"
+    ) {
       updatedPlsStats = {
         installed: false,
         launched: false,
@@ -269,14 +272,13 @@
         status: "dead",
         authToken: "66ccff0d000721114514191981023333",
       };
+      const isPlsFolderExists = (
+        await global.ipcRenderer.invoke(`${IPC_METHOD_BASE}.getPlsBinExists`)
+      ).data.isExists;
+      updatedPlsStats.installed = isPlsFolderExists;
     } else {
       updatedPlsStats = curPlsStats.data;
     }
-
-    const isPlsFolderExists = (
-      await global.ipcRenderer.invoke(`${IPC_METHOD_BASE}.getPlsBinExists`)
-    ).data.isExists;
-    updatedPlsStats.installed = isPlsFolderExists;
 
     // @ts-expect-error
     global.__HUGO_AURA__.plsStats = updatedPlsStats;

@@ -1,5 +1,5 @@
 type DownloadTaskID = string;
-type DownloadTaskStatus = "waiting" | "progressing" | "done" | "failed" | "cancelled";
+type DownloadTaskStatus = "waiting" | "progressing" | "done" | "failed" | "cancelled" | "struggling";
 
 interface DownloadTask {
   id: DownloadTaskID;

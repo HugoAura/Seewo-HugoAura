@@ -17,6 +17,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
 
   global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus = {
     toastAutoHideTimeout: null,
+    curDlTaskId: null,
   };
 
   global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus = {
@@ -361,6 +362,10 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
     updateStatusContent: async () => {
       const curPlsStats = await updatePlsStatusFromLocal();
 
+      if (curPlsStats.status === "downloading") {
+        GLOBAL_FUNCTIONS.downloadPLSBin(true);
+      }
+
       const acIdInst = "acs-bc-psp-installStatus-container";
       const atIdInst = "acs-bc-psp-installStatus-text";
       switch (lifecycleStatus.installed) {
@@ -549,22 +554,101 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       }
     },
 
-    downloadPLSBin: async () => {
+    /**
+     *
+     * @param {boolean} isShow
+     */
+    switchPBarShowStatus: (isShow) => {
+      const operAreaEl = document.getElementsByClassName(
+        "acs-bc-psp-operations-container"
+      )[0];
+      const pBarAreaEl = document.getElementsByClassName(
+        "acs-bc-psp-download-progress-area"
+      )[0];
+      const pBarDescEl = document.getElementById("acsBcPspDownloadPbarDesc");
+      const pBarSelfEl = document.getElementById("acsBcPspDownloadPbarEl");
+
+      if (isShow) {
+        pBarAreaEl.classList.remove("acs-bc-psp-dl-pbar-hidden");
+        operAreaEl.classList.add("acs-bc-psp-oper-ctnr-hidden");
+        pBarDescEl.textContent = "等待中...";
+        pBarSelfEl.style["width"] = "0";
+      } else {
+        pBarAreaEl.classList.add("acs-bc-psp-dl-pbar-hidden");
+        operAreaEl.classList.remove("acs-bc-psp-oper-ctnr-hidden");
+      }
+
+      return true;
+    },
+
+    updatePBarStatus: async (
+      progress = null,
+      desc = null,
+      type = null,
+      isCancelShown = null
+    ) => {
+      const pBarDescEl = document.getElementById("acsBcPspDownloadPbarDesc");
+      const pBarSelfEl = document.getElementById("acsBcPspDownloadPbarEl");
+      const pBarBtnEl = document.getElementById(
+        "acsBcPspDownloadPbarCancelBtn"
+      );
+      if (progress) {
+        pBarSelfEl.style["width"] = `${progress}%`;
+      }
+
+      if (type) {
+        pBarSelfEl.classList.remove("bg-success");
+        pBarSelfEl.classList.remove("bg-warning");
+        pBarSelfEl.classList.remove("bg-danger");
+        if (type !== "normal") {
+          pBarSelfEl.classList.add(`bg-${type}`);
+        }
+      }
+
+      if (desc) {
+        pBarDescEl.innerHTML = desc;
+      }
+
+      if (isCancelShown !== null) {
+        if (isCancelShown) {
+          pBarBtnEl.classList.remove("hidden");
+        } else {
+          pBarBtnEl.classList.add("hidden");
+        }
+      }
+    },
+
+    downloadPLSBin: async (retrieveMode = false) => {
       const GLOBAL_FUNCTIONS =
         global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus;
-      GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", true, "正在检查");
-      GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", true);
       const CUR_CHANNEL = `${IPC_METHOD_BASE}.post.reportPlsDownloadStatus`;
-      await ipcRenderer.invoke(`${IPC_METHOD_BASE}.ensurePlsInstallDir`);
-      GLOBAL_FUNCTIONS.updateToast(
-        "info",
-        "准备开始下载...",
-        null,
-        true,
-        true,
-        2000
-      );
-      GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", true, "等待下载");
+
+      if (!retrieveMode) {
+        GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", true, "正在检查");
+        GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", true);
+        await ipcRenderer.invoke(`${IPC_METHOD_BASE}.ensurePlsInstallDir`);
+        GLOBAL_FUNCTIONS.updateToast(
+          "info",
+          "准备开始下载...",
+          null,
+          true,
+          true,
+          2000
+        );
+        GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", true);
+      } else {
+        GLOBAL_FUNCTIONS.updateToast(
+          "info",
+          "正在恢复下载状态",
+          null,
+          true,
+          true,
+          2000
+        );
+      }
+
+      GLOBAL_FUNCTIONS.switchPBarShowStatus(true);
+      GLOBAL_FUNCTIONS.updatePBarStatus(0, "等待中...", "normal", false);
 
       const callbackFn = (_evt, info) => {
         switch (info.status) {
@@ -581,8 +665,24 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               true,
               5000
             );
+
+            GLOBAL_FUNCTIONS.updatePBarStatus(
+              100,
+              "下载时发生错误",
+              "danger",
+              false
+            );
+            setTimeout(() => {
+              GLOBAL_FUNCTIONS.switchPBarShowStatus(false);
+            }, 1000);
+
             ipcRenderer.off(CUR_CHANNEL, callbackFn);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus(
+              "Download",
+              false,
+              "下载内核"
+            );
             break;
           case "done":
             GLOBAL_FUNCTIONS.updateToast(
@@ -593,6 +693,17 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               true,
               2500
             );
+
+            GLOBAL_FUNCTIONS.updatePBarStatus(
+              100,
+              "下载成功",
+              "success",
+              false
+            );
+            setTimeout(() => {
+              GLOBAL_FUNCTIONS.switchPBarShowStatus(false);
+            }, 1000);
+
             ipcRenderer.off(CUR_CHANNEL, callbackFn);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus(
@@ -609,17 +720,41 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             GLOBAL_FUNCTIONS.updateStatusContent();
             break;
           case "waiting":
-            GLOBAL_FUNCTIONS.updateOperationBtnStatus(
-              "Download",
-              true,
-              "等待中..."
-            );
+            GLOBAL_FUNCTIONS.updatePBarStatus(0, "正在连接", "normal");
+            if (
+              !global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus
+                .curDlTaskId ||
+              global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus
+                .curDlTaskId !== info.id
+            ) {
+              global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus.curDlTaskId =
+                info.id;
+            }
             break;
           case "progressing":
+            const roundProgress = Math.round(info.progress);
+            GLOBAL_FUNCTIONS.updatePBarStatus(
+              roundProgress,
+              `正在下载中... ${roundProgress}% (${(
+                info.curBytes /
+                1024 /
+                1024
+              ).toFixed(2)}MB / ${(info.totalBytes / 1024 / 1024).toFixed(
+                2
+              )}MB)`, // POWERED BY PRETTIER
+              "normal",
+              true
+            );
+            break;
+          case "struggling":
+            GLOBAL_FUNCTIONS.updatePBarStatus(100, info.message, "warning");
+            break;
+          case "cancelled":
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus(
               "Download",
-              true,
-              `下载 ${Math.round(info.progress)}%`
+              false,
+              "下载内核"
             );
             break;
         }
@@ -627,10 +762,55 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
 
       ipcRenderer.on(CUR_CHANNEL, callbackFn);
 
-      ipcRenderer.invoke(`$aura.pls.downloadPls`, {
+      ipcRenderer.invoke(`${IPC_METHOD_BASE}.downloadPls`, {
         channel: "stable",
         reportTo: "assistant",
       });
+    },
+
+    cancelDownloadTask: async () => {
+      const taskId =
+        global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus.curDlTaskId;
+
+      if (!taskId) {
+        GLOBAL_FUNCTIONS.updateToast(
+          "error",
+          "操作取消失败",
+          "<p>未能获取当前的下载任务 ID</p>",
+          true,
+          true,
+          3000
+        );
+        return false;
+      }
+
+      const result = await ipcRenderer.invoke(
+        "$aura.fs.dl.cancelDownloadTask",
+        { targetTaskId: taskId }
+      );
+
+      if (result.success) {
+        GLOBAL_FUNCTIONS.updateToast(
+          "success",
+          "操作取消成功",
+          null,
+          true,
+          true,
+          2000
+        );
+        GLOBAL_FUNCTIONS.switchPBarShowStatus(false);
+        return true;
+      } else {
+        GLOBAL_FUNCTIONS.updateToast(
+          "error",
+          "操作取消失败",
+          `<p>错误代码: ${result.error}</p>`,
+          true,
+          true,
+          3000
+        );
+        return false;
+      }
     },
   };
 

@@ -71,34 +71,92 @@ const functions = {
   handlePLSDownload: async (channel, callbackFn, binPath) => {
     // TODO: Channel selection
     const apiInfo = global.__HUGO_AURA_API__;
-    let plsVersionInfo = {};
 
-    const getVerPromise = new Promise((resolve) => {
+    const getVerPromise = new Promise(async (resolveGetVerReq) => {
       // ↓ 目前 channel param 没有什么用处
-      nodeHttps
-        .get(
-          `${apiInfo.baseUrl}${apiInfo.plsUpdate}?channel=${channel}`,
-          (rep) => {
-            let dataChunk = "";
-            rep.on("data", (chunk) => {
-              dataChunk += chunk;
-            });
+      for (const apiDomain of apiInfo.domains) {
+        const reqPromise = new Promise((resolveHttpRequest) => {
+          nodeHttps
+            .get(
+              `${apiDomain}${apiInfo.plsUpdate}?channel=${channel}`,
+              (rep) => {
+                let dataChunk = "";
+                rep.on("data", (chunk) => {
+                  dataChunk += chunk;
+                });
 
-            rep.on("end", () => {
-              resolve({
-                success: true,
-                data: dataChunk,
+                rep.on("end", () => {
+                  let parsedData = {};
+                  try {
+                    parsedData = JSON.parse(dataChunk);
+                  } catch (e) {
+                    callbackFn({
+                      id: "",
+                      progress: 0,
+                      status: "struggling",
+                      dlUrl: null,
+                      savePath: null,
+                      message: `数据解析失败, 正在尝试 API 域名 ${
+                        apiInfo.domains[apiInfo.domains.indexOf(apiDomain) + 1]
+                      } ...`,
+                      errorObj: e,
+                    });
+
+                    setTimeout(() => {
+                      resolveHttpRequest({
+                        success: false,
+                        errorObj: e,
+                      });
+                    }, 1000);
+                    return;
+                  }
+
+                  resolveHttpRequest({
+                    success: true,
+                    data: parsedData,
+                  });
+                  return;
+                });
+              }
+            )
+            .on("error", (e) => {
+              callbackFn({
+                id: "",
+                progress: 0,
+                status: "struggling",
+                dlUrl: null,
+                savePath: null,
+                message: `连接失败, 正在尝试 API 域名 ${
+                  apiInfo.domains[apiInfo.domains.indexOf(apiDomain) + 1]
+                } ...`,
+                errorObj: e,
               });
+
+              setTimeout(() => {
+                resolveHttpRequest({
+                  success: false,
+                  errorObj: e,
+                });
+              }, 1000);
             });
-          }
-        )
-        .on("error", (e) => {
-          resolve({
-            success: false,
-            data: null,
-            errorObj: e,
-          });
         });
+
+        const requestResult = await reqPromise;
+        if (requestResult.success) {
+          resolveGetVerReq({
+            success: true,
+            data: requestResult.data,
+          });
+          break;
+        } else {
+          continue;
+        }
+      }
+
+      resolveGetVerReq({
+        success: false,
+        data: null,
+      });
     });
 
     const rawResInfo = await getVerPromise;
@@ -109,30 +167,12 @@ const functions = {
         status: "failed",
         dlUrl: null,
         savePath: null,
-        message: "未能获取 PLS 版本信息",
-        errorObj: rawResInfo.errorObj ? rawResInfo.errorObj : null,
+        message: "未能获取 PLS 版本信息, 所有 API 域名均无法连接",
       });
       return false;
     }
 
-    try {
-      plsVersionInfo = JSON.parse(rawResInfo.data);
-    } catch (e) {
-      callbackFn({
-        id: "",
-        progress: 0,
-        status: "failed",
-        dlUrl: null,
-        savePath: null,
-        message: "PLS 版本信息解析失败",
-        errorObj: e,
-      });
-      console.error(
-        "[HugoAura / IPC / PLS] Error querying PLS version info:",
-        e
-      );
-      return false;
-    }
+    const plsVersionInfo = rawResInfo.data;
 
     let deviceArch = process.env.PROCESSOR_ARCHITEW6432
       ? process.env.PROCESSOR_ARCHITEW6432
@@ -155,7 +195,16 @@ const functions = {
     fsComposables.downloadFile(
       plsVersionInfo.data.downloadUrl[deviceArch],
       binPath,
-      callbackFn
+      (...args) => {
+        if (args[0].status === "done") {
+          if (global.__HUGO_AURA__.plsStats) {
+            global.__HUGO_AURA__.plsStats.installed = true;
+            global.__HUGO_AURA__.plsStats.status = "dead";
+          }
+        }
+
+        callbackFn(...args);
+      }
     );
   },
 };
@@ -192,11 +241,18 @@ const applyPlsIpcHandler = (ipcMain) => {
     (_event, _arg) => {
       try {
         const result = fs.existsSync(PLS_BIN_PATH);
+
+        if (global.__HUGO_AURA__.plsStats?.status === "notInstalled") {
+          global.__HUGO_AURA__.plsStats.status = "dead";
+        }
+
         return {
           success: true,
           data: { isExists: result },
         };
       } catch (e) {
+        // @ts-expect-error
+        global.__HUGO_AURA__.plsStats.status = "notInstalled";
         return {
           success: false,
           data: { isExists: false },
