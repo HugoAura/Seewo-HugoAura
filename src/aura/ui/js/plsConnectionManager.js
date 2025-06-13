@@ -272,14 +272,14 @@
         status: "dead",
         authToken: "66ccff0d000721114514191981023333",
       };
-      const isPlsFolderExists = (
-        await global.ipcRenderer.invoke(`${IPC_METHOD_BASE}.getPlsBinExists`)
-      ).data.isExists;
-      updatedPlsStats.installed = isPlsFolderExists;
     } else {
       updatedPlsStats = curPlsStats.data;
     }
 
+    const isPlsFolderExists = (
+      await global.ipcRenderer.invoke(`${IPC_METHOD_BASE}.getPlsBinExists`)
+    ).data.isExists;
+    updatedPlsStats.installed = isPlsFolderExists;
     // @ts-expect-error
     global.__HUGO_AURA__.plsStats = updatedPlsStats;
     console.debug(
@@ -328,5 +328,7 @@
     );
   };
 
-  onSetup();
+  setTimeout(() => {
+    onSetup();
+  }, 1500);
 })();

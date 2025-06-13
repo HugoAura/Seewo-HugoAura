@@ -10,9 +10,9 @@ global.__HUGO_AURA_UI_FUNCTIONS__.headerIcon = {
   let clickTimeout = null;
 
   const onMounted = () => {
-    if (global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod.showEntryIcon) {
+    if (!global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod.showEntryIcon) {
       const iconEl = document.getElementsByClassName("aura-header-icon")[0];
-      iconEl.classList.remove("aura-header-icon-hidden");
+      iconEl.classList.add("aura-header-icon-hidden");
     }
 
     if (

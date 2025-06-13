@@ -32,6 +32,14 @@
           }
         )
           .then(async (response) => {
+            if (response.status !== 200) {
+              resolve({
+                success: true,
+                data: null,
+                status: response.status
+              })
+            }
+
             const parsedData = await response.json();
 
             resolve({
