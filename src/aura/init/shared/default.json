@@ -30,7 +30,14 @@
     "settingsPasswordEnabled": false,
     "settingsPasswordWithSalt": "32703D292460CC9A3B867494D6AD9A8E4A3ADF0FAA4D6867BC4D412CC3927D02E47C6D0B1763BB53E57B2241C6193433561CDA09D7C48CA03983072B876F0965",
     "encryptConfig": false,
-    "appearance": {}
+    "appearance": {},
+    "uiAccessMethod": {
+      "showEntryIcon": true,
+      "fallbackAccessMethods": {
+        "hotkey": false,
+        "touch": false
+      }
+    }
   },
   "devTools": false
 }

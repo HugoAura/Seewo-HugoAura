@@ -42,7 +42,7 @@ const composableFunctions = {
     const dirName = path.dirname(targetPath);
 
     if (!fs.existsSync(dirName)) {
-      fs.mkdirSync(dirName);
+      fs.mkdirSync(dirName, { recursive: true });
     }
 
     const httpModuleIns = url.startsWith("https") ? nodeHttps : nodeHttp;

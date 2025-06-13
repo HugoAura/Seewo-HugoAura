@@ -4,16 +4,14 @@
 
   /* Util: BootStrap Tooltip Ctrl */
   let tooltipTriggerCache = null;
-  const refreshBsTooltip = () => {
+  const refreshBsTooltip = (selector = '[data-bs-toggle="tooltip"]') => {
     if (tooltipTriggerCache) {
       [...tooltipTriggerCache].map((el) =>
         bootstrap.Tooltip.getInstance(el).disable()
       );
     }
 
-    const tooltipTriggerList = document.querySelectorAll(
-      '[data-bs-toggle="tooltip"]'
-    );
+    const tooltipTriggerList = document.querySelectorAll(selector);
     tooltipTriggerCache = tooltipTriggerList;
     [...tooltipTriggerList].map(
       (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)

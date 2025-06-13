@@ -45,6 +45,28 @@ const showToast = (entry) => {
   */
 };
 
+const setDisableStatus = (el, isDisable, hint = null) => {
+  if (isDisable) {
+    el.classList.add("ase-operation-area-disabled");
+    if (hint) {
+      el.setAttribute("data-bs-toggle", "tooltip");
+      el.setAttribute("data-bs-placement", "top");
+      el.setAttribute("data-bs-title", hint);
+      const tooltipIns = bootstrap.Tooltip.getOrCreateInstance(el);
+      tooltipIns.enable();
+    }
+  } else {
+    el.setAttribute("data-bs-toggle", "tooltip");
+    el.setAttribute("data-bs-placement", "top");
+    el.setAttribute("data-bs-title", "None");
+    el.classList.remove("ase-operation-area-disabled");
+    const tooltipIns = bootstrap.Tooltip.getInstance(el);
+    if (tooltipIns) {
+      tooltipIns.dispose();
+    }
+  }
+};
+
 const insertOrRemoveEl = (parent, child, isInsert = true) => {
   if (Array.isArray(child)) {
     for (const perEl of child) {
@@ -71,7 +93,12 @@ const renderInputArea = (entry, operationArea, descriptionArea) => {
       switchEl.checked = elValue;
       switchEl.addEventListener("change", async (event) => {
         showToast(entry);
-        await entry.callbackFn(event.target.checked);
+        await entry.callbackFn(
+          event.target.checked,
+          switchEl,
+          operationArea,
+          descriptionArea
+        );
       });
       operationArea.classList.add("form-check", "form-switch");
       return switchEl;
@@ -92,7 +119,12 @@ const renderInputArea = (entry, operationArea, descriptionArea) => {
         radioEl.addEventListener("change", async (event) => {
           if (event.target.checked) {
             showToast(entry);
-            await entry.callbackFn(event.target.value);
+            await entry.callbackFn(
+              event.target.value,
+              radioEl,
+              operationArea,
+              descriptionArea
+            );
           }
         });
         inlineContainerEl.appendChild(radioEl);
@@ -114,7 +146,12 @@ const renderInputArea = (entry, operationArea, descriptionArea) => {
       inputEl.placeholder = entry.placeHolder;
       inputEl.id = entry.id;
       inputEl.addEventListener("change", async (event) => {
-        const result = await entry.callbackFn(event.target.value);
+        const result = await entry.callbackFn(
+          event.target.value,
+          inputEl,
+          operationArea,
+          descriptionArea
+        );
         const success = result.valid;
         if (success) {
           showToast(entry);
@@ -250,22 +287,6 @@ const renderNormalSettingsItem = (entry, formEl) => {
     // createOnLeaveEvtListener(channel, evtListener);
   }
 
-  const setDisableStatus = (el, isDisable, hint = null) => {
-    if (isDisable) {
-      el.classList.add("ase-operation-area-disabled");
-      if (hint) {
-        el.setAttribute("data-bs-toggle", "tooltip");
-        el.setAttribute("data-bs-placement", "top");
-        el.setAttribute("data-bs-title", hint);
-      }
-    } else {
-      el.setAttribute("data-bs-toggle", "");
-      el.setAttribute("data-bs-placement", "");
-      el.setAttribute("data-bs-title", "");
-      el.classList.remove("ase-operation-area-disabled");
-    }
-  };
-
   if (entry.PLSRequired) {
     if (!global.__HUGO_AURA__.plsStats.connected) {
       setDisableStatus(entryOperationArea, true, "连接至 PLS 以继续");
@@ -285,6 +306,19 @@ const renderNormalSettingsItem = (entry, formEl) => {
   const isShow = entry.auraIf();
   if (!isShow) entryContainerEl.classList.add("aura-settings-entry-hidden");
 
+  const updateDisableStatus = () => {
+    const isDisabledRet = entry.auraDisable();
+    setDisableStatus(
+      entryOperationArea,
+      isDisabledRet.value,
+      isDisabledRet.tooltip
+    );
+  };
+
+  if (entry.auraDisable) {
+    updateDisableStatus();
+  }
+
   if (entry.associateVal) {
     const evtListener = (event) => {
       if (!entry.associateVal.includes(event.detail.path.join("."))) return;
@@ -293,6 +327,10 @@ const renderNormalSettingsItem = (entry, formEl) => {
       isShow
         ? cls.remove("aura-settings-entry-hidden")
         : cls.add("aura-settings-entry-hidden");
+
+      if (entry.auraDisable) {
+        updateDisableStatus();
+      }
     };
     const channel = entry.PLSRequired
       ? "onPLSConfigUpdate"
@@ -378,7 +416,9 @@ const settingsRenderer = (pendingEl, settingsObj) => {
   }
   pendingEl.appendChild(formEl);
 
-  global.__HUGO_AURA_GLOBAL__.utils.refreshBsTooltip();
+  global.__HUGO_AURA_GLOBAL__.utils.refreshBsTooltip(
+    ".aura-settings-entry-property-icon"
+  );
 };
 
 module.exports = { settingsRenderer };

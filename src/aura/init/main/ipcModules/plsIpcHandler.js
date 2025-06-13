@@ -283,7 +283,7 @@ const applyPlsIpcHandler = (ipcMain) => {
       }
 
       try {
-        fs.mkdirSync(PLS_INSTALL_DIR);
+        fs.mkdirSync(PLS_INSTALL_DIR, { recursive: true });
         return {
           success: true,
           data: {

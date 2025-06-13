@@ -155,6 +155,27 @@ const functions = {
 
     return await handleExit();
   },
+
+  getCurAccessMethodCount: () => {
+    const fallbackMethods =
+      global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod
+        .fallbackAccessMethods;
+    const fallbackMethodsKeys = Object.keys(fallbackMethods);
+
+    let enabledCount = 0;
+
+    for (const method of fallbackMethodsKeys) {
+      if (fallbackMethods[method]) {
+        enabledCount += 1;
+      }
+    }
+
+    if (global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod.showEntryIcon) {
+      enabledCount += 1;
+    }
+
+    return enabledCount;
+  },
 };
 
 const auraSettings = [
@@ -286,8 +307,142 @@ const auraSettings = [
   },
   {
     id: 1,
-    categoryName: "外观",
-    child: [],
+    categoryName: "访问方式",
+    child: [
+      {
+        index: 0,
+        id: "showEntryIcon",
+        type: "switch",
+        name: "显示 HugoAura 设置图标",
+        description: "控制 HugoAura 设置入口图标在管家首页的显示状态",
+        restart: false,
+        reload: true,
+        tip: true,
+        tipTitle: "禁用后, HugoAura 图标将不会出现在主页右上角",
+        associateVal: [
+          "auraSettings.uiAccessMethod.fallbackAccessMethods.hotkey",
+          "auraSettings.uiAccessMethod.fallbackAccessMethods.touch",
+        ],
+        auraIf: () => {
+          return true;
+        },
+        auraDisable: () => {
+          const fallbackMethods =
+            global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod
+              .fallbackAccessMethods;
+          const fallbackMethodsKeys = Object.keys(fallbackMethods);
+          let anyEnabled = false;
+
+          for (const method of fallbackMethodsKeys) {
+            if (fallbackMethods[method]) {
+              anyEnabled = true;
+              break;
+            }
+          }
+
+          return {
+            value: !anyEnabled,
+            tooltip: !anyEnabled ? "至少启用一个备选访问方式" : "",
+          };
+        },
+        defaultValue: false,
+        valueGetter: () => {
+          return global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod
+            .showEntryIcon;
+        },
+        callbackFn: async (newVal) => {
+          if (typeof newVal !== "boolean") return;
+          global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod.showEntryIcon =
+            newVal;
+        },
+      },
+      {
+        index: 1,
+        id: "allowHotkeyAccess",
+        type: "switch",
+        name: "使用快捷键打开 HugoAura 设置 UI",
+        description:
+          "启用后, 在管家首页按下 Ctrl + Shift + A 以打开 HugoAura 设置",
+        restart: false,
+        reload: true,
+        associateVal: [
+          "auraSettings.uiAccessMethod.showEntryIcon",
+          "auraSettings.uiAccessMethod.fallbackAccessMethods.hotkey",
+          "auraSettings.uiAccessMethod.fallbackAccessMethods.touch",
+        ],
+        auraIf: () => {
+          return true;
+        },
+        auraDisable: () => {
+          const enableCount = functions.getCurAccessMethodCount();
+          if (
+            enableCount < 2 &&
+            !global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod
+              .showEntryIcon &&
+            global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod
+              .fallbackAccessMethods.hotkey
+          ) {
+            return { value: true, tooltip: "无法禁用所有访问方式" };
+          } else {
+            return { value: false };
+          }
+        },
+        defaultValue: false,
+        valueGetter: () => {
+          return global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod
+            .fallbackAccessMethods.hotkey;
+        },
+        callbackFn: async (newVal) => {
+          if (typeof newVal !== "boolean") return;
+          global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod.fallbackAccessMethods.hotkey =
+            newVal;
+        },
+      },
+      {
+        index: 2,
+        id: "allowTouchAccess",
+        type: "switch",
+        name: "使用触摸手势打开 HugoAura 设置 UI",
+        description:
+          "启用后, 在管家首页连击 7 次右上角信息栏 ( i ) 中的版本号区域以打开 HugoAura 设置",
+        restart: false,
+        reload: true,
+        tip: true,
+        tipTitle: "请在 10 秒钟内完成连击操作, 否则计时器将被重置",
+        associateVal: [
+          "auraSettings.uiAccessMethod.showEntryIcon",
+          "auraSettings.uiAccessMethod.fallbackAccessMethods.hotkey",
+          "auraSettings.uiAccessMethod.fallbackAccessMethods.touch",
+        ],
+        auraIf: () => {
+          return true;
+        },
+        auraDisable: () => {
+          const enableCount = functions.getCurAccessMethodCount();
+          if (
+            enableCount < 2 &&
+            !global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod
+              .showEntryIcon &&
+            global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod
+              .fallbackAccessMethods.touch
+          ) {
+            return { value: true, tooltip: "无法禁用所有访问方式" };
+          } else {
+            return { value: false };
+          }
+        },
+        defaultValue: false,
+        valueGetter: () => {
+          return global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod
+            .fallbackAccessMethods.touch;
+        },
+        callbackFn: async (newVal) => {
+          if (typeof newVal !== "boolean") return;
+          global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod.fallbackAccessMethods.touch =
+            newVal;
+        },
+      },
+    ],
   },
 ];
 

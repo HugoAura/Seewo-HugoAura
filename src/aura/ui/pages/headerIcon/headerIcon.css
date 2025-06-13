@@ -7,6 +7,10 @@
   transition: opacity 0.25s;
 }
 
+.aura-header-icon.aura-header-icon-hidden {
+  display: none;
+}
+
 .aura-header-icon:hover {
   opacity: 0.75;
 }
