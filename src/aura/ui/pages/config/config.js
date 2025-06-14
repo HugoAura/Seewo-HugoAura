@@ -6,6 +6,22 @@ global.__HUGO_AURA_UI_REACTIVES__.config = {
 };
 
 global.__HUGO_AURA_UI_FUNCTIONS__.config = {
+  closeWindow: async () => {
+    if (global.__HUGO_AURA_UI_REACTIVES__.config.isConfigPendingWrite) {
+      await global.__HUGO_AURA_UI_FUNCTIONS__.config.handleSaveConfig();
+    }
+
+    global.ipcRenderer.send("$aura.base.closeWindow", {
+      targetWindowKey: "assistant",
+    });
+  },
+
+  minimizeWindow: () => {
+    global.ipcRenderer.send("$aura.base.minimizeWindow", {
+      targetWindowKey: "assistant",
+    });
+  },
+
   handleNavBack: () => {
     if (global.__HUGO_AURA_UI_REACTIVES__.config.isInSubPage) {
       const acsDialogAreaEl = document.getElementsByClassName(
@@ -28,6 +44,19 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
     } else {
       global.__HUGO_AURA_UI_FUNCTIONS__.config.hideConfigPage();
     }
+  },
+
+  handleNavHome: async () => {
+    if (global.__HUGO_AURA_UI_REACTIVES__.config.isConfigPendingWrite) {
+      global.__HUGO_AURA_UI_FUNCTIONS__.config.handleSaveConfig();
+    }
+
+    global.__HUGO_AURA_UI_FUNCTIONS__.config.hideConfigPage();
+
+    setTimeout(() => {
+      const onLeaveEvent = new CustomEvent("onCurConfigPageLeave");
+      document.dispatchEvent(onLeaveEvent);
+    }, 500);
   },
 
   hideConfigPage: async () => {

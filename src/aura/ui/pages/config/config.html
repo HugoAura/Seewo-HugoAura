@@ -7,11 +7,48 @@
     <div class="aura-config-page-app-bar" style="-webkit-app-region: drag">
       <div
         onclick="global.__HUGO_AURA_UI_FUNCTIONS__.config.handleNavBack()"
-        style="-webkit-app-region: no-drag; z-index: 2000"
+        style="-webkit-app-region: no-drag; z-index: 2000; margin-right: 0.1rem"
       >
         <i class="iconfont"></i>
+        <!-- Chevron Left Icon -->
       </div>
       <p>雨光之环</p>
+      <div class="aura-config-page-app-bar-hr-vertical"></div>
+      <div
+        onclick="global.__HUGO_AURA_UI_FUNCTIONS__.config.handleNavHome()"
+        style="-webkit-app-region: no-drag; z-index: 2000; margin-left: 6px"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="21"
+          height="21"
+          viewBox="0 0 24 24"
+          class="iconfont"
+          style="margin-top: -1.5px"
+        >
+          <path
+            fill="currentColor"
+            d="M6 19h3.692v-5.884h4.616V19H18v-9l-6-4.538L6 10zm-1 1V9.5l7-5.288L19 9.5V20h-5.692v-5.884h-2.616V20zm7-7.77"
+            stroke-width="0.5"
+            stroke="currentColor"
+          />
+        </svg>
+      </div>
+      <div class="aura-config-page-app-bar-spacer"></div>
+      <div
+        onclick="global.__HUGO_AURA_UI_FUNCTIONS__.config.minimizeWindow()"
+        style="-webkit-app-region: no-drag; z-index: 2000"
+      >
+        <i class="iconfont"></i>
+        <!-- Minimize Icon -->
+      </div>
+      <div
+        onclick="global.__HUGO_AURA_UI_FUNCTIONS__.config.closeWindow()"
+        style="-webkit-app-region: no-drag; z-index: 2000; margin-left: 0.5rem"
+      >
+        <i class="iconfont"></i>
+        <!-- Failed / Cancel Icon -->
+      </div>
     </div>
   </div>
 

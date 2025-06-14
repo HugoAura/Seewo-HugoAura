@@ -96,12 +96,9 @@ const functions = {
 
     const handleExit = async () => {
       const result = await awaitCompletePromise;
-      console.debug(result);
       if (result) {
-        console.debug("ret true");
         return { valid: true };
       } else {
-        console.debug("ret false");
         const inputEl = document.getElementById("auraSettingsPasswd");
         // @ts-expect-error
         inputEl.value = "";

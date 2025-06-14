@@ -76,6 +76,7 @@ const buildIpcMain = (electron) => {
     }
   };
 
+  const { applyBaseIpcHandler } = require("./ipcModules/baseIpcHandler");
   const { applyConfigIpcHandler } = require("./ipcModules/configIpcHandler");
   const { applyFsIpcHandler } = require("./ipcModules/fsIpcHandler");
   const { applyPlsIpcHandler } = require("./ipcModules/plsIpcHandler");
@@ -85,6 +86,7 @@ const buildIpcMain = (electron) => {
     app.exit(0);
   });
 
+  applyBaseIpcHandler(ipcMain);
   applyConfigIpcHandler(ipcMain);
   applyFsIpcHandler(ipcMain);
   applyPlsIpcHandler(ipcMain);

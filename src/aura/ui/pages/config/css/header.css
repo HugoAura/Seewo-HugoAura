@@ -19,6 +19,11 @@
   color: rgba(0, 0, 0, 0.8);
 }
 
+.aura-config-page-header-area.color-reverse
+  .aura-config-page-app-bar-hr-vertical {
+  background: rgba(0, 0, 0, 0.5);
+}
+
 .aura-config-page-header-area .iconfont {
   font-size: 24px;
 }
@@ -33,7 +38,7 @@
 }
 
 .aura-config-page-header-area p {
-  margin-top: -1px;
+  margin-top: -2px;
 }
 
 .aura-config-page-header-area.header-collapsed {
@@ -47,4 +52,17 @@
   justify-content: flex-start;
   align-items: center;
   width: 100%;
+}
+
+.aura-config-page-app-bar-spacer {
+  flex-grow: 1;
+}
+
+.aura-config-page-app-bar-hr-vertical {
+  position: relative;
+  margin-left: 8px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.5);
+  height: 12px;
+  transition: background 0.5s;
 }
