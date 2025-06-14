@@ -441,6 +441,35 @@ const auraSettings = [
       },
     ],
   },
+  {
+    id: 2,
+    categoryName: "外观",
+    child: [
+      {
+        index: 0,
+        id: "actionBtnsOnRight",
+        type: "switch",
+        name: "顶栏操作类按钮右置",
+        description: "启用后, 顶栏的<b>返回首页按钮</b>将靠右放置",
+        restart: false,
+        reload: false,
+        auraIf: () => {
+          return true;
+        },
+        defaultValue: false,
+        valueGetter: () => {
+          return global.__HUGO_AURA_CONFIG__.auraSettings.appearance.appBar
+            .actionBtnsOnRight;
+        },
+        callbackFn: async (newVal) => {
+          if (typeof newVal !== "boolean") return;
+          global.__HUGO_AURA_CONFIG__.auraSettings.appearance.appBar.actionBtnsOnRight =
+            newVal;
+          global.__HUGO_AURA_UI_FUNCTIONS__.config.initCustomUIProps(true);
+        },
+      },
+    ],
+  },
 ];
 
 module.exports = { auraSettings };

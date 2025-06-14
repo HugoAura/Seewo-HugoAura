@@ -294,6 +294,27 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
       // TODO: Error handling
     }
   },
+
+  initCustomUIProps: async (refresh = false) => {
+    const verticalHrEl = document.getElementById(
+      "auraConfigPageAppBarVerticalHr"
+    );
+    const spacerElArr = document.getElementsByClassName(
+      "aura-config-page-app-bar-spacer"
+    );
+    if (
+      global.__HUGO_AURA_CONFIG__.auraSettings.appearance.appBar
+        .actionBtnsOnRight
+    ) {
+      verticalHrEl.classList.add("hidden");
+      spacerElArr[0].classList.remove("space-none");
+      spacerElArr[1].classList.add("space-none");
+    } else if (refresh) {
+      verticalHrEl.classList.remove("hidden");
+      spacerElArr[0].classList.add("space-none");
+      spacerElArr[1].classList.remove("space-none");
+    }
+  },
 };
 
 (() => {
@@ -391,6 +412,7 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
   };
 
   const onMounted = () => {
+    global.__HUGO_AURA_UI_FUNCTIONS__.config.initCustomUIProps();
     applyVersionInfo();
 
     showAnimation();

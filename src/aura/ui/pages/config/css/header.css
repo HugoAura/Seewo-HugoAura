@@ -58,6 +58,10 @@
   flex-grow: 1;
 }
 
+.aura-config-page-app-bar-spacer.space-none {
+  flex-grow: 0;
+}
+
 .aura-config-page-app-bar-hr-vertical {
   position: relative;
   margin-left: 8px;
@@ -65,4 +69,8 @@
   background: rgba(255, 255, 255, 0.5);
   height: 12px;
   transition: background 0.5s;
+}
+
+.aura-config-page-app-bar-hr-vertical.hidden {
+  display: none;
 }
