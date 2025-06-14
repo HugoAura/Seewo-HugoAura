@@ -7,6 +7,8 @@ on:
     branches: [dev, stable, main, master]
   workflow_dispatch:
 
+permissions: write-all
+
 jobs:
   pack:
     name: Patch & Pack
@@ -123,6 +125,33 @@ jobs:
           echo "[DEBUG] Files in <Working DIR>/Artifacts directory:"
           ls -la Artifacts/
 
+      - name: Get commit hash & build time
+        run: |
+          cd ./HugoAura-Code
+          SHORT_HASH=$(git rev-parse --short=7 HEAD)
+          FULL_HASH=$(git rev-parse HEAD)
+          echo "SHORT_HASH=$SHORT_HASH" >> $GITHUB_ENV
+          echo "FULL_HASH=$FULL_HASH" >> $GITHUB_ENV
+          echo "BUILDTIME=$(TZ=Asia/Shanghai date)" >> $GITHUB_ENV
+
+      - name: Create release content
+        run: |
+          cat > rel_msg.txt << 'EOF'
+          ## 这是 HugoAura 的 CI 自动构建版本
+
+          ### 版本类型: 🔁 自动构建版
+
+          ### 版本号: `vAutoBuild-${{ env.SHORT_HASH }}`
+
+          ### 对应 Commit: [`${{ env.SHORT_HASH }}`](https://github.com/HugoAura/Seewo-HugoAura/commit/${{ env.FULL_HASH }})
+
+          ---
+
+          ### ⚠ 注意: CI 自动构建版本可能不稳定 / 存在较多 Bug, 更新时请留意
+
+          #### 🕘 构建时间: ${{ env.BUILDTIME }}
+          EOF
+
       - name: Upload patched ASAR
         uses: actions/upload-artifact@v4
         with:
@@ -134,3 +163,16 @@ jobs:
         with:
           name: aura-code
           path: Artifacts/aura.zip
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: vAutoBuild
+          name: "[CI] HugoAura Auto Build Release"
+          body_path: rel_msg.txt
+          prerelease: true
+          generate_release_notes: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            Artifacts/app-patched.asar
+            Artifacts/aura.zip
