@@ -3,7 +3,7 @@
 <h1 align="center">HugoAura</h1>
 <h4 align="center">下一代希沃管家注入式修改方案</h4>
 <div align="center">
-  <a href="https://github.com/HugoAura/HugoAura">首页</a> · <a href="https://hugoaura.org/about">关于</a> · <a href="https://github.com/HugoAura/HugoAura/wiki">文档</a> · <a href="https://github.com/HugoAura/HugoAura/issues">反馈</a>
+  <a href="https://github.com/HugoAura/HugoAura">首页</a> · <a href="https://hugo.aurax.cc/about">关于</a> · <a href="https://github.com/HugoAura/HugoAura/wiki">文档</a> · <a href="https://github.com/HugoAura/HugoAura/issues">反馈</a> · <a href="https://forum.aurax.cc/">社区</a>
 </div>
 
 <br />

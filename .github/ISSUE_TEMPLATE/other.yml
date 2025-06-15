@@ -16,5 +16,5 @@ body:
     attributes:
       label: 提交前请确认 / Confirm before submit
       options:
-        - label: 请勿利用此 Issue 类型进行灌水 / 闲聊, 如果您有相关需求, 可留意后续 HugoAura 的论坛 / 用户讨论群开放情况
+        - label: 请勿利用此 Issue 类型进行闲聊 / 灌水, 如需闲聊, 可移步至 HugoAura 社区 (forum.aurax.cc)
           required: true
