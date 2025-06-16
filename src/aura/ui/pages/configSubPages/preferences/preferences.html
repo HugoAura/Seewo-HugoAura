@@ -20,13 +20,27 @@
     <li class="nav-item" role="presentation">
       <button
         class="nav-link"
+        id="debug-subpage-tab"
+        data-bs-toggle="pill"
+        data-bs-target="#debug-subpage"
+        type="button"
+        role="tab"
+        aria-controls="debug-subpage"
+        aria-selected="false"
+      >
+        调试选项
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
         id="about-subpage-tab"
         data-bs-toggle="pill"
         data-bs-target="#about-subpage"
         type="button"
         role="tab"
         aria-controls="about-subpage"
-        aria-selected="true"
+        aria-selected="false"
       >
         关于项目
       </button>
@@ -38,6 +52,12 @@
       id="aura-subpage"
       role="tabpanel"
       aria-labelledby="aura-subpage-tab"
+    ></div>
+    <div
+      class="tab-pane fade"
+      id="debug-subpage"
+      role="tabpanel"
+      aria-labelledby="debug-subpage-tab"
     ></div>
     <div
       class="tab-pane fade"

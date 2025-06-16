@@ -2,13 +2,43 @@ const path = require("path");
 const fs = require("fs");
 const os = require("os");
 const util = require("util");
+const RegistryManager = require("../shared/registryManager");
+
+const getUserDocumentsDirPath = () => {
+  const registryManager = new RegistryManager();
+  const pathInfo = registryManager.readRegKeySync(
+    '"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders"',
+    "Personal",
+    false,
+    true,
+    /REG_EXPAND_SZ\s+(.+)/
+  );
+  if (pathInfo.success) {
+    const resolvedPath = pathInfo.data.replace(
+      /%([^%]+)%/g,
+      (match, varName) => {
+        return process.env[varName] || match;
+      }
+    );
+
+    return resolvedPath;
+  } else {
+    console.error(
+      "[HugoAura / Init / Logger] Failed to get the path of documents dir, using default val."
+    );
+    return path.join(os.homedir(), "Documents");
+  }
+};
 
 /**
  *
  * @param {import("../aura/types/main/core").WindowName} windowName
  */
 const initLogger = (windowName) => {
-  const logDir = path.join(os.homedir(), "Documents", "HugoAura", "logs");
+  const logDir = path.join(getUserDocumentsDirPath(), "HugoAura", "logs");
+
+  global.__HUGO_AURA__.logDir = logDir;
+
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
   }
@@ -64,25 +94,22 @@ const initLogger = (windowName) => {
     console.error("[CRITICAL] UNCAUGHT EXCEPTION:", err);
   });
 
-  console.log(
-    "[HugoAura / Logger] Logger initialized. Log file:",
-    logFile
-  );
+  console.log("[HugoAura / Logger] Logger initialized. Log file:", logFile);
 };
 
 const cleanupOldLogs = (logDir) => {
   try {
     const files = fs.readdirSync(logDir);
     const now = new Date();
-    const sevenDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const daysAgo = new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000);
 
     files.forEach((file) => {
       if (file.endsWith(".log")) {
         const filePath = path.join(logDir, file);
         const stats = fs.statSync(filePath);
 
-        // 如果文件创建时间超过 30 天, 则删除
-        if (stats.birthtime < sevenDaysAgo) {
+        // 如果文件创建时间超过两周, 则删除
+        if (stats.birthtime < daysAgo) {
           fs.unlinkSync(filePath);
           console.log(
             `[HugoAura / Logger / Cleanup] Cleaned log file: ${file}`
@@ -91,7 +118,10 @@ const cleanupOldLogs = (logDir) => {
       }
     });
   } catch (error) {
-    console.error("[HugoAura / Logger / Cleanup] Unexpected error occurred cleaning log file:", error);
+    console.error(
+      "[HugoAura / Logger / Cleanup] Unexpected error occurred cleaning log file:",
+      error
+    );
   }
 };
 

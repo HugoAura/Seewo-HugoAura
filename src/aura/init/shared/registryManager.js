@@ -6,7 +6,12 @@ const { exec, execSync } = require("child_process");
 
 const LOG_PREFIX = "[HugoAura / Init / Reg";
 const LOG_PREFIX_FUNC = "[HugoAura / Reg";
-const AURA_REGISTRY_PATH = ["HKEY_USERS", ".DEFAULT", "SOFTWARE", "HugoAura"].join("\\");
+const AURA_REGISTRY_PATH = [
+  "HKEY_USERS",
+  ".DEFAULT",
+  "SOFTWARE",
+  "HugoAura",
+].join("\\");
 
 class RegistryManager {
   /**
@@ -341,19 +346,27 @@ class RegistryManager {
   }
 
   /**
-   * @param {string} relativePath
+   * @param {string} keyPath
    * @param {string} keyName
    * @param {boolean | undefined} silent
+   * @param {boolean} absolute
+   * @param {any} regex
    * @returns {Promise<{ success: boolean, data: string | null, error: Error | null }>}
    */
-  async readRegKey(relativePath, keyName, silent = false) {
+  async readRegKey(
+    keyPath,
+    keyName,
+    silent = false,
+    absolute = false,
+    regex = null
+  ) {
     try {
       const { stdout } = await new Promise((resolve, reject) => {
         exec(
           [
             "reg",
             "query",
-            [AURA_REGISTRY_PATH, relativePath].join("\\"),
+            absolute ? keyPath : [AURA_REGISTRY_PATH, keyPath].join("\\"),
             "/v",
             `\"${keyName}\"`,
           ].join(" "),
@@ -367,12 +380,12 @@ class RegistryManager {
 
       if (!silent) {
         console.debug(
-          `${LOG_PREFIX_FUNC} / SUCCESS] Successfully read reg key ${relativePath}/${keyName}, stdout:`,
+          `${LOG_PREFIX_FUNC} / SUCCESS] Successfully read reg key ${keyPath}/${keyName}, stdout:`,
           stdout
         );
       }
 
-      const match = stdout.match(/REG_SZ\s+(.+)/);
+      const match = regex ? stdout.match(regex) : stdout.match(/REG_SZ\s+(.+)/);
 
       if (!match) {
         console.warn(`${LOG_PREFIX} / WARN] Data not found in stdout`);
@@ -390,10 +403,7 @@ class RegistryManager {
         error: null,
       };
     } catch (e) {
-      console.error(
-        `${LOG_PREFIX} / ERROR] Failed to read reg key, error:`,
-        e
-      );
+      console.error(`${LOG_PREFIX} / ERROR] Failed to read reg key, error:`, e);
       return {
         success: false,
         data: null,
@@ -403,18 +413,26 @@ class RegistryManager {
   }
 
   /**
-   * @param {string} relativePath
+   * @param {string} keyPath
    * @param {string} keyName
    * @param {boolean | undefined} silent
+   * @param {boolean} absolute
+   * @param {any} regex
    * @returns {{ success: boolean, data: string | null, error: Error | null }}
    */
-  readRegKeySync(relativePath, keyName, silent = false) {
+  readRegKeySync(
+    keyPath,
+    keyName,
+    silent = false,
+    absolute = false,
+    regex = null
+  ) {
     try {
       const readResult = execSync(
         [
           "reg",
           "query",
-          [AURA_REGISTRY_PATH, relativePath].join("\\"),
+          absolute ? keyPath : [AURA_REGISTRY_PATH, keyPath].join("\\"),
           "/v",
           `\"${keyName}\"`,
         ].join(" "),
@@ -424,11 +442,13 @@ class RegistryManager {
       if (readResult) {
         if (!silent) {
           console.debug(
-            `${LOG_PREFIX_FUNC} / SUCCESS] Successfully read reg key ${relativePath}/${keyName}, stdout:`,
+            `${LOG_PREFIX_FUNC} / SUCCESS] Successfully read reg key ${keyPath}/${keyName}, stdout:`,
             readResult
           );
         }
-        const match = readResult.match(/REG_SZ\s+(.+)/);
+        const match = regex
+          ? readResult.match(regex)
+          : readResult.match(/REG_SZ\s+(.+)/);
 
         if (!match) {
           console.warn(`${LOG_PREFIX} / WARN] Data not found in stdout`);

@@ -6,6 +6,7 @@ if (!global.__HUGO_AURA__) {
     configInit: false,
     central: () => {},
     ipcInit: false,
+    logDir: "",
     plsStats: null,
     plsSettings: null,
     plsRules: null,
@@ -24,7 +25,7 @@ if (!global.__HUGO_AURA_API__) {
       "https://api-aura.asaka.site",
       "https://api.hugoaura.dpdns.org",
       "https://api-aura-projekts.minorice.moe",
-      "https://api.aura.vim.moe"
+      "https://api.aura.vim.moe",
     ],
     plsUpdate: "/api/getPLSLatestVersion",
     auraUpdate: "/api/getAuraLatestVersion",
@@ -79,6 +80,7 @@ const launcher = ({ central, windowName, config }) => {
   // >>> Init Config <<< //
   const configManager = new ConfigManager();
   configManager.side = "main";
+  configManager.migrateOldConfigFile();
   configManager.ensureConfigExists();
   const loadedConfig = configManager.loadConfig();
   if (!global.__HUGO_AURA__.configInit) global.__HUGO_AURA__.configInit = true;

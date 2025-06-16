@@ -170,6 +170,23 @@ const renderInputArea = (entry, operationArea, descriptionArea) => {
       operationArea.classList.add("ase-operation-area-expanded");
       return inputEl;
     }
+    case "button": {
+      const btnEl = document.createElement("button");
+      btnEl.type = "button";
+      btnEl.classList.add("btn");
+      switch (entry.style) {
+        case "outline":
+        default:
+          btnEl.classList.add("btn-outline-primary");
+          break;
+      }
+      btnEl.innerHTML = entry.buttonContent;
+      btnEl.onclick = entry.callbackFn;
+      (async () => {
+        descriptionArea.innerHTML = await entry.valueGetter();
+      })();
+      return btnEl;
+    }
     default:
       break;
   }

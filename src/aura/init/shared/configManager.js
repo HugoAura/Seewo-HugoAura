@@ -69,7 +69,7 @@ const deepMerge = (target, source) => {
 
 class ConfigManager {
   constructor() {
-    this.configDir = path.join(os.homedir(), "Documents", "HugoAura");
+    this.configDir = path.join(global.__HUGO_AURA__.logDir, "..");
     this.configPath = path.join(this.configDir, "config.json");
     this.encConfigPath = path.join(this.configDir, ".cache_2eafc8d0.dat"); // (雾
     /* ↑ 不使用 .tmp 扩展名, 不然容易真被清理了 */
@@ -93,6 +93,33 @@ class ConfigManager {
         }
       );
     }
+  }
+
+  migrateOldConfigFile() {
+    const oldConfigPath = path.join(
+      os.homedir(),
+      "Documents",
+      "HugoAura",
+      "config.json"
+    );
+    const oldEncConfigPath = path.join(
+      os.homedir(),
+      "Documents",
+      "HugoAura",
+      ".cache_2eafc8d0.dat"
+    );
+    if (fs.existsSync(oldConfigPath)) {
+      fs.copyFileSync(oldConfigPath, this.configPath);
+      fs.unlinkSync(oldConfigPath);
+    } else if (fs.existsSync(oldEncConfigPath)) {
+      fs.copyFileSync(oldEncConfigPath, this.encConfigPath);
+      fs.unlinkSync(oldEncConfigPath);
+      this.useEncConfig = true;
+    }
+
+    console.log(
+      `[HugoAura / Config] Moved old config file to ${this.configDir}`
+    );
   }
 
   getHugoAuraConfigPath() {

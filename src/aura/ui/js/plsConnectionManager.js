@@ -45,8 +45,7 @@
   };
 
   const calcFullAuthToken = (/** @type {string} */ authToken) => {
-    const trustToken = window._ACCEPT_DATA.getData("deviceId");
-    const conjToken = authToken + "AuraXAuth" + trustToken + "NeverEnds";
+    const conjToken = authToken + "AuraXAuth 0xFFFFFF NeverEnds";
     const crypto = require("crypto");
     return crypto.createHash("sha512").update(conjToken).digest("hex");
   };
