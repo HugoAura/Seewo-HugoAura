@@ -78,10 +78,10 @@ class ConfigManager {
     this.isConfigReadFailed = false;
     this.side = "unknown";
 
-    if (fs.existsSync(this.configPath)) {
-      this.useEncConfig = false;
-    } else {
+    if (fs.existsSync(this.encConfigPath)) {
       this.useEncConfig = true;
+    } else {
+      this.useEncConfig = false;
     }
 
     if (global.__HUGO_AURA_EVENT_BUS__) {
