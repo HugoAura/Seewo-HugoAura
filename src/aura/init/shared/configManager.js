@@ -96,6 +96,9 @@ class ConfigManager {
   }
 
   migrateOldConfigFile() {
+    if (this.configDir === path.join(os.homedir(), "Documents", "HugoAura")) {
+      return;
+    }
     const oldConfigPath = path.join(
       os.homedir(),
       "Documents",
