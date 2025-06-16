@@ -2,40 +2,13 @@ const path = require("path");
 const fs = require("fs");
 const os = require("os");
 const util = require("util");
-const RegistryManager = require("../shared/registryManager");
-
-const getUserDocumentsDirPath = () => {
-  const registryManager = new RegistryManager();
-  const pathInfo = registryManager.readRegKeySync(
-    '"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders"',
-    "Personal",
-    false,
-    true,
-    /REG_EXPAND_SZ\s+(.+)/
-  );
-  if (pathInfo.success) {
-    const resolvedPath = pathInfo.data.replace(
-      /%([^%]+)%/g,
-      (match, varName) => {
-        return process.env[varName] || match;
-      }
-    );
-
-    return resolvedPath;
-  } else {
-    console.error(
-      "[HugoAura / Init / Logger] Failed to get the path of documents dir, using default val."
-    );
-    return path.join(os.homedir(), "Documents");
-  }
-};
 
 /**
  *
  * @param {import("../aura/types/main/core").WindowName} windowName
  */
 const initLogger = (windowName) => {
-  const logDir = path.join(getUserDocumentsDirPath(), "HugoAura", "logs");
+  const logDir = path.join(global.__HUGO_AURA__.auraDir, "logs");
 
   global.__HUGO_AURA__.logDir = logDir;
 

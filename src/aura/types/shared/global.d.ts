@@ -14,7 +14,7 @@ interface GlobalHugoAuraInfo {
   fsTasks?: MainProcessOnlyVal<FSTasks>;
   hookedWindows?: MainProcessOnlyVal<HookedWindowsMap>;
   ipcInit?: MainProcessOnlyVal<boolean>;
-  logDir: MainProcessOnlyVal<string>;
+  auraDir: MainProcessOnlyVal<string>;
   plsRules?: Record<any, any> | null;
   plsSettings?: Record<any, any> | null;
   plsStats?: PLSStatus | null;

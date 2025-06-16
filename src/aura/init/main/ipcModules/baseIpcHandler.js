@@ -54,6 +54,20 @@ const applyBaseIpcHandler = (ipcMain) => {
       browserWindowIns.close();
     }
   );
+
+  ipcMain.handle(`${methodBase}.getAuraDirAsync`, (_evt, _arg) => {
+    return {
+      success: true,
+      data: global.__HUGO_AURA__.auraDir,
+    };
+  });
+
+  ipcMain.on(`${methodBase}.getAuraDirSync`, (event, _arg) => {
+    event.returnValue = {
+      success: true,
+      data: global.__HUGO_AURA__.auraDir,
+    };
+  });
 };
 
 module.exports = { applyBaseIpcHandler };

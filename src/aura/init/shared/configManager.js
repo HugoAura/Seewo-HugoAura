@@ -69,7 +69,7 @@ const deepMerge = (target, source) => {
 
 class ConfigManager {
   constructor() {
-    this.configDir = path.join(global.__HUGO_AURA__.logDir, "..");
+    this.configDir = global.__HUGO_AURA__.auraDir;
     this.configPath = path.join(this.configDir, "config.json");
     this.encConfigPath = path.join(this.configDir, ".cache_2eafc8d0.dat"); // (雾
     /* ↑ 不使用 .tmp 扩展名, 不然容易真被清理了 */
@@ -99,6 +99,7 @@ class ConfigManager {
     if (this.configDir === path.join(os.homedir(), "Documents", "HugoAura")) {
       return;
     }
+
     const oldConfigPath = path.join(
       os.homedir(),
       "Documents",
@@ -111,6 +112,7 @@ class ConfigManager {
       "HugoAura",
       ".cache_2eafc8d0.dat"
     );
+
     if (fs.existsSync(oldConfigPath)) {
       fs.copyFileSync(oldConfigPath, this.configPath);
       fs.unlinkSync(oldConfigPath);

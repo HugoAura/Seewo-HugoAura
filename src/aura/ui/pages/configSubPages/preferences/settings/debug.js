@@ -1,5 +1,7 @@
 const IPC_METHOD_BASE = "$aura.debug";
 
+const path = require("path");
+
 const debugSettings = [
   {
     id: 0,
@@ -18,19 +20,22 @@ const debugSettings = [
         auraIf: () => true,
         buttonContent: "打开",
         valueGetter: async () => {
-          const ipcRendererRet = await ipcRenderer.invoke(
-            `${IPC_METHOD_BASE}.getLogDirAsync`
-          );
-          if (ipcRendererRet.success && ipcRendererRet.data !== "") {
-            global.__HUGO_AURA__.logDir = ipcRendererRet.data;
-            return "目录位置: " + ipcRendererRet.data;
+          if (
+            global.__HUGO_AURA__.auraDir &&
+            global.__HUGO_AURA__.auraDir !== ""
+          ) {
+            return (
+              "目录位置: " + path.join(global.__HUGO_AURA__.auraDir, "logs")
+            );
           } else {
             return "未能获取日志目录位置";
           }
         },
         callbackFn: async (event) => {
           const childProc = require("child_process");
-          childProc.spawn(`explorer.exe`, [`${global.__HUGO_AURA__.logDir}`]);
+          childProc.spawn(`explorer.exe`, [
+            `${path.join(global.__HUGO_AURA__.auraDir, "logs")}`,
+          ]);
         },
       },
     ],

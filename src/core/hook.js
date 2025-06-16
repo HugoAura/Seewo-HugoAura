@@ -6,7 +6,7 @@ if (!global.__HUGO_AURA__) {
     configInit: false,
     central: () => {},
     ipcInit: false,
-    logDir: "",
+    auraDir: "",
     plsStats: null,
     plsSettings: null,
     plsRules: null,
@@ -37,14 +37,44 @@ if (!global.__HUGO_AURA_CONFIG__) {
   global.__HUGO_AURA_CONFIG__ = {};
 }
 
+const path = require("path");
+const os = require("os");
+
 const MainProcessHooksManager = require("../aura/init/main/windowHooksManager");
 const RendererHooksManager = require("../aura/init/rendererHook/uiHooksManager");
 const EventBus = require("../aura/utils/eventBus");
 const NetworkHook = require("../aura/init/rendererHook/networkHook");
 const ConfigManager = require("../aura/init/shared/configManager");
+const RegistryManager = require("../aura/init/shared/registryManager");
 const { buildIpcMain } = require("../aura/init/main/ipcHandler");
 
 const { initLogger } = require("../aura/init/main/logger");
+
+const getUserDocumentsDirPath = () => {
+  const registryManager = new RegistryManager();
+  const pathInfo = registryManager.readRegKeySync(
+    '"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders"',
+    "Personal",
+    false,
+    true,
+    /REG_EXPAND_SZ\s+(.+)/
+  );
+  if (pathInfo.success && pathInfo.data) {
+    const resolvedPath = pathInfo.data.replace(
+      /%([^%]+)%/g,
+      (match, varName) => {
+        return process.env[varName] || match;
+      }
+    );
+
+    return resolvedPath;
+  } else {
+    console.error(
+      "[HugoAura / Init / Logger] Failed to get the path of documents dir, using default val."
+    );
+    return path.join(os.homedir(), "Documents");
+  }
+};
 
 /**
  *
@@ -66,6 +96,8 @@ const launcher = ({ central, windowName, config }) => {
     app.relaunch({ args: process.argv.slice(1).concat(["--inspect 5858"]) });
     app.exit(0);
   };
+
+  global.__HUGO_AURA__.auraDir = path.join(getUserDocumentsDirPath(), "HugoAura");
 
   // >>> Init Logger <<< //
   initLogger(windowName);

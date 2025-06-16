@@ -5,9 +5,14 @@ const __AURA_VERSION__ = "0.1.1-pre-IV";
 (() => {
   if (require.main) return; // 如果只是导入 Aura Version, 不运行闭包逻辑
 
+  const auraDir = require("electron").ipcRenderer.sendSync(
+    "$aura.base.getAuraDirSync"
+  );
+
   // >>> Init Global Vars <<< //
   if (!global.__HUGO_AURA__) {
     global.__HUGO_AURA__ = {
+      auraDir: auraDir.data,
       configInit: true, // preload 始终比 hook 晚, 默认 config 已初始化
       // ↑ 保留此参数的目的 -> 用于 configManager 中, configManager 的行为在 Renderer 和 Main 中是一致的
       version: __AURA_VERSION__,
