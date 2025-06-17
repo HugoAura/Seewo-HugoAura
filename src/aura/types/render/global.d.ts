@@ -8,7 +8,7 @@ interface AssistantHugoAuraGlobal extends HugoAuraGlobal {
   plsSettings: Record<any, any>;
 }
 
-interface DesktopAssistantHugoAuraGlobal extends HugoAuraGlobal {
+interface AuraWSKeepAliveWindowHugoAuraGlobal extends HugoAuraGlobal {
   plsWs: WebSocket | null;
   plsStats: PLSStatus;
 }

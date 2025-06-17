@@ -14,7 +14,7 @@ class WindowHooksManager {
 
     const hooksPath = path.join(__dirname, "../../../aura/mainProcess/hooks");
 
-    /** @type {import("../../types/main/core").HooksMap} */
+    /** @type {import("../../types/main/core").UIHooksMap} */
     const hooks = new Map();
 
     try {
@@ -55,6 +55,9 @@ class WindowHooksManager {
     browserWindowInstance
   ) {
     const stripWindowName = windowName.split("_")[0];
+
+    if (!global.__HUGO_AURA__.windowHooks) return;
+
     if (!global.__HUGO_AURA__.windowHooks.has(stripWindowName)) {
       console.log(
         `[HugoAura / Init / WDH] Window ${windowName} has no corresponding main process hooks, ignoring...`

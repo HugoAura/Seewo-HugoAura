@@ -47,6 +47,7 @@ const NetworkHook = require("../aura/init/rendererHook/networkHook");
 const ConfigManager = require("../aura/init/shared/configManager");
 const RegistryManager = require("../aura/init/shared/registryManager");
 const { buildIpcMain } = require("../aura/init/main/ipcHandler");
+const plsUtils = require("../aura/utils/pls");
 
 const { initLogger } = require("../aura/init/main/logger");
 
@@ -97,7 +98,10 @@ const launcher = ({ central, windowName, config }) => {
     app.exit(0);
   };
 
-  global.__HUGO_AURA__.auraDir = path.join(getUserDocumentsDirPath(), "HugoAura");
+  global.__HUGO_AURA__.auraDir = path.join(
+    getUserDocumentsDirPath(),
+    "HugoAura"
+  );
 
   // >>> Init Logger <<< //
   initLogger(windowName);
@@ -144,6 +148,13 @@ const launcher = ({ central, windowName, config }) => {
   // >>> Activate DevTools <<< //
   if (loadedConfig.devTools && !config.canOpenDevTool) {
     config.canOpenDevTool = true;
+  }
+
+  // >>> Create WebSocket KeepAlive Window <<< //
+  if (!global.__HUGO_AURA__.hookedWindows?.has("auraWsKeepAlive")) {
+    const wsKaWin = plsUtils.createWsWindow(electron);
+    // @ts-expect-error
+    global.__HUGO_AURA__.hookedWindows.set("auraWsKeepAlive", wsKaWin);
   }
 
   // >>> Listeners <<< //

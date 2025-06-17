@@ -418,7 +418,7 @@ const applyPlsIpcHandler = (ipcMain) => {
      */
     (_event, arg) => {
       ipcMain.send(
-        "desktopAssistant",
+        "auraWsKeepAlive",
         `${methodBase}.ws.post.onReqSendMsg`,
         arg
       );
@@ -568,7 +568,7 @@ const applyPlsIpcHandler = (ipcMain) => {
           status: "Already",
         };
       } else {
-        ipcMain.send("desktopAssistant", `${methodBase}.retryPlsConnect`, arg);
+        ipcMain.send("auraWsKeepAlive", `${methodBase}.retryPlsConnect`, arg);
 
         return {
           success: true,

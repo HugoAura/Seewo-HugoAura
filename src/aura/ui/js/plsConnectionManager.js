@@ -1,5 +1,12 @@
 // @ts-check
 (() => {
+  if (!global.__HUGO_AURA__)
+    global.__HUGO_AURA__ = {
+      configInit: true,
+      auraDir: "",
+      version: "",
+    };
+
   if (!global.__HUGO_AURA__.plsStats)
     global.__HUGO_AURA__.plsStats = {
       installed: false,
@@ -12,8 +19,8 @@
     };
 
   const IPC_METHOD_BASE = "$aura.pls";
-  const REQUIRE_BASE = "../../aura/ui";
-  const __SCOPE = "desktopAssistant";
+  const REQUIRE_BASE = "../../..";
+  const __SCOPE = "auraWsKeepAlive";
 
   const PLS_REG_PATH = "ProxyLayerServices";
 
@@ -312,7 +319,7 @@
   const onSetup = () => {
     if (!global.ipcRenderer) {
       // @ts-ignore
-      global.ipcRenderer = require("electron").global.ipcRenderer;
+      global.ipcRenderer = require("electron").ipcRenderer;
     }
 
     initPlsConnection();
