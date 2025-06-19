@@ -1,6 +1,6 @@
 {
   "name": "HugoAura",
-  "version": "0.1.1-pre-IV",
+  "version": "0.1.1-beta",
   "description": "Aura for SeewoHugo",
   "main": "app.asar/main.js",
   "dependencies": {},

@@ -7,7 +7,7 @@
   transition: opacity 0.25s;
 }
 
-.aura-header-icon.aura-header-icon-hidden {
+#root.aura-header-icon-hidden .aura-header-icon {
   display: none;
 }
 
