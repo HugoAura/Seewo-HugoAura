@@ -359,7 +359,8 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
     let timeout = 0;
     Array.from(operationElArr).forEach((el) => {
       setTimeout(() => {
-        el.className = "operation-el-show aura-config-page-operation-el";
+        el.classList.remove("operation-el-hidden");
+        el.classList.add("operation-el-show");
       }, timeout);
       timeout += 150;
     });

@@ -331,6 +331,10 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               );
               if (ret.success) {
                 lifecycleStatus.svcRunning = false;
+                global.__HUGO_AURA__.plsStats.launched = false;
+                global.__HUGO_AURA__.plsStats.version = "unknown";
+                global.__HUGO_AURA__.plsStats.status = "dead";
+
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
                   "success",
                   "PLS 已停止",
@@ -442,11 +446,11 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
           break;
       }
 
-      if (curPlsStats.version && curPlsStats.version !== "未知") {
-        const versionTextEl = document.getElementById(
-          "acs-bc-psp-version-text"
-        );
+      const versionTextEl = document.getElementById("acs-bc-psp-version-text");
+      if (curPlsStats.version && curPlsStats.version !== "unknown") {
         versionTextEl.textContent = "v" + curPlsStats.version;
+      } else {
+        versionTextEl.textContent = "不可用"
       }
     },
 

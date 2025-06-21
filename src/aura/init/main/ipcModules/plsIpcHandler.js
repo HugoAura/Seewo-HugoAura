@@ -227,7 +227,7 @@ const applyPlsIpcHandler = (ipcMain) => {
     launched: false,
     detached: isPlsDetached,
     connected: false,
-    version: "未知",
+    version: "unknown",
     status: "dead",
     authToken: global.__HUGO_AURA_CONFIG__.plsToken,
   };
@@ -490,12 +490,42 @@ const applyPlsIpcHandler = (ipcMain) => {
             PLS_BIN_PATH,
             "--startup auto install"
           );
-        case "rmSvc":
-          return await functions.execCommand(logHeader, PLS_BIN_PATH, "remove");
+        case "rmSvc": {
+          const result = await functions.execCommand(
+            logHeader,
+            PLS_BIN_PATH,
+            "remove"
+          );
+          return result;
+        }
         case "startSvc":
           return await functions.execCommand(logHeader, PLS_BIN_PATH, "start");
-        case "stopSvc":
-          return await functions.execCommand(logHeader, PLS_BIN_PATH, "stop");
+        case "stopSvc": {
+          const result = await functions.execCommand(
+            logHeader,
+            PLS_BIN_PATH,
+            "stop"
+          );
+          if (result.success && global.__HUGO_AURA__.plsStats) {
+            global.__HUGO_AURA__.plsStats.connected = false;
+            global.__HUGO_AURA__.plsStats.launched = false;
+            global.__HUGO_AURA__.plsStats.version = "unknown";
+            global.__HUGO_AURA__.plsStats.status = "dead";
+
+            ipcMain.send(
+              "assistant",
+              `${methodBase}.post.onPlsStatsUpdate`,
+              global.__HUGO_AURA__.plsStats
+            );
+
+            ipcMain.send(
+              "auraWsKeepAlive",
+              `${methodBase}.post.plsStopped`,
+              {}
+            );
+          }
+          return result;
+        }
         case "rmBin":
           const unlinkPromise = new Promise((resolve) => {
             fs.unlink(PLS_BIN_PATH, (error) => {
@@ -520,6 +550,19 @@ const applyPlsIpcHandler = (ipcMain) => {
           });
 
           const unlinkRet = await unlinkPromise;
+
+          if (unlinkRet.success && global.__HUGO_AURA__.plsStats) {
+            global.__HUGO_AURA__.plsStats.connected = false;
+            global.__HUGO_AURA__.plsStats.launched = false;
+            global.__HUGO_AURA__.plsStats.installed = false;
+            global.__HUGO_AURA__.plsStats.version = "unknown";
+
+            ipcMain.send(
+              "assistant",
+              `${methodBase}.post.onPlsStatsUpdate`,
+              global.__HUGO_AURA__.plsStats
+            );
+          }
 
           return unlinkRet;
         default:

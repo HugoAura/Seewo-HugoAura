@@ -14,7 +14,7 @@
       connected: false,
       launched: false,
       status: "dead",
-      version: "未知",
+      version: "unknown",
       authToken: "",
     };
 
@@ -157,6 +157,13 @@
           sendRetryStatusToMain(false);
           return;
         }
+
+        if (global.__HUGO_AURA__.plsStats.launched === false) {
+          console.warn(
+            "[HugoAura / UI / PLS Manager / WARN] PLS stopped, closing WebSocket connection."
+          );
+          return;
+        }
       }
 
       console.error(
@@ -274,7 +281,7 @@
         launched: false,
         detached: false,
         connected: false,
-        version: "未知",
+        version: "unknown",
         status: "dead",
         authToken: "66ccff0d000721114514191981023333",
       };
@@ -330,6 +337,16 @@
         if (!global.__HUGO_AURA__.plsStats) return;
         if (global.__HUGO_AURA__.plsStats.connected) return;
         initPlsConnection();
+      }
+    );
+
+    global.ipcRenderer.on(
+      `${IPC_METHOD_BASE}.post.plsStopped`,
+      (_evt, _arg) => {
+        if (!global.__HUGO_AURA__.plsStats) return;
+        global.__HUGO_AURA__.plsStats.launched = false;
+        global.__HUGO_AURA__.plsStats.connected = false;
+        global.__HUGO_AURA__.plsStats.version = "unknown";
       }
     );
   };
