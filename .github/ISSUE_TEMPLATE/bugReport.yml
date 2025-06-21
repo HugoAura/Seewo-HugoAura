@@ -54,12 +54,11 @@ body:
   - type: textarea
     attributes:
       label: 日志 / Logs
-      description: 请前往 `用户文件夹/Documents/HugoAura/logs` 取得日志
+      description: 请前往 `偏好设置` - `调试选项` 打开日志文件夹
       placeholder: |
-        ```log
         [LOG]  Logger initialized. Log file: C:\...
         [LOG]  [HugoAura / Loaded] Aura is loaded!
-        ```
+      render: bash
     validations:
       required: false
 
