@@ -142,6 +142,10 @@ const functions = {
       }
     };
 
+    global.__HUGO_AURA_UI_FUNCTIONS__.config.resetAuthDialogInputElOnSubmit(
+      verifyPassword
+    );
+
     // @ts-expect-error
     acpDialogConfirmBtnEl.onclick = verifyPassword;
     // @ts-expect-error

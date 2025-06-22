@@ -235,11 +235,26 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
     inputEl.value = "";
     inputEl.classList.remove("invalid");
     inputEl.classList.remove("is-invalid");
+
+    global.__HUGO_AURA_UI_FUNCTIONS__.config.resetAuthDialogInputElOnSubmit(
+      global.__HUGO_AURA_UI_FUNCTIONS__.config.verifyAuthPassword
+    );
+
     acpDialogConfirmBtnEl.onclick = (_evt) => {
       global.__HUGO_AURA_UI_FUNCTIONS__.config.verifyAuthPassword();
     };
     acpDialogCancelBtnEl.onclick = (_evt) => {
       global.__HUGO_AURA_UI_FUNCTIONS__.config.handleNavBack();
+    };
+  },
+
+  resetAuthDialogInputElOnSubmit: (func) => {
+    const inputEl = document.getElementById("acp-auth-user-input");
+    inputEl.onsubmit = (evt) => evt.preventDefault();
+    inputEl.onkeydown = (event) => {
+      if (event.key === "Enter") {
+        func();
+      }
     };
   },
 
@@ -386,6 +401,9 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
         "aura-config-page-header-area"
       )[0];
       acsDialogAreaEl.style = "";
+      global.__HUGO_AURA_UI_FUNCTIONS__.config.resetAuthDialogInputElOnSubmit(
+        global.__HUGO_AURA_UI_FUNCTIONS__.config.verifyAuthPassword
+      );
       await window.__HUGO_AURA_GLOBAL__.utils.sleep(500);
       acsDialogAreaEl.classList.remove("acp-ada-hidden");
       acpAppBarEl.classList.add("color-reverse");

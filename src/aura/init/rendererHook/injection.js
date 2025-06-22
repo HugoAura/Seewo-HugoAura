@@ -168,8 +168,8 @@
       observers.set(moduleKey, observer);
     };
 
-    const loadResources = async (resources, type, moduleKey, isRevive) => {
-      if (!resources || isRevive) return [];
+    const loadResources = async (resources, type, moduleKey) => {
+      if (!resources) return [];
 
       const resourceArray = Array.isArray(resources) ? resources : [resources];
       const loadedResources = [];
@@ -232,12 +232,11 @@
           const resources = new Set();
           moduleResources.set(moduleKey, resources);
 
-          if (config.pageCSS) {
+          if (config.pageCSS && !isRevive) {
             const cssResources = await loadResources(
               config.pageCSS,
               "css",
-              moduleKey,
-              isRevive
+              moduleKey
             );
             cssResources.forEach((resource) => resources.add(resource));
           }
@@ -250,14 +249,20 @@
           insertElement(target, container, config.selectorMode);
           monitorParent(moduleKey, target, container, config.selectorMode);
 
-          if (config.pageScript) {
+          if (config.pageScript && !isRevive) {
             const jsResources = await loadResources(
               config.pageScript,
               "js",
-              moduleKey,
-              isRevive
+              moduleKey
             );
             jsResources.forEach((resource) => resources.add(resource));
+          }
+
+          if (isRevive) {
+            const onReviveEvent = new CustomEvent(
+              `onLoaderElRevive:${moduleKey}`
+            );
+            document.dispatchEvent(onReviveEvent);
           }
 
           const observer = new MutationObserver(() => {

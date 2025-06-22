@@ -12,7 +12,7 @@ const createWsWindow = (electron) => {
     frame: false,
     skipTaskbar: true,
     transparent: true,
-    alwaysOnTop: true,
+    alwaysOnTop: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -21,6 +21,7 @@ const createWsWindow = (electron) => {
   });
 
   window.setIgnoreMouseEvents(true);
+  window.minimize();
   window.loadFile(
     path.join(
       __dirname,

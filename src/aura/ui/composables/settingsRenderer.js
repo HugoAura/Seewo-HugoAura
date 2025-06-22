@@ -145,9 +145,10 @@ const renderInputArea = (entry, operationArea, descriptionArea) => {
       inputEl.value = entry.valueGetter();
       inputEl.placeholder = entry.placeHolder;
       inputEl.id = entry.id;
-      inputEl.addEventListener("change", async (event) => {
+
+      const handleSubmit = async (event = null) => {
         const result = await entry.callbackFn(
-          event.target.value,
+          event ? event.target.value : inputEl.value,
           inputEl,
           operationArea,
           descriptionArea
@@ -166,7 +167,17 @@ const renderInputArea = (entry, operationArea, descriptionArea) => {
           descriptionArea.textContent = result.hint;
           descriptionArea.classList.add("ase-desc-error-hint");
         }
+      };
+
+      inputEl.addEventListener("change", async (event) => {
+        await handleSubmit(event);
       });
+
+      inputEl.onsubmit = async (evt) => {
+        evt.preventDefault();
+        await handleSubmit();
+      };
+
       operationArea.classList.add("ase-operation-area-expanded");
       return inputEl;
     }

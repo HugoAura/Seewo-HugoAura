@@ -9,9 +9,10 @@ global.__HUGO_AURA_UI_FUNCTIONS__.headerIcon = {
   let clickCounter = 0;
   let clickTimeout = null;
 
-  const onMounted = () => {
+  const onMounted = (revive = false) => {
     if (
-      !global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod.showEntryIcon
+      !global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod.showEntryIcon &&
+      !revive
     ) {
       const rootEl = document.getElementById("root");
       rootEl.classList.add("aura-header-icon-hidden");
@@ -19,7 +20,8 @@ global.__HUGO_AURA_UI_FUNCTIONS__.headerIcon = {
 
     if (
       global.__HUGO_AURA_CONFIG__.auraSettings.uiAccessMethod
-        .fallbackAccessMethods.hotkey
+        .fallbackAccessMethods.hotkey &&
+      !revive
     ) {
       document.addEventListener("keydown", (event) => {
         if (event.ctrlKey && event.shiftKey && event.key === "A") {
@@ -53,4 +55,11 @@ global.__HUGO_AURA_UI_FUNCTIONS__.headerIcon = {
   };
 
   onMounted();
+
+  document.addEventListener(
+    "onLoaderElRevive:Aura.UI.Assistant.HeaderEntry",
+    () => {
+      onMounted(true);
+    }
+  );
 })();
