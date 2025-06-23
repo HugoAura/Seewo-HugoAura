@@ -12,7 +12,14 @@
 > HugoAura 的首个预览版已发布! [查看安装教程](https://github.com/HugoAura/HugoAura/wiki)
 
 > [!IMPORTANT]
-> 已经过测试的希沃管家版本: v1.5.4.3824
+> 已经过测试的希沃管家版本: v1.5.4.3827
+
+> [!WARNING]
+> 我们正在使用 C++ 重构 PLS, 新的子项目代号为 [Aikari](https://github.com/HugoAura/HugoAura-Aikari)。其将集成 MQTT 消息中转、HugoAura 自动更新、特权操作辅助等功能。
+>
+> 在 Aikari 的首个 Alpha 版本发布前, HugoAura 主项目与 [PLS](https://github.com/HugoAura/HugoAura-PLS) 的新功能更新频率将减弱。
+>
+> 您依然可以提出 Feature Request 或 Bug Report。开发者将在能力 / 时间限度内尽可能处理。
 
 ![Repobeats](https://repobeats.axiom.co/api/embed/69b5be5daacef624b8f5e4b8966a0b5898439a22.svg "Repobeats analytics image")
 
@@ -33,7 +40,7 @@
 - [x] 修改希沃管家密码认证组件 (自定义密码 / 解除密码 / 重设认证方式 / ...)
 - [x] 阻止希沃管家前端 Audit 上报行为
 - [x] 屏蔽屏幕锁 / 自定义屏幕锁行为
-- [ ] Aura 代理层服务 (篡改上报数据 / 欺骗冰冻状态)
+- [x] Aura 代理层服务 (篡改上报数据 / 欺骗冰冻状态)
 - [ ] 窥屏提醒
 - [ ] 插件功能
 
