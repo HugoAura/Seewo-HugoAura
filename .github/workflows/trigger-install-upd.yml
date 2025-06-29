@@ -1,0 +1,26 @@
+name: Trigger Aura Install static JSON update
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  trigger-dispatch:
+    runs-on: ubuntu-latest
+    
+    if: github.event.release.tag_name != 'vAutoBuild'
+    
+    steps:
+      - name: Trigger repository dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.AURA_INSTALL_REPO_PAT }}
+          repository: HugoAura/HugoAura-Install
+          event-type: hugoaura_rel
+          client-payload: |
+            {
+              "tag_name": "${{ github.event.release.tag_name }}",
+              "release_name": "${{ github.event.release.name }}",
+              "release_url": "${{ github.event.release.html_url }}",
+              "repository": "${{ github.repository }}"
+            }
