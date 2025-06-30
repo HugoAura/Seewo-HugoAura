@@ -62,6 +62,18 @@
 
 请参阅 [Wiki](https://github.com/HugoAura/HugoAura/wiki) 以了解安装流程。
 
+## 🤖 AIGC 声明
+
+![HugoAura-README_AIGC_Declaration](https://s2.loli.net/2025/06/30/MLHYONTp3E7ZbDW.png)
+
+## 📦 贡献准则
+
+![HugoAura-README_Community_Standards](https://s2.loli.net/2025/06/30/bFBhfYLMR45GJAd.png)
+
+## 🎉 鸣谢
+
+![HugoAura-README_Special_Thanks](https://s2.loli.net/2025/06/30/hDZfM1AKHULszSG.png)
+
 ## ❗ 免责声明
 
 本项目仅用于研究或教育目的, 请勿将本项目用于可能违反当地法律、侵犯著作权或其他软件 EULA 的用途。若将本项目用于非法用途, 一切后果由使用者承担。开发者不承担此类行为带来的任何后果或责任。
