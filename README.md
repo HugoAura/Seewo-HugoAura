@@ -8,6 +8,11 @@
 
 <br />
 
+> [!WARNING]
+> 由于作者暑假要上课外班, 项目进入暂缓更新阶段 (累死了 TwT
+>
+> 提交频率可能降低, 但也不一定。
+
 > [!TIP]
 > HugoAura 的首个预览版已发布! [查看安装教程](https://github.com/HugoAura/HugoAura/wiki)
 
