@@ -1,6 +1,8 @@
 name: Patch ASAR & Pack source code
 
 on:
+  schedule:
+    - cron: '0 5 * * *'
   push:
     branches: [dev, stable]
   pull_request:

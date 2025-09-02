@@ -8,16 +8,11 @@
 
 <br />
 
-> [!WARNING]
-> 由于作者暑假要上课外班, 项目进入暂缓更新阶段 (累死了 TwT
->
-> 提交频率可能降低, 但也不一定。
-
 > [!TIP]
-> HugoAura 的首个预览版已发布! [查看安装教程](https://github.com/HugoAura/HugoAura/wiki)
+> 在[此处](https://github.com/HugoAura/HugoAura/wiki)查看 HugoAura 的安装教程
 
 > [!IMPORTANT]
-> 已经过测试的希沃管家版本: v1.5.4.3827
+> 已经过测试的希沃管家版本: v1.5.4.3828
 
 > [!WARNING]
 > 我们正在使用 C++ 重构 PLS, 新的子项目代号为 [Aikari](https://github.com/HugoAura/HugoAura-Aikari)。其将集成 MQTT 消息中转、HugoAura 自动更新、特权操作辅助等功能。
