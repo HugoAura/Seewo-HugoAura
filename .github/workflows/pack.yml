@@ -18,109 +18,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup Node.JS 20 LTS
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y p7zip-full wget
-          npm install -g asar
-
       - name: Checkout repository code
         uses: actions/checkout@v4
         with:
           path: "./HugoAura-Code"
 
-      - name: Download SeewoServiceSetup
-        run: |
-          echo "[DEBUG] Working DIR:"
-          pwd
-
-          wget -nv -O "SeewoService.exe" "https://e.seewo.com/download/file?code=SeewoServiceSetup"
-          echo "[DEBUG] Listing downloaded file"
-          ls -la SeewoService*
-
-      - name: Extract SeewoServiceSetup as zip
-        run: |
-          mkdir -p SeewoServiceSource
-          7z x "SeewoService.exe" -o"./SeewoServiceSource/" -y
-
-          echo "[DEBUG] Listing extracted files"
-          ls -la SeewoServiceSource/
-
-      - name: Extract ASAR file
-        run: |
-          cd SeewoServiceSource
-          SEEWO_DIR=$(find . -name "SeewoService_*" -type d | head -1)
-          echo "[INFO] Found SeewoService directory: $SEEWO_DIR"
-
-          cd "$SEEWO_DIR/SeewoServiceAssistant/resources/"
-
-          asar extract ./app.asar ./app-unpacked
-
-      - name: Move app-unpacked and clean SSASource
-        run: |
-          mkdir -p SSARes
-
-          cd SeewoServiceSource
-          SEEWO_DIR=$(find . -name "SeewoService_*" -type d | head -1)
-          mv "$SEEWO_DIR/SeewoServiceAssistant/resources/app-unpacked" "../SSARes/"
-
-          cd ..
-          rm -rf SeewoServiceSource
-          rm -rf *.exe
-          echo "[DEBUG] Listing Working DIR"
-          ls -la
-
-      - name: Patch main.js
-        run: |
-          cd SSARes/app-unpacked
-
-          ### cp main.js main.js.bak
-
-          cat > patch_main.js << 'EOF'
-          const fs = require('fs');
-
-          let content = fs.readFileSync('main.js', 'utf8');
-
-          content = 'const hook = require("./hook.js");\n' + content;
-
-          content = content.replace(/n\.m=e/, ';const zeron = require("./zeron.js");n = zeron(n);n.m=e');
-
-          content = content.replace(/let f=new s\(Object\.assign\(\{\},\{transparent:!0,/, ';hook({ central: n, windowName: this.wname, config: c });let f=new s(Object.assign({},{transparent:!0,');
-
-          content = content.replace(/c\.canOpenDevTool/, 'c.canOpenDevTool,preload: __dirname + "\\\\preload.js"');
-
-          fs.writeFileSync('main.js', content);
-
-          console.log('[SUCCESS] main.js has been modified successfully');
-          EOF
-
-          echo "[DEBUG] Running patch_main.js"
-          node ./patch_main.js
-
-          rm -rf patch_main.js
-
-      - name: Copy HugoAura core files
-        run: |
-          cp -r HugoAura-Code/src/core/* SSARes/app-unpacked/
-
-          echo "[DEBUG] Listing files under <Working DIR>/SSARes/app-unpacked/"
-          ls -la SSARes/app-unpacked/
-
-      - name: Create artifacts DIR and re-pack ASAR
+      - name: Create aura.zip
         run: |
           echo "[DEBUG] Creating artifacts directory"
           mkdir -p Artifacts
-
-          asar pack SSARes/app-unpacked Artifacts/app-patched.asar
-
-      - name: Create aura.zip
-        run: |
-          cd HugoAura-Code/src/aura
+          cd HugoAura-Code/src
           zip -r ../../../Artifacts/aura.zip .
           cd ../../..
 
@@ -154,12 +61,6 @@ jobs:
           #### 🕘 构建时间: ${{ env.BUILDTIME }}
           EOF
 
-      - name: Upload patched ASAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: asar-patched
-          path: Artifacts/app-patched.asar
-
       - name: Upload aura.zip
         uses: actions/upload-artifact@v4
         with:
@@ -176,5 +77,4 @@ jobs:
           generate_release_notes: false
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            Artifacts/app-patched.asar
             Artifacts/aura.zip
