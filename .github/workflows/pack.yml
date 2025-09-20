@@ -27,7 +27,9 @@ jobs:
         run: |
           echo "[DEBUG] Creating artifacts directory"
           mkdir -p Artifacts
-          zip -r ./Artifacts/aura.zip ./HugoAura-Code/src
+          cd ./HugoAura-Code/src
+          zip -r ../../Artifacts/aura.zip .
+          cd ../..
 
           echo "[DEBUG] Files in <Working DIR>/Artifacts directory:"
           ls -la Artifacts/
