@@ -1,4 +1,4 @@
-name: Patch ASAR & Pack source code
+name: Pack source code & Create CI/CD Release
 
 on:
   schedule:
@@ -13,7 +13,7 @@ permissions: write-all
 
 jobs:
   pack:
-    name: Patch & Pack
+    name: Pack
 
     runs-on: ubuntu-latest
 
@@ -27,9 +27,7 @@ jobs:
         run: |
           echo "[DEBUG] Creating artifacts directory"
           mkdir -p Artifacts
-          cd HugoAura-Code/src
-          zip -r ../../../Artifacts/aura.zip .
-          cd ../../..
+          zip -r ./Artifacts/aura.zip ./HugoAura-Code/src
 
           echo "[DEBUG] Files in <Working DIR>/Artifacts directory:"
           ls -la Artifacts/
