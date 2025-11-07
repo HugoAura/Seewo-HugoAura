@@ -30,12 +30,12 @@ const newFunction = function (e, t, n) {
     p = n.n(h),
     _ = n(41),
     M = n.n(_),
-    g = (n(808), n(7)),
+    g = (n(814), n(7)),
     b = n(9),
     y = n(8),
     v = n.n(y),
     w =
-      (n(810),
+      (n(816),
       {
         "./numberKeyboard.less": {
           "ps-icon": "numberKeyboard__ps-icon__1KO_WOCz",
@@ -530,7 +530,7 @@ const newFunction = function (e, t, n) {
       password: "password",
     },
     G = n(19);
-  n(812);
+  n(818);
   function W(e) {
     var t = e.canvasRender,
       n = void 0 === t || t,
@@ -589,12 +589,12 @@ const newFunction = function (e, t, n) {
         )
     );
   }
-  n(815);
+  n(821);
   var J = n(64),
     V = n(20);
   var q,
     Z,
-    X = n(16);
+    X = n(17);
   function K(r) {
     var a = (function () {
       if ("undefined" == typeof Reflect || !Reflect.construct) return !1;
@@ -805,7 +805,7 @@ const newFunction = function (e, t, n) {
           );
         })(h.PureComponent))
       ) || Z,
-    oe = (n(817), n(137).a);
+    oe = (n(823), n(137).a);
   function se(t, e) {
     var n = Object.keys(t);
     if (Object.getOwnPropertySymbols) {
@@ -913,6 +913,7 @@ const newFunction = function (e, t, n) {
             });
           }),
           (o.checkPasswordCorrect = function () {
+            // ### BOR ### //
             const originalAuthFailed = () => {
               o.failCount++,
                 o.passwordCheckFail(),
@@ -955,6 +956,7 @@ const newFunction = function (e, t, n) {
             o.state.inputPassword.join("") === o.password
               ? (o.props.onActivationCorrect(), (o.failCount = 0))
               : customAuthFailed();
+            // ### EOR ### //
           }),
           (o.insertHtml = function () {
             return p.a.createElement(
@@ -1002,7 +1004,7 @@ const newFunction = function (e, t, n) {
         n
       );
     })(I),
-    me = (n(819), n(38));
+    me = (n(825), n(38));
   function fe(r) {
     var a = (function () {
       if ("undefined" == typeof Reflect || !Reflect.construct) return !1;

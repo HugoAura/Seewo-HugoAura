@@ -1,6 +1,6 @@
 // @ts-check
 
-const __AURA_VERSION__ = "0.1.1-beta";
+const __AURA_VERSION__ = "0.1.1-beta-patch-1";
 
 (() => {
   if (require.main) return; // 如果只是导入 Aura Version, 不运行闭包逻辑
