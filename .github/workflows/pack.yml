@@ -27,8 +27,10 @@ jobs:
         run: |
           echo "[DEBUG] Creating artifacts directory"
           mkdir -p Artifacts
-          cd ./HugoAura-Code/src
+          cd ./HugoAura-Code/src/aura
           zip -r ../../Artifacts/aura.zip .
+          cd ../core
+          zip -r ../../Artifacts/core.zip .
           cd ../..
 
           echo "[DEBUG] Files in <Working DIR>/Artifacts directory:"
@@ -67,6 +69,12 @@ jobs:
           name: aura-code
           path: Artifacts/aura.zip
 
+      - name: Upload core.zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: aura-core
+          path: Artifacts/core.zip
+
       - name: Upload release
         uses: softprops/action-gh-release@v2
         with:
@@ -78,3 +86,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             Artifacts/aura.zip
+            Artifacts/core.zip
