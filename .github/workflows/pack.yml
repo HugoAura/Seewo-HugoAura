@@ -28,10 +28,10 @@ jobs:
           echo "[DEBUG] Creating artifacts directory"
           mkdir -p Artifacts
           cd ./HugoAura-Code/src/aura
-          zip -r ../../Artifacts/aura.zip .
+          zip -r ../../../Artifacts/aura.zip .
           cd ../core
-          zip -r ../../Artifacts/core.zip .
-          cd ../..
+          zip -r ../../../Artifacts/core.zip .
+          cd ../../..
 
           echo "[DEBUG] Files in <Working DIR>/Artifacts directory:"
           ls -la Artifacts/
