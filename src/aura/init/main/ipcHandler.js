@@ -80,7 +80,7 @@ const buildIpcMain = (electron) => {
   const { applyDebugIpcHandler } = require("./ipcModules/debugIpcHandler");
   const { applyConfigIpcHandler } = require("./ipcModules/configIpcHandler");
   const { applyFsIpcHandler } = require("./ipcModules/fsIpcHandler");
-  const { applyPlsIpcHandler } = require("./ipcModules/plsIpcHandler");
+  const { applyAikariIpcHandler } = require("./ipcModules/aikariIpcHandler");
 
   ipcMain.handle("$aura.base.restartApplication", async () => {
     app.relaunch();
@@ -91,7 +91,7 @@ const buildIpcMain = (electron) => {
   applyDebugIpcHandler(ipcMain);
   applyConfigIpcHandler(ipcMain);
   applyFsIpcHandler(ipcMain);
-  applyPlsIpcHandler(ipcMain);
+  applyAikariIpcHandler(ipcMain);
 };
 
 module.exports = { buildIpcMain };

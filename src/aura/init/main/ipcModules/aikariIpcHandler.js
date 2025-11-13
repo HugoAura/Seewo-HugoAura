@@ -68,7 +68,7 @@ const functions = {
    * @param {(arg: DownloadTask) => any} callbackFn
    * @param {string} binPath
    */
-  handlePLSDownload: async (channel, callbackFn, binPath) => {
+  handleAikariDownload: async (channel, callbackFn, binPath) => {
     // TODO: Channel selection
     const apiInfo = global.__HUGO_AURA_API__;
 
@@ -78,7 +78,7 @@ const functions = {
         const reqPromise = new Promise((resolveHttpRequest) => {
           nodeHttps
             .get(
-              `${apiDomain}${apiInfo.plsUpdate}?channel=${channel}`,
+              `${apiDomain}${apiInfo.aikariUpdate}?channel=${channel}`,
               (rep) => {
                 let dataChunk = "";
                 rep.on("data", (chunk) => {
@@ -167,12 +167,12 @@ const functions = {
         status: "failed",
         dlUrl: null,
         savePath: null,
-        message: "未能获取 PLS 版本信息, 所有 API 域名均无法连接",
+        message: "未能获取 Aikari 版本信息, 所有 API 域名均无法连接",
       });
       return false;
     }
 
-    const plsVersionInfo = rawResInfo.data;
+    const aikariVersionInfo = rawResInfo.data;
 
     let deviceArch = process.env.PROCESSOR_ARCHITEW6432
       ? process.env.PROCESSOR_ARCHITEW6432
@@ -180,7 +180,7 @@ const functions = {
     // @ts-expect-error
     deviceArch = deviceArch.toLowerCase();
 
-    if (!Object.keys(plsVersionInfo.data.downloadUrl).includes(deviceArch)) {
+    if (!Object.keys(aikariVersionInfo.data.downloadUrl).includes(deviceArch)) {
       callbackFn({
         id: "",
         progress: 0,
@@ -193,13 +193,13 @@ const functions = {
     }
 
     fsComposables.downloadFile(
-      plsVersionInfo.data.downloadUrl[deviceArch],
+      aikariVersionInfo.data.downloadUrl[deviceArch],
       binPath,
       (...args) => {
         if (args[0].status === "done") {
-          if (global.__HUGO_AURA__.plsStats) {
-            global.__HUGO_AURA__.plsStats.installed = true;
-            global.__HUGO_AURA__.plsStats.status = "dead";
+          if (global.__HUGO_AURA__.aikariStats) {
+            global.__HUGO_AURA__.aikariStats.installed = true;
+            global.__HUGO_AURA__.aikariStats.status = "dead";
           }
         }
 
@@ -213,37 +213,43 @@ const functions = {
  *
  * @param {import("../../../types/main/electron").AuraIPCMain} ipcMain
  */
-const applyPlsIpcHandler = (ipcMain) => {
-  const methodBase = "$aura.pls";
+const applyAikariIpcHandler = (ipcMain) => {
+  const methodBase = "$aura.aikari";
 
-  const PLS_INSTALL_DIR = path.join("C:\\Program Files", "HugoAura PLS", "bin");
-  const PLS_BIN_PATH = path.join(PLS_INSTALL_DIR, "HugoAura-PLS.exe");
-  const PLS_SVC_NAME = "HugoAuraPLS";
+  const AIKARI_DEFAULT_INSTALL_DIR = path.join(
+    "C:\\Program Files",
+    "HugoAura Aikari"
+  );
+  const AIKARI_LAUNCHER_PATH = path.join(
+    AIKARI_DEFAULT_INSTALL_DIR,
+    "Aikari-Launcher.exe"
+  );
+  const AIKARI_SVC_NAME = "HugoAuraAikari";
 
-  const isPlsDetached = process.argv.includes("--pls-detach");
+  const isAikariDetached = process.argv.includes("--aikari-detach");
 
-  global.__HUGO_AURA__.plsStats = {
+  global.__HUGO_AURA__.aikariStats = {
     installed: false,
     launched: false,
-    detached: isPlsDetached,
+    detached: isAikariDetached,
     connected: false,
     version: "unknown",
     status: "dead",
-    authToken: global.__HUGO_AURA_CONFIG__.plsToken,
+    authToken: global.__HUGO_AURA_CONFIG__.aikariToken,
   };
 
   ipcMain.handle(
-    `${methodBase}.getPlsBinExists`,
+    `${methodBase}.getIfAikariBinExists`,
     /**
      *
      * @returns {{ success: boolean; data: { isExists: boolean }; error?: Error }}
      */
     (_event, _arg) => {
       try {
-        const result = fs.existsSync(PLS_BIN_PATH);
+        const result = fs.existsSync(AIKARI_LAUNCHER_PATH);
 
-        if (global.__HUGO_AURA__.plsStats?.status === "notInstalled") {
-          global.__HUGO_AURA__.plsStats.status = "dead";
+        if (global.__HUGO_AURA__.aikariStats?.status === "notInstalled") {
+          global.__HUGO_AURA__.aikariStats.status = "dead";
         }
 
         return {
@@ -252,7 +258,7 @@ const applyPlsIpcHandler = (ipcMain) => {
         };
       } catch (e) {
         // @ts-expect-error
-        global.__HUGO_AURA__.plsStats.status = "notInstalled";
+        global.__HUGO_AURA__.aikariStats.status = "notInstalled";
         return {
           success: false,
           data: { isExists: false },
@@ -263,7 +269,7 @@ const applyPlsIpcHandler = (ipcMain) => {
   );
 
   ipcMain.handle(
-    `${methodBase}.ensurePlsInstallDir`,
+    `${methodBase}.ensureAikariInstallDir`,
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} _event
@@ -271,24 +277,24 @@ const applyPlsIpcHandler = (ipcMain) => {
      * @returns {{ success: boolean; data: { alreadyExists: boolean; createdDir: string; }; error?: Error }}
      */
     (_event, _arg) => {
-      const alreadyExists = fs.existsSync(PLS_INSTALL_DIR);
+      const alreadyExists = fs.existsSync(AIKARI_DEFAULT_INSTALL_DIR);
       if (alreadyExists) {
         return {
           success: true,
           data: {
             alreadyExists: true,
-            createdDir: PLS_INSTALL_DIR,
+            createdDir: AIKARI_DEFAULT_INSTALL_DIR,
           },
         };
       }
 
       try {
-        fs.mkdirSync(PLS_INSTALL_DIR, { recursive: true });
+        fs.mkdirSync(AIKARI_DEFAULT_INSTALL_DIR, { recursive: true });
         return {
           success: true,
           data: {
             alreadyExists: false,
-            createdDir: PLS_INSTALL_DIR,
+            createdDir: AIKARI_DEFAULT_INSTALL_DIR,
           },
         };
       } catch (error) {
@@ -296,7 +302,7 @@ const applyPlsIpcHandler = (ipcMain) => {
           success: false,
           data: {
             alreadyExists: false,
-            createdDir: PLS_INSTALL_DIR,
+            createdDir: AIKARI_DEFAULT_INSTALL_DIR,
           },
           error: error,
         };
@@ -305,30 +311,30 @@ const applyPlsIpcHandler = (ipcMain) => {
   );
 
   ipcMain.handle(
-    `${methodBase}.getPlsStats`,
+    `${methodBase}.getAikariStatus`,
     /**
      *
-     * @returns {{ success: boolean; data: import("../../../types/shared/pls/status").PLSStatus | null | undefined; }}
+     * @returns {{ success: boolean; data: import("../../../types/shared/aikari/status").AikariStatus | null | undefined; }}
      */
     (_event, _arg) => {
       return {
         success: true,
-        data: global.__HUGO_AURA__.plsStats,
+        data: global.__HUGO_AURA__.aikariStats,
       };
     }
   );
 
   ipcMain.handle(
-    `${methodBase}.updatePlsStats`,
+    `${methodBase}.updateAikariStatus`,
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} _event
-     * @param {import("../../../types/shared/pls/status").PLSStatus} arg
+     * @param {import("../../../types/shared/aikari/status").AikariStatus} arg
      * @returns
      */
     (_event, arg) => {
-      global.__HUGO_AURA__.plsStats = arg;
-      ipcMain.send("assistant", `${methodBase}.post.onPlsStatsUpdate`, arg);
+      global.__HUGO_AURA__.aikariStats = arg;
+      ipcMain.send("assistant", `${methodBase}.post.onAikariStatsUpdate`, arg);
       return {
         success: true,
       };
@@ -336,7 +342,7 @@ const applyPlsIpcHandler = (ipcMain) => {
   );
 
   ipcMain.handle(
-    `${methodBase}.getPlsSettings`,
+    `${methodBase}.getAikariSettings`,
     /**
      *
      * @returns {{ success: boolean; data: Record<any, any> | null | undefined }}
@@ -344,13 +350,13 @@ const applyPlsIpcHandler = (ipcMain) => {
     (_event, _arg) => {
       return {
         success: true,
-        data: global.__HUGO_AURA__.plsSettings,
+        data: global.__HUGO_AURA__.aikariSettings,
       };
     }
   );
 
   ipcMain.handle(
-    `${methodBase}.updatePlsSettings`,
+    `${methodBase}.updateAikariSettings`,
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} _event
@@ -358,8 +364,12 @@ const applyPlsIpcHandler = (ipcMain) => {
      * @returns
      */
     (_event, arg) => {
-      global.__HUGO_AURA__.plsSettings = arg;
-      ipcMain.send("assistant", `${methodBase}.post.onPlsSettingsUpdate`, arg);
+      global.__HUGO_AURA__.aikariSettings = arg;
+      ipcMain.send(
+        "assistant",
+        `${methodBase}.post.onAikariSettingsUpdate`,
+        arg
+      );
       return {
         success: true,
       };
@@ -367,7 +377,7 @@ const applyPlsIpcHandler = (ipcMain) => {
   );
 
   ipcMain.handle(
-    `${methodBase}.getPlsRules`,
+    `${methodBase}.getAikariRules`,
     /**
      *
      * @returns {{ success: boolean; data: Record<any, any> | null | undefined }}
@@ -375,13 +385,13 @@ const applyPlsIpcHandler = (ipcMain) => {
     (_event, _arg) => {
       return {
         success: true,
-        data: global.__HUGO_AURA__.plsRules,
+        data: global.__HUGO_AURA__.aikariRules,
       };
     }
   );
 
   ipcMain.handle(
-    `${methodBase}.updatePlsRules`,
+    `${methodBase}.updateAikariRules`,
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} _event
@@ -389,8 +399,8 @@ const applyPlsIpcHandler = (ipcMain) => {
      * @returns
      */
     (_event, arg) => {
-      global.__HUGO_AURA__.plsRules = arg;
-      ipcMain.send("assistant", `${methodBase}.post.onPlsRulesUpdate`, arg);
+      global.__HUGO_AURA__.aikariRules = arg;
+      ipcMain.send("assistant", `${methodBase}.post.onAikariRulesUpdate`, arg);
       return {
         success: true,
       };
@@ -402,7 +412,7 @@ const applyPlsIpcHandler = (ipcMain) => {
     /**
      *
      * @param {import("electron").IpcMainEvent} _event
-     * @param {PLSResponse} arg
+     * @param {AikariResponse} arg
      */
     (_event, arg) => {
       ipcMain.send("assistant", `${methodBase}.ws.post.onNewMsgRecv`, arg);
@@ -414,7 +424,7 @@ const applyPlsIpcHandler = (ipcMain) => {
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} _event
-     * @param {ClientPLSRequest} arg
+     * @param {ClientAikariRequest} arg
      */
     (_event, arg) => {
       ipcMain.send(
@@ -426,17 +436,17 @@ const applyPlsIpcHandler = (ipcMain) => {
   );
 
   ipcMain.handle(
-    `${methodBase}.syncPlsConfig`,
+    `${methodBase}.syncAikariConfig`,
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} event
      * @param {{ basic: Record<any, any>, rules: Record<any, any> }} arg
      */
     (event, arg) => {
-      global.__HUGO_AURA__.plsRules = arg.rules;
-      global.__HUGO_AURA__.plsSettings = arg.basic;
+      global.__HUGO_AURA__.aikariRules = arg.rules;
+      global.__HUGO_AURA__.aikariSettings = arg.basic;
 
-      ipcMain.send("*", `${methodBase}.syncPlsConfig`, arg, event.sender);
+      ipcMain.send("*", `${methodBase}.syncAikariConfig`, arg, event.sender);
 
       return {
         success: true,
@@ -445,24 +455,27 @@ const applyPlsIpcHandler = (ipcMain) => {
   );
 
   ipcMain.handle(
-    `${methodBase}.plsLifecycleQuery`,
+    `${methodBase}.aikariLifecycleQuery`,
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} _event
-     * @param {{ target: import("../../../types/shared/pls/status").PLSLifecycleType }} arg
+     * @param {{ target: import("../../../types/shared/aikari/status").AikariLifecycleType }} arg
      * @returns {Promise<{ success: boolean, result: boolean }>}
      */
     async (_event, arg) => {
       switch (arg.target) {
         case "isDetached":
-          return { success: true, result: isPlsDetached };
+          return { success: true, result: isAikariDetached };
         case "isSvcInstalled":
-          return await functions.querySvcDetail(PLS_SVC_NAME, "SERVICE_NAME");
+          return await functions.querySvcDetail(
+            AIKARI_SVC_NAME,
+            "SERVICE_NAME"
+          );
         case "isSvcStart":
-          return await functions.querySvcDetail(PLS_SVC_NAME, "RUNNING");
+          return await functions.querySvcDetail(AIKARI_SVC_NAME, "RUNNING");
         default:
           console.warn(
-            `[HugoAura / IPC / PLS] <plsLifecycleQuery> Invalid arg.target: ${arg.target}`
+            `[HugoAura / IPC / Aikari] <AikariLifecycleQuery> Invalid arg.target: ${arg.target}`
           );
           return {
             success: false,
@@ -473,98 +486,68 @@ const applyPlsIpcHandler = (ipcMain) => {
   );
 
   ipcMain.handle(
-    `${methodBase}.plsLifecycleControl`,
+    `${methodBase}.aikariLifecycleControl`,
     /**
      *
      * @param {*} _event
-     * @param {{ target: import("../../../types/shared/pls/status").PLSLifecycleControlType }} arg
+     * @param {{ target: import("../../../types/shared/aikari/status").AikariLifecycleControlType }} arg
      * @returns {Promise<{ success: boolean, errorObj?: Error }>}
      */
     async (_event, arg) => {
-      const logHeader = "[HugoAura / IPC / PLS] <plsLifecycleControl>";
+      const logHeader = "[HugoAura / IPC / Aikari] <AikariLifecycleControl>";
 
+      // TODO: Impl this
       switch (arg.target) {
         case "instSvc":
           return await functions.execCommand(
             logHeader,
-            PLS_BIN_PATH,
+            AIKARI_LAUNCHER_PATH,
             "--startup auto install"
           );
-        case "rmSvc": {
+        case "uninstSvc": {
           const result = await functions.execCommand(
             logHeader,
-            PLS_BIN_PATH,
+            AIKARI_LAUNCHER_PATH,
             "remove"
           );
           return result;
         }
         case "startSvc":
-          return await functions.execCommand(logHeader, PLS_BIN_PATH, "start");
+          return await functions.execCommand(
+            logHeader,
+            AIKARI_LAUNCHER_PATH,
+            "start"
+          );
         case "stopSvc": {
           const result = await functions.execCommand(
             logHeader,
-            PLS_BIN_PATH,
+            AIKARI_LAUNCHER_PATH,
             "stop"
           );
-          if (result.success && global.__HUGO_AURA__.plsStats) {
-            global.__HUGO_AURA__.plsStats.connected = false;
-            global.__HUGO_AURA__.plsStats.launched = false;
-            global.__HUGO_AURA__.plsStats.version = "unknown";
-            global.__HUGO_AURA__.plsStats.status = "dead";
+          if (result.success && global.__HUGO_AURA__.aikariStats) {
+            global.__HUGO_AURA__.aikariStats.connected = false;
+            global.__HUGO_AURA__.aikariStats.launched = false;
+            global.__HUGO_AURA__.aikariStats.version = "unknown";
+            global.__HUGO_AURA__.aikariStats.status = "dead";
 
             ipcMain.send(
               "assistant",
-              `${methodBase}.post.onPlsStatsUpdate`,
-              global.__HUGO_AURA__.plsStats
+              `${methodBase}.post.onAikariStatsUpdate`,
+              global.__HUGO_AURA__.aikariStats
             );
 
             ipcMain.send(
               "auraWsKeepAlive",
-              `${methodBase}.post.plsStopped`,
+              `${methodBase}.post.aikariStopped`,
               {}
             );
           }
           return result;
         }
-        case "rmBin":
-          const unlinkPromise = new Promise((resolve) => {
-            fs.unlink(PLS_BIN_PATH, (error) => {
-              if (error) {
-                resolve({
-                  success: false,
-                  errorObj: error,
-                });
-                console.error(
-                  `${logHeader} Failed to remove PLS bin, error:`,
-                  error
-                );
-                return false;
-              }
-
-              resolve({
-                success: true,
-                errorObj: null,
-              });
-              return true;
-            });
-          });
-
-          const unlinkRet = await unlinkPromise;
-
-          if (unlinkRet.success && global.__HUGO_AURA__.plsStats) {
-            global.__HUGO_AURA__.plsStats.connected = false;
-            global.__HUGO_AURA__.plsStats.launched = false;
-            global.__HUGO_AURA__.plsStats.installed = false;
-            global.__HUGO_AURA__.plsStats.version = "unknown";
-
-            ipcMain.send(
-              "assistant",
-              `${methodBase}.post.onPlsStatsUpdate`,
-              global.__HUGO_AURA__.plsStats
-            );
-          }
-
-          return unlinkRet;
+        case "inst":
+        // TODO: Impl Aikari INST
+        case "uninst":
+        // same
         default:
           return { success: false, errorObj: new Error("Method not found") };
       }
@@ -572,7 +555,7 @@ const applyPlsIpcHandler = (ipcMain) => {
   );
 
   ipcMain.handle(
-    `${methodBase}.downloadPls`,
+    `${methodBase}.downloadAndInstallAikari`,
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} _evt
@@ -582,22 +565,22 @@ const applyPlsIpcHandler = (ipcMain) => {
     (_evt, arg) => {
       const channel = arg.channel ? arg.channel : "stable";
       const reportWin = arg.reportTo ? arg.reportTo : "assistant";
-      functions.handlePLSDownload(
+      functions.handleAikariDownload(
         channel,
         (status) => {
           ipcMain.send(
             reportWin,
-            `${methodBase}.post.reportPlsDownloadStatus`,
+            `${methodBase}.post.reportAikariInstallStep`,
             status
           );
         },
-        PLS_BIN_PATH
+        AIKARI_LAUNCHER_PATH
       );
     }
   );
 
   ipcMain.handle(
-    `${methodBase}.retryPlsConnect`,
+    `${methodBase}.retryAikariConnect`,
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} _event
@@ -605,13 +588,17 @@ const applyPlsIpcHandler = (ipcMain) => {
      * @returns {{ success: boolean, status: "Already" | "Retrying" }}
      */
     (_event, arg) => {
-      if (global.__HUGO_AURA__.plsStats?.connected) {
+      if (global.__HUGO_AURA__.aikariStats?.connected) {
         return {
           success: true,
           status: "Already",
         };
       } else {
-        ipcMain.send("auraWsKeepAlive", `${methodBase}.retryPlsConnect`, arg);
+        ipcMain.send(
+          "auraWsKeepAlive",
+          `${methodBase}.retryAikariConnect`,
+          arg
+        );
 
         return {
           success: true,
@@ -639,4 +626,4 @@ const applyPlsIpcHandler = (ipcMain) => {
   );
 };
 
-module.exports = { applyPlsIpcHandler };
+module.exports = { applyAikariIpcHandler };

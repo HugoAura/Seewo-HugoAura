@@ -1,15 +1,15 @@
-.acs-behaviour-control-pls-status-page {
+.acs-behaviour-control-aikari-status-page {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.acs-behaviour-control-pls-status-page p {
+.acs-behaviour-control-aikari-status-page p {
   font-family: sans-serif;
 }
 
-.acs-bc-pls-status-page-pls-description {
+.acs-bc-aikari-status-page-aikari-description {
   margin-top: 0.5rem;
   max-width: 80%;
   opacity: 0.35;
@@ -17,11 +17,11 @@
   text-align: center;
 }
 
-.acs-bc-pls-status-page-main-logo {
-  max-width: 11%;
+.acs-bc-aikari-status-page-main-logo {
+  max-width: 15%;
   opacity: 0.45;
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .acs-bc-psp-operations-container {
@@ -133,7 +133,7 @@
   margin-top: 1px;
 }
 
-.acs-bc-pls-status-page-status-el {
+.acs-bc-aikari-status-page-status-el {
   display: flex;
   align-items: center;
   width: 40%;
@@ -141,17 +141,17 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.25);
 }
 
-.acs-bc-pls-status-page-status-el div {
+.acs-bc-aikari-status-page-status-el div {
   display: flex;
   align-items: center;
 }
 
-.acs-bc-pls-status-page-status-area {
+.acs-bc-aikari-status-page-status-area {
   flex-grow: 1;
   justify-content: flex-end;
 }
 
-.acs-bc-pls-status-page-status-area-circle {
+.acs-bc-aikari-status-page-status-area-circle {
   height: 10px;
   width: 10px;
   border-radius: 100%;
@@ -159,48 +159,48 @@
   margin-top: 2px;
 }
 
-.acs-bc-pls-status-page-status-area.pending
-  .acs-bc-pls-status-page-status-area-circle {
+.acs-bc-aikari-status-page-status-area.pending
+  .acs-bc-aikari-status-page-status-area-circle {
   background-color: rgba(0, 0, 0, 0.375);
 }
 
-.acs-bc-pls-status-page-status-area.pending p {
+.acs-bc-aikari-status-page-status-area.pending p {
   opacity: 0.5;
 }
 
-.acs-bc-pls-status-page-status-area.success
-  .acs-bc-pls-status-page-status-area-circle {
+.acs-bc-aikari-status-page-status-area.success
+  .acs-bc-aikari-status-page-status-area-circle {
   background-color: rgb(0, 175, 38);
 }
 
-.acs-bc-pls-status-page-status-area.success p {
+.acs-bc-aikari-status-page-status-area.success p {
   color: rgb(0, 150, 33);
 }
 
-.acs-bc-pls-status-page-status-area.failed
-  .acs-bc-pls-status-page-status-area-circle {
+.acs-bc-aikari-status-page-status-area.failed
+  .acs-bc-aikari-status-page-status-area-circle {
   background-color: rgb(175, 0, 0);
 }
 
-.acs-bc-pls-status-page-status-area.failed p {
+.acs-bc-aikari-status-page-status-area.failed p {
   color: rgb(175, 0, 0);
 }
 
-.acs-bc-pls-status-page-status-area.warning
-  .acs-bc-pls-status-page-status-area-circle {
+.acs-bc-aikari-status-page-status-area.warning
+  .acs-bc-aikari-status-page-status-area-circle {
   background-color: rgb(212, 127, 0);
 }
 
-.acs-bc-pls-status-page-status-area.warning p {
+.acs-bc-aikari-status-page-status-area.warning p {
   color: rgb(212, 127, 0);
 }
 
-.acs-bc-pls-status-page-status-area.info
-  .acs-bc-pls-status-page-status-area-circle {
+.acs-bc-aikari-status-page-status-area.info
+  .acs-bc-aikari-status-page-status-area-circle {
   background-color: #3d78ff;
 }
 
-.acs-bc-pls-status-page-status-area.info p {
+.acs-bc-aikari-status-page-status-area.info p {
   color: #3d78ff;
 }
 

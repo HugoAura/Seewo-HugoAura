@@ -106,7 +106,7 @@ global.__HUGO_AURA_UI_FUNCTIONS__.config = {
         if (!side) {
           setTimeout(() => {
             global.__HUGO_AURA_LOADER__[
-              "Aura.UI.Assistant.Config.BehaviourCtrl.PlsStatus"
+              "Aura.UI.Assistant.Config.BehaviourCtrl.AikariStatus"
             ].active = false;
           }, 500);
         }

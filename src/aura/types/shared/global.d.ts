@@ -3,7 +3,7 @@ import type EventBus from "../../utils/eventBus";
 import { HookedWindowsMap, UIHooksMap, WindowHooksMap } from "../main/core";
 import { UIHooksObject } from "../render/uiHook";
 import ConfigManager from "../../init/shared/configManager";
-import { PLSStatus } from "./pls/status";
+import { AikariStatus } from "./aikari/status";
 
 type MainProcessOnlyVal<T> = T;
 type RendererProcessOnlyVal<T> = T;
@@ -15,10 +15,10 @@ interface GlobalHugoAuraInfo {
   hookedWindows?: MainProcessOnlyVal<HookedWindowsMap>;
   ipcInit?: MainProcessOnlyVal<boolean>;
   auraDir: MainProcessOnlyVal<string>;
-  plsRules?: Record<any, any> | null;
-  plsSettings?: Record<any, any> | null;
-  plsStats?: PLSStatus | null;
-  plsWs?: RendererProcessOnlyVal<WebSocket>;
+  aikariRules?: Record<any, any> | null;
+  aikariSettings?: Record<any, any> | null;
+  aikariStats?: AikariStatus | null;
+  aikariWs?: RendererProcessOnlyVal<WebSocket>;
   uiHooks?: MainProcessOnlyVal<UIHooksMap>;
   windowHooks?: MainProcessOnlyVal<WindowHooksMap>;
   version: RendererProcessOnlyVal<string>;
@@ -26,7 +26,7 @@ interface GlobalHugoAuraInfo {
 
 interface GlobalHugoAuraApiInfo {
   domains: string[];
-  plsUpdate: string;
+  aikariUpdate: string;
   auraUpdate: string;
 }
 

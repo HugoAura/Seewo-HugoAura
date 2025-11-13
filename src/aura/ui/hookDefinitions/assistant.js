@@ -41,13 +41,13 @@ const def = {
           selectorMode: "appendChild",
           pageCSS: "ui/pages/configSubPages/behaviourCtrl/behaviourCtrl.css",
           childs: {
-            PlsStatus: {
+            AikariStatus: {
               active: false,
-              pageURI: "ui/pages/configSubPages/behaviourCtrl/plsStatus.html",
-              pageScript: "ui/pages/configSubPages/behaviourCtrl/plsStatus.js",
+              pageURI: "ui/pages/configSubPages/behaviourCtrl/aikariStatus.html",
+              pageScript: "ui/pages/configSubPages/behaviourCtrl/aikariStatus.js",
               pageSelector: "#status-subpage",
               selectorMode: "appendChild",
-              pageCSS: "ui/pages/configSubPages/behaviourCtrl/plsStatus.css",
+              pageCSS: "ui/pages/configSubPages/behaviourCtrl/aikariStatus.css",
             },
             DeviceSecurity: {
               childs: {
@@ -86,7 +86,7 @@ const def = {
   ],
   globalJS: [
     "ui/js/global.js",
-    "ui/js/plsListener.js",
+    "ui/js/aikariListener.js",
     "ui/bootstrap/bootstrap.bundle.min.js",
   ],
   onLoaded: `

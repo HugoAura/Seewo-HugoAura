@@ -18,12 +18,12 @@ const showRelaunchToast = () => {
   if (!toastBs.isShown()) toastBs.show();
 };
 
-const showRelaunchPLSToast = () => {
-  const toast = document.getElementById("relaunchPlsNotifyToast");
+const showRelaunchAikariToast = () => {
+  const toast = document.getElementById("relaunchAikariNotifyToast");
   const toastBs = bootstrap.Toast.getOrCreateInstance(toast);
 
-  if (global.__HUGO_AURA__.plsStats.detached) {
-    const relaunchBtn = document.getElementById("plsRelaunchBtn");
+  if (global.__HUGO_AURA__.aikariStats.detached) {
+    const relaunchBtn = document.getElementById("aikariRelaunchBtn");
     relaunchBtn.disabled = true;
     relaunchBtn.textContent = "分离模式下无法执行";
   }
@@ -37,12 +37,6 @@ const showToast = (entry) => {
   } else if (entry.restart) {
     showRelaunchToast();
   }
-
-  /*
-  else if (entry.restartPLS) {
-    showRelaunchPLSToast();
-  }
-  */
 };
 
 const setDisableStatus = (el, isDisable, hint = null) => {
@@ -225,29 +219,29 @@ const renderNormalSettingsItem = (entry, formEl) => {
     powerIcon.setAttribute("data-bs-title", "需要重启 Electron 进程");
     entryTitle.appendChild(powerIcon);
   }
-  if (entry.PLSRequired) {
-    const plsIcon = document.createElement("i");
-    plsIcon.classList.add(
+  if (entry.AikariRequired) {
+    const aikariIcon = document.createElement("i");
+    aikariIcon.classList.add(
       "layui-icon",
       "layui-icon-component",
       "aura-settings-entry-property-icon"
     );
-    plsIcon.setAttribute("data-bs-toggle", "tooltip");
-    plsIcon.setAttribute("data-bs-placement", "top");
-    plsIcon.setAttribute("data-bs-title", "需要 PLS 支持");
-    entryTitle.appendChild(plsIcon);
+    aikariIcon.setAttribute("data-bs-toggle", "tooltip");
+    aikariIcon.setAttribute("data-bs-placement", "top");
+    aikariIcon.setAttribute("data-bs-title", "需要 Aikari 支持");
+    entryTitle.appendChild(aikariIcon);
   }
-  if (entry.restartPLS) {
-    const plsIcon = document.createElement("i");
-    plsIcon.classList.add(
+  if (entry.restartAikari) {
+    const aikariIcon = document.createElement("i");
+    aikariIcon.classList.add(
       "layui-icon",
       "layui-icon-logout",
       "aura-settings-entry-property-icon"
     );
-    plsIcon.setAttribute("data-bs-toggle", "tooltip");
-    plsIcon.setAttribute("data-bs-placement", "top");
-    plsIcon.setAttribute("data-bs-title", "需要重启 PLS 进程");
-    entryTitle.appendChild(plsIcon);
+    aikariIcon.setAttribute("data-bs-toggle", "tooltip");
+    aikariIcon.setAttribute("data-bs-placement", "top");
+    aikariIcon.setAttribute("data-bs-title", "需要重启 Aikari 进程");
+    entryTitle.appendChild(aikariIcon);
   }
   if (entry.reload) {
     const reloadIcon = document.createElement("i");
@@ -308,27 +302,27 @@ const renderNormalSettingsItem = (entry, formEl) => {
         insertOrRemoveEl(entryOperationArea, targetEl, true);
       }
     };
-    const channel = entry.PLSRequired
-      ? "onPLSConfigUpdate"
+    const channel = entry.AikariRequired
+      ? "onAikariConfigUpdate"
       : "onHugoAuraConfigUpdate";
     entryContainerEl.addEventListener(channel, evtListener);
     // createOnLeaveEvtListener(channel, evtListener);
   }
 
-  if (entry.PLSRequired) {
-    if (!global.__HUGO_AURA__.plsStats.connected) {
-      setDisableStatus(entryOperationArea, true, "连接至 PLS 以继续");
+  if (entry.AikariRequired) {
+    if (!global.__HUGO_AURA__.aikariStats.connected) {
+      setDisableStatus(entryOperationArea, true, "连接至 Aikari 以继续");
     }
 
     const evtListener = (event) => {
       if (event.detail.connected) {
         setDisableStatus(entryOperationArea, false);
       } else {
-        setDisableStatus(entryOperationArea, true, "连接至 PLS 以继续");
+        setDisableStatus(entryOperationArea, true, "连接至 Aikari 以继续");
       }
     };
-    entryContainerEl.addEventListener("onPLSStatsUpdate", evtListener);
-    // createOnLeaveEvtListener("onPLSStatsUpdate", evtListener);
+    entryContainerEl.addEventListener("onAikariStatsUpdate", evtListener);
+    // createOnLeaveEvtListener("onAikariStatsUpdate", evtListener);
   }
   entryContainerEl.appendChild(entryOperationArea);
   const isShow = entry.auraIf();
@@ -360,8 +354,8 @@ const renderNormalSettingsItem = (entry, formEl) => {
         updateDisableStatus();
       }
     };
-    const channel = entry.PLSRequired
-      ? "onPLSConfigUpdate"
+    const channel = entry.AikariRequired
+      ? "onAikariConfigUpdate"
       : "onHugoAuraConfigUpdate";
     entryContainerEl.addEventListener(channel, evtListener);
     // createOnLeaveEvtListener(channel, evtListener);
@@ -403,7 +397,7 @@ const renderPreviewItem = (entry, formEl) => {
   };
 
   document.addEventListener(
-    eventChannel === "pls" ? "onPLSConfigUpdate" : "onHugoAuraConfigUpdate",
+    eventChannel === "pls" ? "onAikariConfigUpdate" : "onHugoAuraConfigUpdate",
     eventListener
   );
   createOnLeaveEvtListener(eventListener); // Clean up

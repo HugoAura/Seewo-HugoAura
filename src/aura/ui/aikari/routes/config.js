@@ -1,10 +1,10 @@
 // @ts-check
 
-const IPC_METHOD_BASE = "$aura.pls";
+const IPC_METHOD_BASE = "$aura.aikari";
 
 /**
  *
- * @param {PLSPush} parsedWsMsg
+ * @param {AikariPush} parsedWsMsg
  * @returns
  */
 const configRouteHandler = (parsedWsMsg) => {
@@ -12,13 +12,13 @@ const configRouteHandler = (parsedWsMsg) => {
   switch (target) {
     case "pushBasicConfig":
       global.ipcRenderer.invoke(
-        `${IPC_METHOD_BASE}.updatePlsSettings`,
+        `${IPC_METHOD_BASE}.updateAikariSettings`,
         parsedWsMsg.data
       );
       break;
     case "pushRuleSettings":
       global.ipcRenderer.invoke(
-        `${IPC_METHOD_BASE}.updatePlsRules`,
+        `${IPC_METHOD_BASE}.updateAikariRules`,
         parsedWsMsg.data
       );
       break;
