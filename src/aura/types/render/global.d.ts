@@ -3,14 +3,14 @@ interface HugoAuraGlobal {
 }
 
 interface AssistantHugoAuraGlobal extends HugoAuraGlobal {
-  plsStatus: PLSStatus;
+  plsStatus: AikariStatus;
   plsRules: Record<any, any>;
   plsSettings: Record<any, any>;
 }
 
 interface AuraWSKeepAliveWindowHugoAuraGlobal extends HugoAuraGlobal {
   plsWs: WebSocket | null;
-  plsStats: PLSStatus;
+  plsStats: AikariStatus;
 }
 
 type UIFunctionsObject = Record<string, any>;

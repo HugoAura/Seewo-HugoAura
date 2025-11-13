@@ -7,7 +7,7 @@ const { configRouteHandler } = require(`${REQUIRE_BASE}/routes/config`);
 
 /**
  *
- * @param {PLSPush} parsedWsMsg
+ * @param {AikariPush} parsedWsMsg
  * @returns
  */
 const pushMsgHandler = (parsedWsMsg) => {

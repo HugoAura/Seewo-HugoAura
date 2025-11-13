@@ -1,12 +1,11 @@
-<div class="acs-behaviour-control-pls-status-page">
-  <p class="acs-bc-pls-status-page-pls-description">
-    HugoAura ProxyLayerServices (Aura-PLS) 是基于 Python + MITMProxy
-    实现的代理服务, 用于解密并修改希沃基础服务 (SeewoCore) 的 MQTT 数据包,
-    实现行为监控、伪造上报等功能
+<div class="acs-behaviour-control-aikari-status-page">
+  <p class="acs-bc-aikari-status-page-aikari-description">
+    HugoAura Aikari 是基于 C++ 实现的 HugoAura 特权访问服务, 集成篡改 MQTT
+    数据包、冰点穿透增强等功能, 实现行为监控、伪造上报
   </p>
   <img
-    src="../../aura/ui/static/aura_pls.png"
-    class="acs-bc-pls-status-page-main-logo"
+    src="../../aura/ui/static/aikari_color_reversed.png"
+    class="acs-bc-aikari-status-page-main-logo"
   />
 
   <div class="acs-bc-psp-operations-container">
@@ -155,61 +154,61 @@
     </div>
   </div>
 
-  <div class="acs-bc-pls-status-page-status-el">
+  <div class="acs-bc-aikari-status-page-status-el">
     <p>安装状态</p>
     <div
-      class="acs-bc-pls-status-page-status-area pending"
+      class="acs-bc-aikari-status-page-status-area pending"
       id="acs-bc-psp-installStatus-container"
     >
-      <span class="acs-bc-pls-status-page-status-area-circle"></span>
+      <span class="acs-bc-aikari-status-page-status-area-circle"></span>
       <p id="acs-bc-psp-installStatus-text">未安装</p>
     </div>
   </div>
 
-  <div class="acs-bc-pls-status-page-status-el">
+  <div class="acs-bc-aikari-status-page-status-el">
     <p>启动状态</p>
     <div
-      class="acs-bc-pls-status-page-status-area pending"
+      class="acs-bc-aikari-status-page-status-area pending"
       id="acs-bc-psp-launchStatus-container"
     >
-      <span class="acs-bc-pls-status-page-status-area-circle"></span>
+      <span class="acs-bc-aikari-status-page-status-area-circle"></span>
       <p id="acs-bc-psp-launchStatus-text">未启动</p>
     </div>
   </div>
 
-  <div class="acs-bc-pls-status-page-status-el">
+  <div class="acs-bc-aikari-status-page-status-el">
     <p>连接状态</p>
     <div
-      class="acs-bc-pls-status-page-status-area pending"
+      class="acs-bc-aikari-status-page-status-area pending"
       id="acs-bc-psp-connStatus-container"
     >
-      <span class="acs-bc-pls-status-page-status-area-circle"></span>
+      <span class="acs-bc-aikari-status-page-status-area-circle"></span>
       <p id="acs-bc-psp-connStatus-text">已断开</p>
     </div>
   </div>
 
-  <div class="acs-bc-pls-status-page-status-el" style="border-bottom: none">
+  <div class="acs-bc-aikari-status-page-status-el" style="border-bottom: none">
     <p>版本</p>
-    <div class="acs-bc-pls-status-page-status-area">
+    <div class="acs-bc-aikari-status-page-status-area">
       <p id="acs-bc-psp-version-text">不可用</p>
     </div>
   </div>
 
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div
-      id="plsStatusNotifyToast"
+      id="aikariStatusNotifyToast"
       class="acs-bc-psp-toast toast"
       data-bs-autohide="false"
     >
       <div class="toast-header">
-        <strong class="me-auto" id="plsStatusNotifyToastTitle"></strong>
+        <strong class="me-auto" id="aikariStatusNotifyToastTitle"></strong>
         <button
           type="button"
           class="btn-close"
           data-bs-dismiss="toast"
         ></button>
       </div>
-      <div class="toast-body" id="plsStatusNotifyToastBody"></div>
+      <div class="toast-body" id="aikariStatusNotifyToastBody"></div>
     </div>
   </div>
 </div>

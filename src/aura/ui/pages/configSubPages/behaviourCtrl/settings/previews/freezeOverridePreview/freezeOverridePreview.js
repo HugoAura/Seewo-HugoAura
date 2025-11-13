@@ -148,9 +148,10 @@
     )[0];
 
     const eventListener = (_event) => {
-      if (!global.__HUGO_AURA__.plsRules) return;
+      // if (!global.__HUGO_AURA__.plsRules) return;
       composables.getAndUpdateDiskInfo(
-        global.__HUGO_AURA__.plsRules.client.security.uploadFreezeInfo
+        // global.__HUGO_AURA__.plsRules.client.security.uploadFreezeInfo
+        { enable: false }
       );
     };
     rootEl.addEventListener("onAssociateValueUpdated", eventListener);

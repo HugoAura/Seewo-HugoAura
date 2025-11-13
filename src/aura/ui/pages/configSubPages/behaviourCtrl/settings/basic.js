@@ -1,8 +1,8 @@
 const REQUIRE_BASE = ".";
 
 const {
-  updatePlsConfigToRemote,
-} = require(`${REQUIRE_BASE}/../../../../composables/plsConfigManager`);
+  updateAikariConfigToRemote,
+} = require(`${REQUIRE_BASE}/../../../../composables/aikariConfigManager`);
 
 const reusableChkFn = {
   checkRelativePath: () => {
@@ -42,8 +42,8 @@ const basicSettings = [
         reactiveVal: ["root.settings"],
         restart: false,
         reload: false,
-        PLSRequired: true,
-        restartPLS: false,
+        AikariRequired: true,
+        restartAikari: false,
         warning: true,
         warningContent: "PLS 仍会在默认端口被占用时, 自动随机端口重试",
         associateVal: null,
@@ -51,8 +51,8 @@ const basicSettings = [
         defaultValue: "",
         placeHolder: "输入端口号 (10000 ~ 65535)",
         valueGetter: () => {
-          if (!global.__HUGO_AURA__.plsSettings) return "";
-          return global.__HUGO_AURA__.plsSettings.wsPort;
+          if (!global.__HUGO_AURA__.aikariSettings) return "";
+          return global.__HUGO_AURA__.aikariSettings.wsPort;
         },
         callbackFn: (newVal) => {
           if (newVal === "" || !newVal)
@@ -63,8 +63,8 @@ const basicSettings = [
             return { valid: false, hint: "请输入合法的端口号 (10000 ~ 65535)" };
           }
 
-          global.__HUGO_AURA__.plsSettings.wsPort = numberNewVal;
-          updatePlsConfigToRemote("wsPort", numberNewVal);
+          global.__HUGO_AURA__.aikariSettings.wsPort = numberNewVal;
+          updateAikariConfigToRemote("wsPort", numberNewVal);
           return { valid: true };
         },
       },
@@ -79,8 +79,8 @@ const basicSettings = [
         reactiveVal: ["root.settings"],
         restart: false,
         reload: false,
-        PLSRequired: true,
-        restartPLS: true,
+        AikariRequired: true,
+        restartAikari: true,
         tip: true,
         tipTitle:
           '路径相对于 "%PROGRAMDATA%\\HugoAura\\Aura-PLS\\", 使用 "/" 作为路径符',
@@ -89,8 +89,8 @@ const basicSettings = [
         defaultValue: "",
         placeHolder: "输入相对路径, 例如: config/vme50/cert.crt",
         valueGetter: () => {
-          if (!global.__HUGO_AURA__.plsSettings) return "";
-          return global.__HUGO_AURA__.plsSettings.certPath;
+          if (!global.__HUGO_AURA__.aikariSettings) return "";
+          return global.__HUGO_AURA__.aikariSettings.certPath;
         },
         callbackFn: (newVal) => {
           const validate = reusableChkFn.checkRelativePath();
@@ -98,8 +98,8 @@ const basicSettings = [
             return validate;
           }
 
-          global.__HUGO_AURA__.plsSettings.certPath = newVal;
-          updatePlsConfigToRemote("certPath", newVal);
+          global.__HUGO_AURA__.aikariSettings.certPath = newVal;
+          updateAikariConfigToRemote("certPath", newVal);
           return { valid: true };
         },
       },
@@ -114,8 +114,8 @@ const basicSettings = [
         reactiveVal: ["root.settings"],
         restart: false,
         reload: false,
-        PLSRequired: true,
-        restartPLS: true,
+        AikariRequired: true,
+        restartAikari: true,
         tip: true,
         tipTitle:
           '路径相对于 "%PROGRAMDATA%\\HugoAura\\Aura-PLS\\", 使用 "/" 作为路径符',
@@ -126,8 +126,8 @@ const basicSettings = [
         defaultValue: "",
         placeHolder: "输入相对路径, 例如: config/vme50/cert.key",
         valueGetter: () => {
-          if (!global.__HUGO_AURA__.plsSettings) return "";
-          return global.__HUGO_AURA__.plsSettings.keyPath;
+          if (!global.__HUGO_AURA__.aikariSettings) return "";
+          return global.__HUGO_AURA__.aikariSettings.keyPath;
         },
         callbackFn: (newVal) => {
           const validate = reusableChkFn.checkRelativePath();
@@ -135,8 +135,8 @@ const basicSettings = [
             return validate;
           }
 
-          global.__HUGO_AURA__.plsSettings.keyPath = newVal;
-          updatePlsConfigToRemote("keyPath", newVal);
+          global.__HUGO_AURA__.aikariSettings.keyPath = newVal;
+          updateAikariConfigToRemote("keyPath", newVal);
           return { valid: true };
         },
       },
@@ -150,20 +150,20 @@ const basicSettings = [
         reactiveVal: ["root.settings"],
         restart: false,
         reload: false,
-        PLSRequired: true,
-        restartPLS: true,
+        AikariRequired: true,
+        restartAikari: true,
         associateVal: null,
         auraIf: () => true,
         defaultValue: false,
         valueGetter: () => {
-          if (!global.__HUGO_AURA__.plsSettings) return "";
-          return global.__HUGO_AURA__.plsSettings.regenCert;
+          if (!global.__HUGO_AURA__.aikariSettings) return "";
+          return global.__HUGO_AURA__.aikariSettings.regenCert;
         },
         callbackFn: (newVal) => {
           if (typeof newVal !== "boolean") return false;
 
-          global.__HUGO_AURA__.plsSettings.regenCert = newVal;
-          updatePlsConfigToRemote("regenCert", newVal);
+          global.__HUGO_AURA__.aikariSettings.regenCert = newVal;
+          updateAikariConfigToRemote("regenCert", newVal);
           return true;
         },
       },

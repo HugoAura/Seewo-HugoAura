@@ -1,28 +1,29 @@
 import { RendererProcessOnlyVal } from "../global";
 
-type PLSStatusDesc =
+type AikariStatusDesc =
   | "dead"
   | "running"
   | "notReady"
   | "downloading"
+  | "installing"
   | "notInstalled";
 
-interface PLSStatus {
+interface AikariStatus {
   installed: boolean;
   detached: boolean;
   connected: boolean;
   launched: boolean;
-  status: PLSStatusDesc;
+  status: AikariStatusDesc;
   version: string;
   authToken: string;
 }
 
-type PLSLifecycleType = "isDetached" | "isSvcInstalled" | "isSvcStart";
+type AikariLifecycleType = "isDetached" | "isSvcInstalled" | "isSvcStart";
 
-type PLSLifecycleControlType =
+type AikariLifecycleControlType =
   | "instSvc"
-  | "rmSvc"
+  | "uninstSvc"
   | "startSvc"
   | "stopSvc"
-  | "rmBin"
-  | "dlBin";
+  | "uninst"
+  | "inst";

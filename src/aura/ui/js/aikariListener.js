@@ -1,21 +1,21 @@
 (() => {
-  const IPC_METHOD_BASE = "$aura.pls";
+  const IPC_METHOD_BASE = "$aura.aikari";
   const REQUIRE_BASE = "../../aura/ui";
   const __SCOPE = "assistant";
   const {
-    updatePlsStatusFromLocal,
-  } = require(`${REQUIRE_BASE}/composables/plsConfigManager`);
+    updateAikariStatusFromLocal,
+  } = require(`${REQUIRE_BASE}/composables/aikariConfigManager`);
 
   const setupListeners = () => {
     if (!global.ipcRenderer)
       global.ipcRenderer = require("electron").ipcRenderer;
 
     ipcRenderer.on(
-      `${IPC_METHOD_BASE}.post.onPlsStatsUpdate`,
+      `${IPC_METHOD_BASE}.post.onAikariStatsUpdate`,
       (_event, arg) => {
-        global.__HUGO_AURA__.plsStats = arg;
+        global.__HUGO_AURA__.aikariStats = arg;
 
-        const event = new CustomEvent("onPLSStatsUpdate", {
+        const event = new CustomEvent("onAikariStatsUpdate", {
           detail: {
             connected: arg.connected,
           },
@@ -35,11 +35,11 @@
     );
 
     ipcRenderer.on(
-      `${IPC_METHOD_BASE}.post.onPlsSettingsUpdate`,
+      `${IPC_METHOD_BASE}.post.onAikariSettingsUpdate`,
       (_event, arg) => {
-        global.__HUGO_AURA__.plsSettings = arg;
+        global.__HUGO_AURA__.aikariSettings = arg;
 
-        const event = new CustomEvent("onPLSConfigUpdate", {
+        const event = new CustomEvent("onAikariConfigUpdate", {
           detail: {
             path: ["root", "settings"],
             value: arg,
@@ -60,11 +60,11 @@
     );
 
     ipcRenderer.on(
-      `${IPC_METHOD_BASE}.post.onPlsRulesUpdate`,
+      `${IPC_METHOD_BASE}.post.onAikariRulesUpdate`,
       (_event, arg) => {
-        global.__HUGO_AURA__.plsRules = arg;
+        global.__HUGO_AURA__.aikariRules = arg;
 
-        const event = new CustomEvent("onPLSConfigUpdate", {
+        const event = new CustomEvent("onAikariConfigUpdate", {
           detail: {
             path: ["root", "ruleSettings"],
             value: arg,
@@ -87,7 +87,7 @@
     ipcRenderer.on(
       `${IPC_METHOD_BASE}.post.updateRetryStatus`,
       (_event, arg) => {
-        const event = new CustomEvent("onPLSStatsUpdate", {
+        const event = new CustomEvent("onAikariStatsUpdate", {
           detail: {
             connected: arg.success,
           },
@@ -107,6 +107,6 @@
     );
   };
 
-  updatePlsStatusFromLocal();
+  updateAikariStatusFromLocal();
   setupListeners();
 })();

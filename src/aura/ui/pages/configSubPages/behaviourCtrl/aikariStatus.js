@@ -6,7 +6,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
 
 (() => {
   const REQUIRE_BASE = "../../aura/ui/pages/configSubPages/behaviourCtrl";
-  const IPC_METHOD_BASE = "$aura.pls";
+  const IPC_METHOD_BASE = "$aura.aikari";
 
   const lifecycleStatus = {
     installed: false,
@@ -15,12 +15,12 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
     svcRunning: false,
   };
 
-  global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus = {
+  global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus = {
     toastAutoHideTimeout: null,
     curDlTaskId: null,
   };
 
-  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus = {
+  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus = {
     updateToast: async (
       variant,
       title,
@@ -29,17 +29,17 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       autoHide = true,
       hideAfter = 3000
     ) => {
-      const toastRootEl = document.getElementById("plsStatusNotifyToast");
+      const toastRootEl = document.getElementById("aikariStatusNotifyToast");
       const toastHeaderEl = document.getElementById(
-        "plsStatusNotifyToastTitle"
+        "aikariStatusNotifyToastTitle"
       );
-      const toastBodyEl = document.getElementById("plsStatusNotifyToastBody");
+      const toastBodyEl = document.getElementById("aikariStatusNotifyToastBody");
 
       const bsToastIns = bootstrap.Toast.getOrCreateInstance(toastRootEl);
       if (bsToastIns.isShown) {
         bsToastIns.hide();
         const timeout =
-          global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus
+          global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus
             .toastAutoHideTimeout;
         if (timeout) {
           clearTimeout(timeout);
@@ -60,7 +60,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
 
       bsToastIns.show();
       if (autoHide && hideAfter) {
-        global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus.toastAutoHideTimeout =
+        global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus.toastAutoHideTimeout =
           setTimeout(() => {
             bsToastIns.hide();
           }, hideAfter);
@@ -85,7 +85,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
         switch (btnName) {
           case "Refresh":
             btnEl.onclick = () => {
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                 "warning",
                 "正在更新",
                 null,
@@ -93,12 +93,12 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 false,
                 null
               );
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.refreshPlsStatus();
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.refreshAikariStatus();
             };
             break;
           case "Download":
             btnEl.onclick = async () => {
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.downloadPLSBin();
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.downloadAndInstallAikariBin();
             };
             break;
 
@@ -106,11 +106,11 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
           // 如果后续要引入错误视觉反馈, 合并到单个 fn 反而会增加实现复杂度
           case "Install":
             btnEl.onclick = async () => {
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateOperationBtnStatus(
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateOperationBtnStatus(
                 "Install",
                 true
               );
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                 "info",
                 "正在请求安装",
                 null,
@@ -119,12 +119,12 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 null
               );
               const ret = await ipcRenderer.invoke(
-                `${IPC_METHOD_BASE}.plsLifecycleControl`,
+                `${IPC_METHOD_BASE}.aikariLifecycleControl`,
                 { target: "instSvc" }
               );
               if (ret.success) {
                 lifecycleStatus.svcInstalled = true;
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                   "success",
                   "服务安装成功",
                   null,
@@ -133,7 +133,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                   2000
                 );
               } else {
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                   "error",
                   "服务安装失败",
                   `<p>${ret.errorObj}</p>`,
@@ -142,17 +142,17 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                   null
                 );
               }
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
             };
             break;
           case "Uninstall":
             if (btnContent === "删除内核") {
               btnEl.onclick = async () => {
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateOperationBtnStatus(
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateOperationBtnStatus(
                   "Uninstall",
                   true
                 );
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                   "warning",
                   "正在删除内核",
                   null,
@@ -161,20 +161,20 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                   null
                 );
                 const ret = await ipcRenderer.invoke(
-                  `${IPC_METHOD_BASE}.plsLifecycleControl`,
+                  `${IPC_METHOD_BASE}.aikariLifecycleControl`,
                   { target: "rmBin" }
                 );
                 if (ret.success) {
                   lifecycleStatus.installed = false;
                   lifecycleStatus.svcInstalled = false;
-                  global.__HUGO_AURA__.plsStats.installed = false;
-                  global.__HUGO_AURA__.plsStats.connected = false;
-                  global.__HUGO_AURA__.plsStats.launched = false;
+                  global.__HUGO_AURA__.aikariStats.installed = false;
+                  global.__HUGO_AURA__.aikariStats.connected = false;
+                  global.__HUGO_AURA__.aikariStats.launched = false;
                   ipcRenderer.invoke(
-                    `${IPC_METHOD_BASE}.updatePlsStats`,
-                    global.__HUGO_AURA__.plsStats
+                    `${IPC_METHOD_BASE}.updateAikariStatus`,
+                    global.__HUGO_AURA__.aikariStats
                   );
-                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                     "success",
                     "内核已删除",
                     null,
@@ -183,7 +183,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                     2000
                   );
                 } else {
-                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                     "error",
                     "内核删除失败",
                     `<p>
@@ -194,15 +194,15 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                     null
                   );
                 }
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
               };
             } else {
               btnEl.onclick = async () => {
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateOperationBtnStatus(
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateOperationBtnStatus(
                   "Uninstall",
                   true
                 );
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                   "info",
                   lifecycleStatus.svcRunning
                     ? "正在停止服务并卸载"
@@ -214,11 +214,11 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 );
                 if (lifecycleStatus.svcRunning) {
                   const stopRet = await ipcRenderer.invoke(
-                    `${IPC_METHOD_BASE}.plsLifecycleControl`,
+                    `${IPC_METHOD_BASE}.aikariLifecycleControl`,
                     { target: "stopSvc" }
                   );
                   if (!stopRet.success) {
-                    global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                    global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                       "error",
                       "服务卸载失败: 无法停止服务",
                       `<p>${
@@ -227,7 +227,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                           : "检查日志以获取详细信息"
                       }</p>
                       <p>
-                        您可以尝试手动停止 PLS 服务
+                        您可以尝试手动停止 Aikari 服务
                       </p>`,
                       true,
                       false,
@@ -238,12 +238,12 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                   }
                 }
                 const ret = await ipcRenderer.invoke(
-                  `${IPC_METHOD_BASE}.plsLifecycleControl`,
+                  `${IPC_METHOD_BASE}.aikariLifecycleControl`,
                   { target: "rmSvc" }
                 );
                 if (ret.success) {
                   lifecycleStatus.svcInstalled = false;
-                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                     "success",
                     "服务卸载成功",
                     null,
@@ -252,7 +252,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                     2000
                   );
                 } else {
-                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                     "error",
                     "服务卸载失败",
                     "<p>检查日志以获取详细信息</p>",
@@ -261,18 +261,18 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                     null
                   );
                 }
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
               };
             }
 
             break;
           case "Start":
             btnEl.onclick = async () => {
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateOperationBtnStatus(
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateOperationBtnStatus(
                 "Start",
                 true
               );
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                 "info",
                 "正在请求启动",
                 null,
@@ -281,29 +281,29 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 null
               );
               const ret = await ipcRenderer.invoke(
-                `${IPC_METHOD_BASE}.plsLifecycleControl`,
+                `${IPC_METHOD_BASE}.aikariLifecycleControl`,
                 { target: "startSvc" }
               );
               if (ret.success) {
                 lifecycleStatus.svcRunning = true;
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                   "success",
-                  "PLS 已启动",
+                  "Aikari 已启动",
                   null,
                   true,
                   true,
                   2000
                 );
                 await global.__HUGO_AURA_GLOBAL__.utils.sleep(100);
-                await ipcRenderer.invoke(`${IPC_METHOD_BASE}.retryPlsConnect`);
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
+                await ipcRenderer.invoke(`${IPC_METHOD_BASE}.retryAikariConnect`);
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
               } else {
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                   "error",
-                  "PLS 启动失败",
-                  "<p>检查 PLS 日志目录以获取详细信息</p>",
+                  "Aikari 启动失败",
+                  "<p>检查 Aikari 日志目录以获取详细信息</p>",
                   true,
                   false,
                   null
@@ -313,11 +313,11 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             break;
           case "Stop":
             btnEl.onclick = async () => {
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateOperationBtnStatus(
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateOperationBtnStatus(
                 "Stop",
                 true
               );
-              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                 "info",
                 "正在请求停止",
                 null,
@@ -326,33 +326,33 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 null
               );
               const ret = await ipcRenderer.invoke(
-                `${IPC_METHOD_BASE}.plsLifecycleControl`,
+                `${IPC_METHOD_BASE}.aikariLifecycleControl`,
                 { target: "stopSvc" }
               );
               if (ret.success) {
                 lifecycleStatus.svcRunning = false;
-                global.__HUGO_AURA__.plsStats.launched = false;
-                global.__HUGO_AURA__.plsStats.version = "unknown";
-                global.__HUGO_AURA__.plsStats.status = "dead";
+                global.__HUGO_AURA__.aikariStats.launched = false;
+                global.__HUGO_AURA__.aikariStats.version = "unknown";
+                global.__HUGO_AURA__.aikariStats.status = "dead";
 
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                   "success",
-                  "PLS 已停止",
+                  "Aikari 已停止",
                   null,
                   true,
                   true,
                   2000
                 );
               } else {
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                   "error",
-                  "PLS 停止失败",
+                  "Aikari 停止失败",
                   null,
                   true,
                   false,
                   null
                 );
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
+                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
               }
             };
             break;
@@ -364,10 +364,10 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
     },
 
     updateStatusContent: async () => {
-      const curPlsStats = await updatePlsStatusFromLocal();
+      const curAikariStats = await updateAikariStatusFromLocal();
 
-      if (curPlsStats.status === "downloading") {
-        GLOBAL_FUNCTIONS.downloadPLSBin(true);
+      if (curAikariStats.status === "downloading") {
+        GLOBAL_FUNCTIONS.downloadAndInstallAikariBin(true);
       }
 
       const acIdInst = "acs-bc-psp-installStatus-container";
@@ -411,9 +411,9 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
         GLOBAL_FUNCTIONS.updateOperationBtnStatus("Start", true);
         GLOBAL_FUNCTIONS.updateOperationBtnStatus("Stop", true);
       } else if (lifecycleStatus.svcInstalled && lifecycleStatus.installed) {
-        switch (lifecycleStatus.svcRunning || curPlsStats.launched) {
+        switch (lifecycleStatus.svcRunning || curAikariStats.launched) {
           case true:
-            if (curPlsStats.status !== "notReady") {
+            if (curAikariStats.status !== "notReady") {
               updateStatusEl(acIdLaunch, atIdLaunch, "SUCCESS", "已启动");
               GLOBAL_FUNCTIONS.updateOperationBtnStatus("Start", true);
               GLOBAL_FUNCTIONS.updateOperationBtnStatus("Stop", false);
@@ -433,12 +433,12 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
 
       const acIdConn = "acs-bc-psp-connStatus-container";
       const atIdConn = "acs-bc-psp-connStatus-text";
-      switch (curPlsStats.connected) {
+      switch (curAikariStats.connected) {
         case true:
           updateStatusEl(acIdConn, atIdConn, "SUCCESS", "已连接");
           break;
         case false:
-          if (curPlsStats.status !== "notReady") {
+          if (curAikariStats.status !== "notReady") {
             updateStatusEl(acIdConn, atIdConn, "FAILED", "连接失败");
           } else {
             updateStatusEl(acIdConn, atIdConn, "PENDING", "等待启动");
@@ -447,45 +447,16 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       }
 
       const versionTextEl = document.getElementById("acs-bc-psp-version-text");
-      if (curPlsStats.version && curPlsStats.version !== "unknown") {
-        versionTextEl.textContent = "v" + curPlsStats.version;
+      if (curAikariStats.version && curAikariStats.version !== "unknown") {
+        versionTextEl.textContent = curAikariStats.version;
       } else {
         versionTextEl.textContent = "不可用"
       }
     },
 
-    refreshPlsStatus: async (init = false) => {
-      const binExistsRet = await ipcRenderer.invoke(
-        `${IPC_METHOD_BASE}.getPlsBinExists`
-      );
-      if (binExistsRet.success && binExistsRet.data.isExists) {
-        lifecycleStatus.installed = true;
-        global.__HUGO_AURA__.plsStats.installed = true;
-        ipcRenderer.invoke(
-          `${IPC_METHOD_BASE}.updatePlsStats`,
-          global.__HUGO_AURA__.plsStats
-        );
-      } else {
-        lifecycleStatus.installed = false;
-        global.__HUGO_AURA__.plsStats.installed = false;
-        ipcRenderer.invoke(
-          `${IPC_METHOD_BASE}.updatePlsStats`,
-          global.__HUGO_AURA__.plsStats
-        );
-        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
-          "error",
-          "请下载 PLS 内核以继续",
-          null,
-          true,
-          true,
-          3000
-        );
-        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
-        return;
-      }
-
+    refreshAikariStatus: async (init = false) => {
       const isDetachedRet = await ipcRenderer.invoke(
-        `${IPC_METHOD_BASE}.plsLifecycleQuery`,
+        `${IPC_METHOD_BASE}.aikariLifecycleQuery`,
         { target: "isDetached" }
       );
       if (isDetachedRet.success && isDetachedRet.result) {
@@ -494,8 +465,37 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
         lifecycleStatus.detached = false;
       }
 
+      const binExistsRet = await ipcRenderer.invoke(
+        `${IPC_METHOD_BASE}.getIfAikariBinExists`
+      );
+      if ((binExistsRet.success && binExistsRet.data.isExists) || lifecycleStatus.detached) {
+        lifecycleStatus.installed = true;
+        global.__HUGO_AURA__.aikariStats.installed = true;
+        ipcRenderer.invoke(
+          `${IPC_METHOD_BASE}.updateAikariStatus`,
+          global.__HUGO_AURA__.aikariStats
+        );
+      } else {
+        lifecycleStatus.installed = false;
+        global.__HUGO_AURA__.aikariStats.installed = false;
+        ipcRenderer.invoke(
+          `${IPC_METHOD_BASE}.updateAikariStatus`,
+          global.__HUGO_AURA__.aikariStats
+        );
+        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
+          "error",
+          "请下载 Aikari 内核以继续",
+          null,
+          true,
+          true,
+          3000
+        );
+        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
+        return;
+      }
+
       const isSvcInstalledRet = await ipcRenderer.invoke(
-        `${IPC_METHOD_BASE}.plsLifecycleQuery`,
+        `${IPC_METHOD_BASE}.aikariLifecycleQuery`,
         { target: "isSvcInstalled" }
       );
       if (isSvcInstalledRet.success && isSvcInstalledRet.result) {
@@ -505,7 +505,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       }
 
       const isSvcRunningRet = await ipcRenderer.invoke(
-        `${IPC_METHOD_BASE}.plsLifecycleQuery`,
+        `${IPC_METHOD_BASE}.aikariLifecycleQuery`,
         { target: "isSvcStart" }
       );
       if (isSvcRunningRet.success && isSvcRunningRet.result) {
@@ -515,16 +515,16 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       }
 
       if (init) {
-        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
+        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
         return;
       }
 
       const updateOperationBtnStatus =
-        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus
+        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus
           .updateOperationBtnStatus;
       updateOperationBtnStatus("Refresh", true);
       const result = await ipcRenderer.invoke(
-        `${IPC_METHOD_BASE}.retryPlsConnect`
+        `${IPC_METHOD_BASE}.retryAikariConnect`
       );
       if (result.success && result.status === "Retrying") {
         updateOperationBtnStatus("Refresh", true, "正在重连");
@@ -534,7 +534,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
           async (_evt, arg) => {
             await global.__HUGO_AURA_GLOBAL__.utils.sleep(50);
             updateOperationBtnStatus("Refresh", false, "刷新状态");
-            global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+            global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
               arg.success ? "success" : "error",
               arg.success ? "更新成功" : "连接失败",
               null,
@@ -542,12 +542,12 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               true,
               3000
             );
-            global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateStatusContent();
+            global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
           }
         );
       } else if (result.success && result.status === "Already") {
         updateOperationBtnStatus("Refresh", false, "刷新状态");
-        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus.updateToast(
+        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
           "success",
           "更新成功",
           null,
@@ -622,15 +622,15 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       }
     },
 
-    downloadPLSBin: async (retrieveMode = false) => {
+    downloadAikariBin: async (retrieveMode = false) => {
       const GLOBAL_FUNCTIONS =
-        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus;
-      const CUR_CHANNEL = `${IPC_METHOD_BASE}.post.reportPlsDownloadStatus`;
+        global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus;
+      const CUR_CHANNEL = `${IPC_METHOD_BASE}.post.reportAikariInstallStep`;
 
       if (!retrieveMode) {
         GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", true, "正在检查");
         GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", true);
-        await ipcRenderer.invoke(`${IPC_METHOD_BASE}.ensurePlsInstallDir`);
+        await ipcRenderer.invoke(`${IPC_METHOD_BASE}.ensureAikariInstallDir`);
         GLOBAL_FUNCTIONS.updateToast(
           "info",
           "准备开始下载...",
@@ -716,22 +716,22 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               "下载内核"
             );
             lifecycleStatus.installed = true;
-            global.__HUGO_AURA__.plsStats.installed = true;
+            global.__HUGO_AURA__.aikariStats.installed = true;
             ipcRenderer.invoke(
-              `${IPC_METHOD_BASE}.updatePlsStats`,
-              global.__HUGO_AURA__.plsStats
+              `${IPC_METHOD_BASE}.updateAikariStatus`,
+              global.__HUGO_AURA__.aikariStats
             );
             GLOBAL_FUNCTIONS.updateStatusContent();
             break;
           case "waiting":
             GLOBAL_FUNCTIONS.updatePBarStatus(0, "正在连接", "normal");
             if (
-              !global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus
+              !global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus
                 .curDlTaskId ||
-              global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus
+              global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus
                 .curDlTaskId !== info.id
             ) {
-              global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus.curDlTaskId =
+              global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus.curDlTaskId =
                 info.id;
             }
             break;
@@ -766,7 +766,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
 
       ipcRenderer.on(CUR_CHANNEL, callbackFn);
 
-      ipcRenderer.invoke(`${IPC_METHOD_BASE}.downloadPls`, {
+      ipcRenderer.invoke(`${IPC_METHOD_BASE}.downloadAndInstallAikari`, {
         channel: "stable",
         reportTo: "assistant",
       });
@@ -774,7 +774,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
 
     cancelDownloadTask: async () => {
       const taskId =
-        global.__HUGO_AURA_UI_REACTIVES__.subConfig.plsStatus.curDlTaskId;
+        global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus.curDlTaskId;
 
       if (!taskId) {
         GLOBAL_FUNCTIONS.updateToast(
@@ -819,11 +819,11 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
   };
 
   const GLOBAL_FUNCTIONS =
-    global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.plsStatus;
+    global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus;
 
   const {
-    updatePlsStatusFromLocal,
-  } = require(`${REQUIRE_BASE}/../../../composables/plsConfigManager`);
+    updateAikariStatusFromLocal,
+  } = require(`${REQUIRE_BASE}/../../../composables/aikariConfigManager`);
 
   const initBsTooltip = () => {
     const tooltipTriggerList = document.querySelectorAll(
@@ -845,21 +845,21 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
     switch (target) {
       case "PENDING":
         areaContainerEl.className =
-          "acs-bc-pls-status-page-status-area pending";
+          "acs-bc-aikari-status-page-status-area pending";
         break;
       case "SUCCESS":
         areaContainerEl.className =
-          "acs-bc-pls-status-page-status-area success";
+          "acs-bc-aikari-status-page-status-area success";
         break;
       case "FAILED":
-        areaContainerEl.className = "acs-bc-pls-status-page-status-area failed";
+        areaContainerEl.className = "acs-bc-aikari-status-page-status-area failed";
         break;
       case "WARNING":
         areaContainerEl.className =
-          "acs-bc-pls-status-page-status-area warning";
+          "acs-bc-aikari-status-page-status-area warning";
         break;
       case "INFO":
-        areaContainerEl.className = "acs-bc-pls-status-page-status-area info";
+        areaContainerEl.className = "acs-bc-aikari-status-page-status-area info";
         break;
       default:
         return false;
@@ -871,14 +871,14 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
   const onMounted = () => {
     initBsTooltip();
     GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
-    GLOBAL_FUNCTIONS.refreshPlsStatus(true);
+    GLOBAL_FUNCTIONS.refreshAikariStatus(true);
 
     const eventListener = () => {
       GLOBAL_FUNCTIONS.updateStatusContent();
     };
-    document.addEventListener("onPLSStatsUpdate", eventListener);
+    document.addEventListener("onAikariStatsUpdate", eventListener);
     global.__HUGO_AURA_GLOBAL__.utils.createOnLeaveEvtListener(
-      "onPLSStatsUpdate",
+      "onAikariStatsUpdate",
       eventListener
     );
   };

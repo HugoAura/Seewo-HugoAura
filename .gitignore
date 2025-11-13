@@ -15,6 +15,7 @@ autoConfiguration.json
 
 # NPM Packages
 node_modules/
+package-lock.json
 
 # OS Files
 desktop.ini

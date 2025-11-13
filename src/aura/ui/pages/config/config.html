@@ -293,14 +293,14 @@
 
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
       <div
-        id="relaunchPlsNotifyToast"
+        id="relaunchAikariNotifyToast"
         class="toast acp-toast-emerg"
         aria-atomic="true"
         data-bs-autohide="false"
       >
         <div class="toast-header">
           <i class="layui-icon layui-icon-tips"></i>
-          <strong class="me-auto">重启 PLS 进程以应用设置</strong>
+          <strong class="me-auto">重启 Aikari 进程以应用设置</strong>
           <button
             type="button"
             class="btn-close"
@@ -308,13 +308,13 @@
           ></button>
         </div>
         <div class="toast-body">
-          <p>请重启 PLS 进程以应用修改的设置</p>
+          <p>请重启 Aikari 进程以应用修改的设置</p>
           <p>已修改的配置将自动保存</p>
           <button
             type="button"
             class="btn btn-primary btn-sm"
-            id="plsRelaunchBtn"
-            onclick="ipcRenderer.invoke('$aura.pls.relaunchPls')"
+            id="aikariRelaunchBtn"
+            onclick="ipcRenderer.invoke('$aura.aikari.relaunchPls')"
           >
             重启进程
           </button>

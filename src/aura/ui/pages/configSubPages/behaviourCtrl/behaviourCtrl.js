@@ -10,13 +10,13 @@
   const { deviceSecuritySettings } = require(`${REQUIRE_BASE}/deviceSecurity`);
 
   const {
-    updatePlsSettingsFromLocal,
-    updatePlsRulesFromLocal,
-  } = require(`${REQUIRE_BASE}/../../../../composables/plsConfigManager`);
+    updateAikariSettingsFromLocal,
+    updateAikariRulesFromLocal,
+  } = require(`${REQUIRE_BASE}/../../../../composables/aikariConfigManager`);
 
   const initStatusPage = () => {
     global.__HUGO_AURA_LOADER__[
-      "Aura.UI.Assistant.Config.BehaviourCtrl.PlsStatus"
+      "Aura.UI.Assistant.Config.BehaviourCtrl.AikariStatus"
     ].active = true;
   };
 
@@ -33,8 +33,8 @@
   };
 
   const renderSubPages = async () => {
-    await updatePlsSettingsFromLocal();
-    await updatePlsRulesFromLocal();
+    await updateAikariSettingsFromLocal();
+    await updateAikariRulesFromLocal();
 
     initBasicSettingsPage();
     initDeviceSecuritySettingsPage();
