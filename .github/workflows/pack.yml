@@ -1,8 +1,6 @@
 name: Pack source code & Create CI/CD Release
 
 on:
-  schedule:
-    - cron: '0 5 * * *'
   push:
     branches: [dev, stable]
   pull_request:
