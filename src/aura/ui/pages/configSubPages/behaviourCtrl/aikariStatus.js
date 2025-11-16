@@ -284,6 +284,8 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 false,
                 null
               );
+              const isHostNotInit =
+                await global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.showWarnToastIfHostsNotInitialized();
               const ret = await ipcRenderer.invoke(
                 `${IPC_METHOD_BASE}.aikariLifecycleControl`,
                 { target: "startSvc" }
@@ -291,14 +293,16 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               if (ret.success) {
                 lifecycleStatus.svcRunning = true;
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
-                global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
-                  "success",
-                  "Aikari 已启动",
-                  null,
-                  true,
-                  true,
-                  2000
-                );
+                if (!isHostNotInit) {
+                  global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
+                    "success",
+                    "Aikari 已启动",
+                    null,
+                    true,
+                    true,
+                    2000
+                  );
+                }
                 await global.__HUGO_AURA_GLOBAL__.utils.sleep(100);
                 await ipcRenderer.invoke(
                   `${IPC_METHOD_BASE}.retryAikariConnect`
@@ -396,7 +400,12 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Start", true);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Stop", true);
           } else {
-            updateStatusEl(acIdInst, atIdInst, "SUCCESS", "已安装");
+            updateStatusEl(
+              acIdInst,
+              atIdInst,
+              "SUCCESS",
+              "应用已安装, 服务已安装"
+            );
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("InstallSvc", true);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus(
               "UninstallSvc",
@@ -462,6 +471,30 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
         versionTextEl.textContent = curAikariStats.version;
       } else {
         versionTextEl.textContent = "不可用";
+      }
+    },
+
+    showWarnToastIfHostsNotInitialized: async () => {
+      const dnsModule = require("dns");
+      const lookupPromise = new Promise((resolve) => {
+        dnsModule.lookup("iot-broker-mis.seewo.com", (err, result) => {
+          resolve(err ? err : result);
+        });
+      });
+      const result = await lookupPromise;
+      if (result) {
+        if (!result.startsWith("127.")) {
+          global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
+            "error",
+            "警告: 页面即将刷新",
+            `<p>您似乎是首次运行 Aikari, 基于 Aikari PLS 模块的实现原理, 我们需要修改 Hosts 文件并重启 SeewoCore 进程以开始拦截流量。</p>
+            <p>重启 SeewoCore 进程会导致管家前端页面<b>在重启完成后自动发生刷新</b>, 因此稍后请留意此变更。</p>`,
+            true,
+            false,
+            null
+          );
+          return true;
+        }
       }
     },
 
@@ -636,7 +669,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       }
     },
 
-    downloadAikariBin: async (retrieveMode = false) => {
+    downloadAndInstallAikariBin: async (retrieveMode = false) => {
       const GLOBAL_FUNCTIONS =
         global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus;
       const CUR_CHANNEL = `${IPC_METHOD_BASE}.post.reportAikariInstallStep`;
@@ -671,25 +704,50 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       const callbackFn = (_evt, info) => {
         switch (info.status) {
           case "failed":
-            GLOBAL_FUNCTIONS.updateToast(
-              "error",
-              "下载失败",
-              `<p>${
-                info.message ? info.message : "检查日志以获取错误信息"
-              }</p><p>
-              ${info.errorObj ? info.errorObj : ""}
-              </p>`,
-              true,
-              true,
-              5000
-            );
+            if (info.id !== "INSTALL_STAGE") {
+              GLOBAL_FUNCTIONS.updateToast(
+                "error",
+                "下载失败",
+                `<p>${
+                  info.message ? info.message : "检查日志以获取错误信息"
+                }</p><p>
+                ${info.errorObj ? info.errorObj : ""}
+                </p>`,
+                true,
+                true,
+                5000
+              );
 
-            GLOBAL_FUNCTIONS.updatePBarStatus(
-              100,
-              "下载时发生错误",
-              "danger",
-              false
-            );
+              GLOBAL_FUNCTIONS.updatePBarStatus(
+                100,
+                "下载时发生错误",
+                "danger",
+                false
+              );
+            } else {
+              GLOBAL_FUNCTIONS.updateToast(
+                "error",
+                "安装失败",
+                `<p>${
+                  info.message
+                    ? info.message
+                    : "检查 HugoAura 日志或安装器日志 (%TEMP%/Aikari-Install-Temp) 以获取错误信息"
+                }</p><p>
+                ${info.errorObj ? info.errorObj : ""}
+                </p>`,
+                true,
+                true,
+                15000
+              );
+
+              GLOBAL_FUNCTIONS.updatePBarStatus(
+                100,
+                `发生错误: ${info.message}`,
+                "danger",
+                false
+              );
+            }
+
             setTimeout(() => {
               GLOBAL_FUNCTIONS.switchPBarShowStatus(false);
             }, 1000);
@@ -703,66 +761,102 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             );
             break;
           case "done":
-            GLOBAL_FUNCTIONS.updateToast(
-              "success",
-              "下载成功",
-              null,
-              true,
-              true,
-              2500
-            );
+            if (info.id !== "INSTALL_STAGE") {
+              GLOBAL_FUNCTIONS.updateToast(
+                "success",
+                "下载成功",
+                null,
+                true,
+                true,
+                2500
+              );
 
-            GLOBAL_FUNCTIONS.updatePBarStatus(
-              100,
-              "下载成功",
-              "success",
-              false
-            );
-            setTimeout(() => {
-              GLOBAL_FUNCTIONS.switchPBarShowStatus(false);
-            }, 1000);
+              GLOBAL_FUNCTIONS.updatePBarStatus(
+                100,
+                "下载成功",
+                "success",
+                false
+              );
+              break;
+            } else {
+              GLOBAL_FUNCTIONS.updateToast(
+                "success",
+                "安装成功",
+                null,
+                true,
+                true,
+                2500
+              );
 
-            ipcRenderer.off(CUR_CHANNEL, callbackFn);
-            GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
-            GLOBAL_FUNCTIONS.updateOperationBtnStatus(
-              "Install",
-              true,
-              "下载应用"
-            );
-            lifecycleStatus.installed = true;
-            global.__HUGO_AURA__.aikariStats.installed = true;
-            ipcRenderer.invoke(
-              `${IPC_METHOD_BASE}.updateAikariStatus`,
-              global.__HUGO_AURA__.aikariStats
-            );
-            GLOBAL_FUNCTIONS.updateStatusContent();
-            break;
+              GLOBAL_FUNCTIONS.updatePBarStatus(
+                100,
+                "Aikari 安装成功",
+                "success",
+                false
+              );
+
+              setTimeout(() => {
+                GLOBAL_FUNCTIONS.switchPBarShowStatus(false);
+              }, 1000);
+
+              ipcRenderer.off(CUR_CHANNEL, callbackFn);
+              GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
+              GLOBAL_FUNCTIONS.updateOperationBtnStatus(
+                "Install",
+                true,
+                "下载应用"
+              );
+              lifecycleStatus.installed = true;
+              global.__HUGO_AURA__.aikariStats.installed = true;
+              setTimeout(() => {
+                ipcRenderer.invoke(
+                  `${IPC_METHOD_BASE}.updateAikariStatus`,
+                  global.__HUGO_AURA__.aikariStats
+                );
+                GLOBAL_FUNCTIONS.updateStatusContent();
+              }, 500);
+              break;
+            }
           case "waiting":
-            GLOBAL_FUNCTIONS.updatePBarStatus(0, "正在连接", "normal");
+            GLOBAL_FUNCTIONS.updatePBarStatus(
+              0,
+              info.message ? info.message : "正在连接",
+              "normal"
+            );
             if (
-              !global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus
+              (!global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus
                 .curDlTaskId ||
-              global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus
-                .curDlTaskId !== info.id
+                global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus
+                  .curDlTaskId !== info.id) &&
+              info.id !== "INSTALL_STAGE"
             ) {
               global.__HUGO_AURA_UI_REACTIVES__.subConfig.aikariStatus.curDlTaskId =
                 info.id;
             }
             break;
           case "progressing":
-            const roundProgress = Math.round(info.progress);
-            GLOBAL_FUNCTIONS.updatePBarStatus(
-              roundProgress,
-              `正在下载中... ${roundProgress}% (${(
-                info.curBytes /
-                1024 /
-                1024
-              ).toFixed(2)}MB / ${(info.totalBytes / 1024 / 1024).toFixed(
-                2
-              )}MB)`, // POWERED BY PRETTIER
-              "normal",
-              true
-            );
+            if (info.id !== "INSTALL_STAGE") {
+              const roundProgress = Math.round(info.progress);
+              GLOBAL_FUNCTIONS.updatePBarStatus(
+                roundProgress,
+                `正在下载中... ${roundProgress}% (${(
+                  info.curBytes /
+                  1024 /
+                  1024
+                ).toFixed(2)}MB / ${(info.totalBytes / 1024 / 1024).toFixed(
+                  2
+                )}MB)`, // POWERED BY PRETTIER
+                "normal",
+                true
+              );
+            } else {
+              GLOBAL_FUNCTIONS.updatePBarStatus(
+                info.progress,
+                `正在安装 Aikari...`,
+                "normal",
+                false
+              );
+            }
             break;
           case "struggling":
             GLOBAL_FUNCTIONS.updatePBarStatus(100, info.message, "warning");

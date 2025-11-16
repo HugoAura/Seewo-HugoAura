@@ -68,7 +68,7 @@ const functions = {
    * @param {(arg: DownloadTask) => any} callbackFn
    * @param {string} binPath
    */
-  handleAikariDownload: async (channel, callbackFn, binPath) => {
+  handleAikariDlAndInstall: async (channel, callbackFn, binPath) => {
     // TODO: Channel selection
     const apiInfo = global.__HUGO_AURA_API__;
 
@@ -167,7 +167,8 @@ const functions = {
         status: "failed",
         dlUrl: null,
         savePath: null,
-        message: "未能获取 Aikari 版本信息, 所有 API 域名均无法连接",
+        message:
+          "未能获取 Aikari 版本信息, 所有 API 域名均无法连接, 建议前往 GitHub 下载安装包并自行安装",
       });
       return false;
     }
@@ -187,25 +188,85 @@ const functions = {
         status: "failed",
         dlUrl: null,
         savePath: null,
-        message: `处理器架构识别失败, 检测到的架构: ${deviceArch}`,
+        message: `不支持的处理器架构, 检测到的架构: "${deviceArch}"`,
       });
       return false;
     }
 
-    fsComposables.downloadFile(
-      aikariVersionInfo.data.downloadUrl[deviceArch],
-      binPath,
-      (...args) => {
-        if (args[0].status === "done") {
-          if (global.__HUGO_AURA__.aikariStats) {
-            global.__HUGO_AURA__.aikariStats.installed = true;
-            global.__HUGO_AURA__.aikariStats.status = "dead";
+    const downloadFilePromise = new Promise((resolve) => {
+      fsComposables.downloadFile(
+        aikariVersionInfo.data.downloadUrl[deviceArch],
+        binPath,
+        (...args) => {
+          if (args[0].status === "done") {
+            resolve(true);
+          } else if (args[0].status === "failed") {
+            resolve(false);
           }
-        }
 
-        callbackFn(...args);
+          callbackFn(...args);
+        }
+      );
+    });
+
+    const dlResult = await downloadFilePromise;
+
+    if (dlResult) {
+      callbackFn({
+        id: "INSTALL_STAGE",
+        progress: 5,
+        status: "waiting",
+        dlUrl: null,
+        savePath: null,
+        message: "准备运行 Aikari 安装程序...",
+      });
+
+      const runInstPromise = new Promise((resolve) => {
+        exec(
+          `"${binPath}" /VERYSILENT /SUPPRESSMSGBOXES /LOG="${binPath}\\..\\Aikari-Install.log"`,
+          (err, stdout, stderr) => {
+            if (err) {
+              console.error(
+                `[HugoAura / Main / Aikari IPC Handler / Install Aikari] Error running installer: ${stderr}`
+              );
+              resolve({ success: false });
+            }
+            resolve({ success: true });
+          }
+        );
+      });
+
+      callbackFn({
+        id: "INSTALL_STAGE",
+        progress: 15,
+        status: "progressing",
+        dlUrl: null,
+        savePath: null,
+        message: "正在安装 Aikari...",
+      });
+
+      const instResult = await runInstPromise;
+
+      callbackFn({
+        id: "INSTALL_STAGE",
+        progress: 100,
+        status: instResult.success ? "done" : "failed",
+        dlUrl: null,
+        savePath: null,
+        message: instResult.success
+          ? "Aikari 安装成功"
+          : "安装失败, 请检查 %TEMP%/Aikari-Install-Temp 下的安装日志",
+      });
+
+      if (instResult.success) {
+        if (global.__HUGO_AURA__.aikariStats) {
+          global.__HUGO_AURA__.aikariStats.installed = true;
+          global.__HUGO_AURA__.aikariStats.status = "dead";
+        }
       }
-    );
+
+      fs.unlinkSync(binPath);
+    }
   },
 };
 
@@ -230,6 +291,15 @@ const applyAikariIpcHandler = (ipcMain) => {
     "unins000.exe"
   );
   const AIKARI_SVC_NAME = "HugoAuraAikari";
+
+  const AIKARI_TEMP_DL_DIR = path.join(
+    require("os").tmpdir(),
+    "Aikari-Install-Temp"
+  );
+  const AIKARI_TEMP_INSTALLER_FILENAME = path.join(
+    AIKARI_TEMP_DL_DIR,
+    "Aikari-Installer.exe"
+  );
 
   const isAikariDetached = process.argv.includes("--aikari-detach");
 
@@ -569,12 +639,21 @@ const applyAikariIpcHandler = (ipcMain) => {
      *
      * @param {import("electron").IpcMainInvokeEvent} _evt
      * @param {{channel?: "stable" | "alpha", reportTo?: import("../../../types/main/core").WindowName}} arg
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    (_evt, arg) => {
+    async (_evt, arg) => {
+      if (fs.existsSync(AIKARI_TEMP_DL_DIR)) {
+        try {
+          fs.unlinkSync(AIKARI_TEMP_DL_DIR);
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        fs.mkdirSync(AIKARI_TEMP_DL_DIR);
+      }
       const channel = arg.channel ? arg.channel : "stable";
       const reportWin = arg.reportTo ? arg.reportTo : "assistant";
-      functions.handleAikariDownload(
+      functions.handleAikariDlAndInstall(
         channel,
         (status) => {
           ipcMain.send(
@@ -583,7 +662,7 @@ const applyAikariIpcHandler = (ipcMain) => {
             status
           );
         },
-        AIKARI_LAUNCHER_PATH
+        AIKARI_TEMP_INSTALLER_FILENAME
       );
     }
   );

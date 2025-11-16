@@ -27,7 +27,7 @@ if (!global.__HUGO_AURA_API__) {
       "https://api-aura-projekts.minorice.moe",
       "https://api.aura.vim.moe",
     ],
-    aikariUpdate: "/api/getPLSLatestVersion",
+    aikariUpdate: "/api/getAikariLatestVersion",
     auraUpdate: "/api/getAuraLatestVersion",
   };
   global.__HUGO_AURA_API__ = __HUGO_AURA_API__;
