@@ -6,9 +6,11 @@
   let tooltipTriggerCache = null;
   const refreshBsTooltip = (selector = '[data-bs-toggle="tooltip"]') => {
     if (tooltipTriggerCache) {
-      [...tooltipTriggerCache].map((el) =>
-        bootstrap.Tooltip.getInstance(el).disable()
-      );
+      [...tooltipTriggerCache].map((el) => {
+        if (bootstrap.Tooltip.getInstance(el)) {
+          bootstrap.Tooltip.getInstance(el).disable();
+        }
+      });
     }
 
     const tooltipTriggerList = document.querySelectorAll(selector);

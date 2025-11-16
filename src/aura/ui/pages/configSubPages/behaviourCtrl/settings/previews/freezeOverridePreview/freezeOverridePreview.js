@@ -36,8 +36,8 @@
               resolve({
                 success: true,
                 data: null,
-                status: response.status
-              })
+                status: response.status,
+              });
             }
 
             const parsedData = await response.json();
@@ -84,7 +84,7 @@
 
       const diskElTemplate = document.createElement("p");
       diskElTemplate.classList.add("acs-bc-dsc-fop-disk-el");
-      if (!curConfig.enable) {
+      if (!curConfig.enabled) {
         for (const disk of curDisks) {
           const curDiskEl = diskElTemplate.cloneNode();
           if (disk.status !== 0) {
@@ -95,44 +95,16 @@
           diskContainerEl.appendChild(curDiskEl);
         }
       } else {
-        switch (curConfig.rewriteMode) {
-          case "allFreeze":
-            {
-              for (const disk of curDisks) {
-                const curDiskEl = diskElTemplate.cloneNode();
-                // @ts-expect-error
-                curDiskEl.classList.add("active");
-                curDiskEl.textContent = `${disk.name.toUpperCase()} 盘`;
-                diskContainerEl.appendChild(curDiskEl);
-              }
-            }
-            break;
-          case "systemOnly":
-            {
-              let idx = 0;
-              for (const disk of curDisks) {
-                const curDiskEl = diskElTemplate.cloneNode();
-                // @ts-expect-error
-                if (idx === 0) curDiskEl.classList.add("active");
-                curDiskEl.textContent = `${disk.name.toUpperCase()} 盘`;
-                diskContainerEl.appendChild(curDiskEl);
-                idx += 1;
-              }
-            }
-            break;
-          case "exceptSecondDisk":
-            {
-              let idx = 0;
-              for (const disk of curDisks) {
-                const curDiskEl = diskElTemplate.cloneNode();
-                // @ts-expect-error
-                if (idx === 0) curDiskEl.classList.add("active");
-                curDiskEl.textContent = `${disk.name.toUpperCase()} 盘`;
-                diskContainerEl.appendChild(curDiskEl);
-                idx += 1;
-              }
-            }
-            break;
+        let idx = 0;
+        for (const disk of curDisks) {
+          const curDiskEl = diskElTemplate.cloneNode();
+          if (curConfig.frozenDisks.includes(disk.name.toLowerCase())) {
+          // @ts-expect-error
+            curDiskEl.classList.add("active");
+          }
+          curDiskEl.textContent = `${disk.name.toUpperCase()} 盘`;
+          diskContainerEl.appendChild(curDiskEl);
+          idx += 1;
         }
       }
 
@@ -148,10 +120,10 @@
     )[0];
 
     const eventListener = (_event) => {
-      // if (!global.__HUGO_AURA__.plsRules) return;
+      if (!global.__HUGO_AURA__.aikariRules) return;
       composables.getAndUpdateDiskInfo(
-        // global.__HUGO_AURA__.plsRules.client.security.uploadFreezeInfo
-        { enable: false }
+        global.__HUGO_AURA__.aikariRules.ssaFeatures.securityPolicies
+          .freezeManagement.freezeDiskInfoPost
       );
     };
     rootEl.addEventListener("onAssociateValueUpdated", eventListener);

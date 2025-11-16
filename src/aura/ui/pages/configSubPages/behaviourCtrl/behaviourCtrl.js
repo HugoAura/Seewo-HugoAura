@@ -7,12 +7,14 @@
   } = require(`${REQUIRE_BASE}/../../../../composables/settingsRenderer`);
 
   const { basicSettings } = require(`${REQUIRE_BASE}/basic`);
-  const { deviceSecuritySettings } = require(`${REQUIRE_BASE}/deviceSecurity`);
+  const { deviceInfoPostSettings } = require(`${REQUIRE_BASE}/deviceInfoPost`);
 
   const {
     updateAikariSettingsFromLocal,
     updateAikariRulesFromLocal,
   } = require(`${REQUIRE_BASE}/../../../../composables/aikariConfigManager`);
+
+  const fileSystemRawCmds = require(`${REQUIRE_BASE}/../../../../composables/rawCmdExec/fs`);
 
   const initStatusPage = () => {
     global.__HUGO_AURA_LOADER__[
@@ -20,16 +22,26 @@
     ].active = true;
   };
 
+  const preInitUIReactives = async () => {
+    if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
+      global.__HUGO_AURA_UI_REACTIVES__.subConfig = {};
+    if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig.behaviourCtrlShared)
+      global.__HUGO_AURA_UI_REACTIVES__.subConfig.behaviourCtrlShared = {};
+
+    global.__HUGO_AURA_UI_REACTIVES__.subConfig.behaviourCtrlShared.diskCaptions =
+      await fileSystemRawCmds.getDiskCaptions();
+  };
+
   const initBasicSettingsPage = () => {
     const basicSubPageEl = document.getElementById("basic-config-subpage");
     settingsRenderer(basicSubPageEl, basicSettings);
   };
 
-  const initDeviceSecuritySettingsPage = () => {
-    const deviceSecuritySubPageEl = document.getElementById(
-      "security-config-subpage"
+  const initDeviceInfoPostSettingsPage = () => {
+    const deviceInfoPostSubPageEl = document.getElementById(
+      "device-info-post-config-subpage"
     );
-    settingsRenderer(deviceSecuritySubPageEl, deviceSecuritySettings);
+    settingsRenderer(deviceInfoPostSubPageEl, deviceInfoPostSettings);
   };
 
   const renderSubPages = async () => {
@@ -37,15 +49,16 @@
     await updateAikariRulesFromLocal();
 
     initBasicSettingsPage();
-    initDeviceSecuritySettingsPage();
+    initDeviceInfoPostSettingsPage();
   };
 
   const onMounted = () => {
     const rootEl = document.getElementById("acs-behaviour-control-el");
+    preInitUIReactives();
     initStatusPage();
     setTimeout(() => {
       rootEl.classList.remove("acs-behaviour-control-hidden");
-      renderSubPages(); // 如果立即渲染子页面, 此时 plsRules 还未初始化, 会导致子页面 auraIf 失效
+      renderSubPages();
     }, 500);
   };
 
