@@ -218,11 +218,16 @@ const applyAikariIpcHandler = (ipcMain) => {
 
   const AIKARI_DEFAULT_INSTALL_DIR = path.join(
     "C:\\Program Files",
-    "HugoAura Aikari"
+    "HugoAura",
+    "Aikari"
   );
   const AIKARI_LAUNCHER_PATH = path.join(
     AIKARI_DEFAULT_INSTALL_DIR,
     "Aikari-Launcher.exe"
+  );
+  const AIKARI_UNINSTALLER_PATH = path.join(
+    AIKARI_DEFAULT_INSTALL_DIR,
+    "unins000.exe"
   );
   const AIKARI_SVC_NAME = "HugoAuraAikari";
 
@@ -502,27 +507,27 @@ const applyAikariIpcHandler = (ipcMain) => {
           return await functions.execCommand(
             logHeader,
             AIKARI_LAUNCHER_PATH,
-            "--startup auto install"
+            "--service install"
           );
         case "uninstSvc": {
           const result = await functions.execCommand(
             logHeader,
             AIKARI_LAUNCHER_PATH,
-            "remove"
+            "--service uninstall"
           );
           return result;
         }
         case "startSvc":
           return await functions.execCommand(
             logHeader,
-            AIKARI_LAUNCHER_PATH,
-            "start"
+            "sc.exe",
+            `start ${AIKARI_SVC_NAME}`
           );
         case "stopSvc": {
           const result = await functions.execCommand(
             logHeader,
-            AIKARI_LAUNCHER_PATH,
-            "stop"
+            "sc.exe",
+            `stop ${AIKARI_SVC_NAME}`
           );
           if (result.success && global.__HUGO_AURA__.aikariStats) {
             global.__HUGO_AURA__.aikariStats.connected = false;
@@ -547,7 +552,11 @@ const applyAikariIpcHandler = (ipcMain) => {
         case "inst":
         // TODO: Impl Aikari INST
         case "uninst":
-        // same
+          return await functions.execCommand(
+            logHeader,
+            AIKARI_UNINSTALLER_PATH,
+            ""
+          );
         default:
           return { success: false, errorObj: new Error("Method not found") };
       }

@@ -33,7 +33,9 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       const toastHeaderEl = document.getElementById(
         "aikariStatusNotifyToastTitle"
       );
-      const toastBodyEl = document.getElementById("aikariStatusNotifyToastBody");
+      const toastBodyEl = document.getElementById(
+        "aikariStatusNotifyToastBody"
+      );
 
       const bsToastIns = bootstrap.Toast.getOrCreateInstance(toastRootEl);
       if (bsToastIns.isShown) {
@@ -96,7 +98,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.refreshAikariStatus();
             };
             break;
-          case "Download":
+          case "Install":
             btnEl.onclick = async () => {
               global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.downloadAndInstallAikariBin();
             };
@@ -104,10 +106,10 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
 
           // ↓ 这边的确可以把这些全都合并到一个可复用 fn 里去, 但没必要
           // 如果后续要引入错误视觉反馈, 合并到单个 fn 反而会增加实现复杂度
-          case "Install":
+          case "InstallSvc":
             btnEl.onclick = async () => {
               global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateOperationBtnStatus(
-                "Install",
+                "InstallSvc",
                 true
               );
               global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
@@ -145,24 +147,26 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
               global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
             };
             break;
-          case "Uninstall":
-            if (btnContent === "删除内核") {
+          case "UninstallSvc":
+            if (btnContent === "卸载应用") {
               btnEl.onclick = async () => {
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateOperationBtnStatus(
-                  "Uninstall",
+                  "UninstallSvc",
                   true
                 );
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                   "warning",
-                  "正在删除内核",
-                  null,
+                  "正在卸载 Aikari",
+                  `<p>
+                    请在弹出窗口中完成操作
+                  </p>`,
                   false,
                   false,
                   null
                 );
                 const ret = await ipcRenderer.invoke(
                   `${IPC_METHOD_BASE}.aikariLifecycleControl`,
-                  { target: "rmBin" }
+                  { target: "uninst" }
                 );
                 if (ret.success) {
                   lifecycleStatus.installed = false;
@@ -176,7 +180,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                   );
                   global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                     "success",
-                    "内核已删除",
+                    "Aikari 已完成卸载",
                     null,
                     true,
                     true,
@@ -185,7 +189,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 } else {
                   global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                     "error",
-                    "内核删除失败",
+                    "Aikari 卸载失败",
                     `<p>
                       ${ret.errorObj ? ret.errorObj : "检查日志以获取详细信息"}
                     </p>`,
@@ -199,7 +203,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             } else {
               btnEl.onclick = async () => {
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateOperationBtnStatus(
-                  "Uninstall",
+                  "UninstallSvc",
                   true
                 );
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
@@ -239,7 +243,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 }
                 const ret = await ipcRenderer.invoke(
                   `${IPC_METHOD_BASE}.aikariLifecycleControl`,
-                  { target: "rmSvc" }
+                  { target: "uninstSvc" }
                 );
                 if (ret.success) {
                   lifecycleStatus.svcInstalled = false;
@@ -296,7 +300,9 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                   2000
                 );
                 await global.__HUGO_AURA_GLOBAL__.utils.sleep(100);
-                await ipcRenderer.invoke(`${IPC_METHOD_BASE}.retryAikariConnect`);
+                await ipcRenderer.invoke(
+                  `${IPC_METHOD_BASE}.retryAikariConnect`
+                );
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
               } else {
                 global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
@@ -375,20 +381,25 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       switch (lifecycleStatus.installed) {
         case true:
           if (!lifecycleStatus.svcInstalled) {
-            updateStatusEl(acIdInst, atIdInst, "WARNING", "已下载, 服务未安装");
-            GLOBAL_FUNCTIONS.updateOperationBtnStatus("Install", false);
+            updateStatusEl(
+              acIdInst,
+              atIdInst,
+              "WARNING",
+              "应用已安装, 服务未安装"
+            );
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus("InstallSvc", false);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus(
-              "Uninstall",
+              "UninstallSvc",
               false,
-              "删除内核"
+              "卸载应用"
             );
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Start", true);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Stop", true);
           } else {
             updateStatusEl(acIdInst, atIdInst, "SUCCESS", "已安装");
-            GLOBAL_FUNCTIONS.updateOperationBtnStatus("Install", true);
+            GLOBAL_FUNCTIONS.updateOperationBtnStatus("InstallSvc", true);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus(
-              "Uninstall",
+              "UninstallSvc",
               false,
               "卸载服务"
             );
@@ -396,9 +407,9 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
           break;
         case false:
           updateStatusEl(acIdInst, atIdInst, "PENDING", "未下载");
-          GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", false);
-          GLOBAL_FUNCTIONS.updateOperationBtnStatus("Install", true);
-          GLOBAL_FUNCTIONS.updateOperationBtnStatus("Uninstall", true);
+          GLOBAL_FUNCTIONS.updateOperationBtnStatus("Install", false);
+          GLOBAL_FUNCTIONS.updateOperationBtnStatus("InstallSvc", true);
+          GLOBAL_FUNCTIONS.updateOperationBtnStatus("UninstallSvc", true);
           GLOBAL_FUNCTIONS.updateOperationBtnStatus("Start", true);
           GLOBAL_FUNCTIONS.updateOperationBtnStatus("Stop", true);
       }
@@ -450,7 +461,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       if (curAikariStats.version && curAikariStats.version !== "unknown") {
         versionTextEl.textContent = curAikariStats.version;
       } else {
-        versionTextEl.textContent = "不可用"
+        versionTextEl.textContent = "不可用";
       }
     },
 
@@ -468,7 +479,10 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       const binExistsRet = await ipcRenderer.invoke(
         `${IPC_METHOD_BASE}.getIfAikariBinExists`
       );
-      if ((binExistsRet.success && binExistsRet.data.isExists) || lifecycleStatus.detached) {
+      if (
+        (binExistsRet.success && binExistsRet.data.isExists) ||
+        lifecycleStatus.detached
+      ) {
         lifecycleStatus.installed = true;
         global.__HUGO_AURA__.aikariStats.installed = true;
         ipcRenderer.invoke(
@@ -628,7 +642,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       const CUR_CHANNEL = `${IPC_METHOD_BASE}.post.reportAikariInstallStep`;
 
       if (!retrieveMode) {
-        GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", true, "正在检查");
+        GLOBAL_FUNCTIONS.updateOperationBtnStatus("Install", true, "正在检查");
         GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", true);
         await ipcRenderer.invoke(`${IPC_METHOD_BASE}.ensureAikariInstallDir`);
         GLOBAL_FUNCTIONS.updateToast(
@@ -639,7 +653,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
           true,
           2000
         );
-        GLOBAL_FUNCTIONS.updateOperationBtnStatus("Download", true);
+        GLOBAL_FUNCTIONS.updateOperationBtnStatus("Install", true);
       } else {
         GLOBAL_FUNCTIONS.updateToast(
           "info",
@@ -683,9 +697,9 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             ipcRenderer.off(CUR_CHANNEL, callbackFn);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus(
-              "Download",
+              "Install",
               false,
-              "下载内核"
+              "下载应用"
             );
             break;
           case "done":
@@ -711,9 +725,9 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             ipcRenderer.off(CUR_CHANNEL, callbackFn);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus(
-              "Download",
+              "Install",
               true,
-              "下载内核"
+              "下载应用"
             );
             lifecycleStatus.installed = true;
             global.__HUGO_AURA__.aikariStats.installed = true;
@@ -756,9 +770,9 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
           case "cancelled":
             GLOBAL_FUNCTIONS.updateOperationBtnStatus("Refresh", false);
             GLOBAL_FUNCTIONS.updateOperationBtnStatus(
-              "Download",
+              "Install",
               false,
-              "下载内核"
+              "下载应用"
             );
             break;
         }
@@ -852,14 +866,16 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
           "acs-bc-aikari-status-page-status-area success";
         break;
       case "FAILED":
-        areaContainerEl.className = "acs-bc-aikari-status-page-status-area failed";
+        areaContainerEl.className =
+          "acs-bc-aikari-status-page-status-area failed";
         break;
       case "WARNING":
         areaContainerEl.className =
           "acs-bc-aikari-status-page-status-area warning";
         break;
       case "INFO":
-        areaContainerEl.className = "acs-bc-aikari-status-page-status-area info";
+        areaContainerEl.className =
+          "acs-bc-aikari-status-page-status-area info";
         break;
       default:
         return false;

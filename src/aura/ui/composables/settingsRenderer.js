@@ -50,9 +50,9 @@ const setDisableStatus = (el, isDisable, hint = null) => {
       tooltipIns.enable();
     }
   } else {
-    el.setAttribute("data-bs-toggle", "tooltip");
-    el.setAttribute("data-bs-placement", "top");
-    el.setAttribute("data-bs-title", "None");
+    el.removeAttribute("data-bs-toggle");
+    el.removeAttribute("data-bs-placement");
+    el.removeAttribute("data-bs-title");
     el.classList.remove("ase-operation-area-disabled");
     const tooltipIns = bootstrap.Tooltip.getInstance(el);
     if (tooltipIns) {
@@ -100,7 +100,18 @@ const renderInputArea = (entry, operationArea, descriptionArea) => {
     case "radio": {
       const elValue = entry.valueGetter();
       const elArr = [];
-      for (const template of entry.templates) {
+      let targetTemplatesArr = [];
+      let targetTemplateLablesArr = [];
+      targetTemplatesArr =
+        typeof entry.templates === "function"
+          ? entry.templates()
+          : entry.templates;
+      targetTemplateLablesArr =
+        typeof entry.templateLabels === "function"
+          ? entry.templateLabels()
+          : entry.templateLabels;
+
+      for (const template of targetTemplatesArr) {
         const inlineContainerEl = document.createElement("div");
         inlineContainerEl.classList.add("form-check", "form-check-inline");
         const radioEl = document.createElement("input");
@@ -108,7 +119,7 @@ const renderInputArea = (entry, operationArea, descriptionArea) => {
         radioEl.classList.add("form-check-input");
         radioEl.type = "radio";
         radioEl.name = `${entry.id}Radios`;
-        radioEl.id = `${entry.id}Radio${entry.templates.indexOf(template)}`;
+        radioEl.id = `${entry.id}Radio${targetTemplatesArr.indexOf(template)}`;
         radioEl.checked = template === elValue ? true : false;
         radioEl.addEventListener("change", async (event) => {
           if (event.target.checked) {
@@ -126,7 +137,53 @@ const renderInputArea = (entry, operationArea, descriptionArea) => {
         labelEl.classList.add("form-check-label");
         labelEl.setAttribute("for", radioEl.id);
         labelEl.textContent =
-          entry.templateLabels[entry.templates.indexOf(template)];
+          targetTemplateLablesArr[targetTemplatesArr.indexOf(template)];
+        inlineContainerEl.appendChild(labelEl);
+        elArr.push(inlineContainerEl);
+      }
+      return elArr;
+    }
+    case "checkbox": {
+      const elValue = entry.valueGetter();
+      const elArr = [];
+      let targetTemplatesArr = [];
+      let targetTemplateLablesArr = [];
+      targetTemplatesArr =
+        typeof entry.templates === "function"
+          ? entry.templates()
+          : entry.templates;
+      targetTemplateLablesArr =
+        typeof entry.templateLabels === "function"
+          ? entry.templateLabels()
+          : entry.templateLabels;
+
+      for (const templateName of targetTemplatesArr) {
+        const inlineContainerEl = document.createElement("div");
+        inlineContainerEl.classList.add("form-check", "form-check-inline");
+        const chkBoxEl = document.createElement("input");
+        chkBoxEl.value = templateName;
+        chkBoxEl.classList.add("form-check-input");
+        chkBoxEl.type = "checkbox";
+        chkBoxEl.name = `${entry.id}Checkbox`;
+        chkBoxEl.id = `${entry.id}Checkbox${targetTemplatesArr.indexOf(
+          templateName
+        )}`;
+        chkBoxEl.checked = elValue.includes(templateName) ? true : false;
+        chkBoxEl.addEventListener("change", async (event) => {
+          showToast(entry);
+          await entry.callbackFn(
+            event.target.value,
+            chkBoxEl,
+            operationArea,
+            descriptionArea
+          );
+        });
+        inlineContainerEl.appendChild(chkBoxEl);
+        const labelEl = document.createElement("label");
+        labelEl.classList.add("form-check-label");
+        labelEl.setAttribute("for", chkBoxEl.id);
+        labelEl.textContent =
+          targetTemplateLablesArr[targetTemplatesArr.indexOf(templateName)];
         inlineContainerEl.appendChild(labelEl);
         elArr.push(inlineContainerEl);
       }
@@ -219,7 +276,7 @@ const renderNormalSettingsItem = (entry, formEl) => {
     powerIcon.setAttribute("data-bs-title", "需要重启 Electron 进程");
     entryTitle.appendChild(powerIcon);
   }
-  if (entry.AikariRequired) {
+  if (entry.aikariRequired) {
     const aikariIcon = document.createElement("i");
     aikariIcon.classList.add(
       "layui-icon",
@@ -302,14 +359,14 @@ const renderNormalSettingsItem = (entry, formEl) => {
         insertOrRemoveEl(entryOperationArea, targetEl, true);
       }
     };
-    const channel = entry.AikariRequired
+    const channel = entry.aikariRequired
       ? "onAikariConfigUpdate"
       : "onHugoAuraConfigUpdate";
     entryContainerEl.addEventListener(channel, evtListener);
     // createOnLeaveEvtListener(channel, evtListener);
   }
 
-  if (entry.AikariRequired) {
+  if (entry.aikariRequired) {
     if (!global.__HUGO_AURA__.aikariStats.connected) {
       setDisableStatus(entryOperationArea, true, "连接至 Aikari 以继续");
     }
@@ -332,7 +389,7 @@ const renderNormalSettingsItem = (entry, formEl) => {
     const isDisabledRet = entry.auraDisable();
     setDisableStatus(
       entryOperationArea,
-      isDisabledRet.value,
+      global.__HUGO_AURA__.aikariStats.connected ? isDisabledRet.value : true,
       isDisabledRet.tooltip
     );
   };
@@ -354,7 +411,7 @@ const renderNormalSettingsItem = (entry, formEl) => {
         updateDisableStatus();
       }
     };
-    const channel = entry.AikariRequired
+    const channel = entry.aikariRequired
       ? "onAikariConfigUpdate"
       : "onHugoAuraConfigUpdate";
     entryContainerEl.addEventListener(channel, evtListener);
@@ -397,7 +454,9 @@ const renderPreviewItem = (entry, formEl) => {
   };
 
   document.addEventListener(
-    eventChannel === "pls" ? "onAikariConfigUpdate" : "onHugoAuraConfigUpdate",
+    eventChannel === "aikari"
+      ? "onAikariConfigUpdate"
+      : "onHugoAuraConfigUpdate",
     eventListener
   );
   createOnLeaveEvtListener(eventListener); // Clean up

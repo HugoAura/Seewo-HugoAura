@@ -54,6 +54,29 @@ const actions = {
       return null;
     }
   },
+  getAikariPLSRules: async (wsObj) => {
+    const eventId = genRandomHex();
+    wsObj.send(
+      JSON.stringify({
+        module: "pls",
+        eventId,
+        method: "config.rules.getConfig",
+      })
+    );
+    const promise = new Promise((resolve) => {
+      wsGetCallbacks.set(eventId, resolve);
+    });
+    const data = await promise;
+    if (data.success) {
+      console.debug(
+        "[HugoAura / UI / Aikari OCMS] Received Aikari PLS rules: ",
+        data
+      );
+      return data.data;
+    } else {
+      return null;
+    }
+  },
 };
 
 const onAikariConnectedMsgSeq = async ({ curAikariStates, wsObj }) => {
@@ -66,11 +89,20 @@ const onAikariConnectedMsgSeq = async ({ curAikariStates, wsObj }) => {
   document.addEventListener("onAikariMessageRecv", onMsgRecvListener);
   // Get Aikari Version
   await actions.getAikariVersion(updatedAikariStates, wsObj);
+  // Get Aikari Launcher Config
   const aikariLauncherConfig = await actions.getAikariLauncherConfig(wsObj);
   if (aikariLauncherConfig) {
     global.ipcRenderer.invoke(
       `${IPC_METHOD_BASE}.updateAikariSettings`,
       aikariLauncherConfig
+    );
+  }
+  // Get Aikari PLS Rules
+  const aikariPLSRules = await actions.getAikariPLSRules(wsObj);
+  if (aikariPLSRules) {
+    global.ipcRenderer.invoke(
+      `${IPC_METHOD_BASE}.updateAikariRules`,
+      aikariPLSRules
     );
   }
 
