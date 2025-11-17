@@ -14,6 +14,13 @@
 > [!IMPORTANT]
 > 已经过测试的希沃管家版本: v1.5.5.3878
 
+> [!NOTE]
+> **社群信息**
+>
+> - [QQ 群 (用户自治)](https://qm.qq.com/q/buo7m9oHBK)
+> - [Telegram 群组](https://www.bilibili.com/video/BV1GJ411x7h7/) (暂时还没有...)
+> - [STCN 论坛讨论版块](https://www.bilibili.com/video/BV1GJ411x7h7/) (暂时还没有...)
+
 ![Repobeats](https://repobeats.axiom.co/api/embed/69b5be5daacef624b8f5e4b8966a0b5898439a22.svg "Repobeats analytics image")
 
 ## ✨ 概览
