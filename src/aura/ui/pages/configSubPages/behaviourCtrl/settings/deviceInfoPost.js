@@ -89,6 +89,7 @@ const deviceInfoPostSettings = [
             value:
               !global.__HUGO_AURA__.aikariRules.ssaFeatures.securityPolicies
                 .freezeManagement.freezeDiskInfoPost.enabled,
+            tooltip: "启用冰冻状态篡改以继续",
           };
         },
         defaultValue: [],
@@ -228,6 +229,7 @@ const deviceInfoPostSettings = [
             value:
               !global.__HUGO_AURA__.aikariRules.deviceInfo.software
                 .softwareReportPost.enabled,
+            tooltip: "启用软件信息上报覆写以继续",
           };
         },
         defaultValue: true,

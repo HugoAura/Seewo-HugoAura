@@ -366,6 +366,19 @@ const renderNormalSettingsItem = (entry, formEl) => {
     // createOnLeaveEvtListener(channel, evtListener);
   }
 
+  const updateDisableStatus = (entry) => {
+    const isDisabledRet = entry.auraDisable();
+    setDisableStatus(
+      entryOperationArea,
+      isDisabledRet.value,
+      isDisabledRet.tooltip
+    );
+  };
+
+  if (entry.auraDisable) {
+    updateDisableStatus(entry);
+  }
+
   if (entry.aikariRequired) {
     if (!global.__HUGO_AURA__.aikariStats.connected) {
       setDisableStatus(entryOperationArea, true, "连接至 Aikari 以继续");
@@ -373,7 +386,11 @@ const renderNormalSettingsItem = (entry, formEl) => {
 
     const evtListener = (event) => {
       if (event.detail.connected) {
-        setDisableStatus(entryOperationArea, false);
+        try {
+          updateDisableStatus(entry);
+        } catch {
+          setDisableStatus(entryOperationArea, false);
+        }
       } else {
         setDisableStatus(entryOperationArea, true, "连接至 Aikari 以继续");
       }
@@ -385,19 +402,6 @@ const renderNormalSettingsItem = (entry, formEl) => {
   const isShow = entry.auraIf();
   if (!isShow) entryContainerEl.classList.add("aura-settings-entry-hidden");
 
-  const updateDisableStatus = () => {
-    const isDisabledRet = entry.auraDisable();
-    setDisableStatus(
-      entryOperationArea,
-      global.__HUGO_AURA__.aikariStats.connected ? isDisabledRet.value : true,
-      isDisabledRet.tooltip
-    );
-  };
-
-  if (entry.auraDisable) {
-    updateDisableStatus();
-  }
-
   if (entry.associateVal) {
     const evtListener = (event) => {
       if (!entry.associateVal.includes(event.detail.path.join("."))) return;
@@ -408,7 +412,7 @@ const renderNormalSettingsItem = (entry, formEl) => {
         : cls.add("aura-settings-entry-hidden");
 
       if (entry.auraDisable) {
-        updateDisableStatus();
+        updateDisableStatus(entry);
       }
     };
     const channel = entry.aikariRequired

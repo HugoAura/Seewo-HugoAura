@@ -246,7 +246,14 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                   { target: "uninstSvc" }
                 );
                 if (ret.success) {
+                  lifecycleStatus.svcRunning = false;
                   lifecycleStatus.svcInstalled = false;
+                  global.__HUGO_AURA__.aikariStats.connected = false;
+                  global.__HUGO_AURA__.aikariStats.launched = false;
+                  ipcRenderer.invoke(
+                    `${IPC_METHOD_BASE}.updateAikariStatus`,
+                    global.__HUGO_AURA__.aikariStats
+                  );
                   global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                     "success",
                     "服务卸载成功",
