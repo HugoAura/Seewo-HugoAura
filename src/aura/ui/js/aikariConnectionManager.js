@@ -38,9 +38,9 @@
   let isErrorOccurred = false;
 
   /** @type {number} */
-  let plsPort = 22077;
+  let aikariPort = 22077;
   /** @type {"wss" | "ws"} */
-  let plsProtocol = "wss";
+  let aikariProtocol = "wss";
 
   /** @type {boolean} */
   let isRetrying = false;
@@ -49,9 +49,13 @@
   let curSendListener = null;
   let curSendGetListener = null;
 
-  const sendRetryStatusToMain = (/** @type {Boolean} */ status) => {
+  const sendRetryStatusToMain = (
+    /** @type {Boolean} */ status,
+    /** @type {string?} */ message = null
+  ) => {
     global.ipcRenderer.invoke(`${IPC_METHOD_BASE}.post.updateRetryStatus`, {
       success: status,
+      message: message,
     });
   };
 
@@ -86,7 +90,7 @@
       // @ts-expect-error
       global.__HUGO_AURA__.aikariStats.authToken = authTokenRet.data;
     } else {
-      sendRetryStatusToMain(false);
+      sendRetryStatusToMain(false, "E_AUTH_TOKEN_GET_FAILED");
       return;
     }
     const portRet = await registryManager.readRegKey(
@@ -96,7 +100,7 @@
     );
     if (portRet.success) {
       try {
-        plsPort = Number(portRet.data);
+        aikariPort = Number(portRet.data);
       } catch {
         console.warn(
           `[HugoAura / UI / Aikari Conn Manager] Invalid Aikari port: ${portRet.data}`
@@ -104,7 +108,10 @@
       }
     }
     // TODO: wsHost
-    createAikariConnection(updatedAikariStats.authToken, connectionResultCallback);
+    createAikariConnection(
+      updatedAikariStats.authToken,
+      connectionResultCallback
+    );
   };
 
   /**
@@ -116,18 +123,20 @@
   const createAikariConnection = (authToken, callback) => {
     if (failedCounter >= 3) {
       console.error(
-        `[HugoAura / UI / Aikari Conn Manager / ERROR] Failed connecting to PLS WebSocket server, please check the status of PLS process.`
+        `[HugoAura / UI / Aikari Conn Manager / ERROR] Failed connecting to Aikari WebSocket server, please check the status of Aikari process.`
       );
-      sendRetryStatusToMain(false);
+      sendRetryStatusToMain(false, "E_WS_CONN_FAILED_AFT_MULTIPLE_TRIES");
       return;
     }
 
     /** @type {WebSocket} */
     const aikariWs = new WebSocket(
-      `${plsProtocol}://aikari.hugoaura.local:${plsPort}/?auth=${authToken}`
+      `${aikariProtocol}://aikari.hugoaura.local:${aikariPort}/?auth=${authToken}`
     );
 
     aikariWs.onopen = () => {
+      failedCounter = 0;
+      isErrorOccurred = false;
       callback(true, aikariWs);
     };
 
@@ -142,7 +151,7 @@
       if (global.__HUGO_AURA__.aikariStats) {
         if (global.__HUGO_AURA__.aikariStats.status === "notReady") {
           if (isRetrying) {
-            sendRetryStatusToMain(false);
+            sendRetryStatusToMain(false, "E_IS_LOADING");
             return;
           }
           console.warn(
@@ -153,7 +162,7 @@
             isRetrying = false;
             startConnAikariProc(global.__HUGO_AURA__.aikariStats);
           }, 10000);
-          sendRetryStatusToMain(false);
+          sendRetryStatusToMain(false, "E_START_WAIT_FOR_LOADING");
           return;
         }
 
@@ -234,7 +243,7 @@
       global.__HUGO_AURA__.aikariStats
     );
 
-    sendRetryStatusToMain(true);
+    sendRetryStatusToMain(true, "SUCCESS");
   };
 
   /**
@@ -275,21 +284,21 @@
     if (!global.__HUGO_AURA__.aikariStats) return;
 
     if (isRetrying) {
-      sendRetryStatusToMain(false);
+      sendRetryStatusToMain(false, "E_RETRY_PENDING");
       return;
     }
 
     failedCounter = 0;
     isErrorOccurred = false;
 
-    const curPlsStats = await global.ipcRenderer.invoke(
+    const curAikariStats = await global.ipcRenderer.invoke(
       `${IPC_METHOD_BASE}.getAikariStatus`
     );
     let updatedAikariStats = {};
     if (
-      (curPlsStats === null || !curPlsStats.success) &&
-      curPlsStats.status !== "downloading" &&
-      curPlsStats.status !== "installing"
+      (curAikariStats === null || !curAikariStats.success) &&
+      curAikariStats.status !== "downloading" &&
+      curAikariStats.status !== "installing"
     ) {
       updatedAikariStats = {
         installed: false,
@@ -301,7 +310,7 @@
         authToken: "",
       };
     } else {
-      updatedAikariStats = curPlsStats.data;
+      updatedAikariStats = curAikariStats.data;
     }
 
     const isAikariBinExists = (
@@ -326,7 +335,7 @@
     if (updatedAikariStats.installed || updatedAikariStats.detached) {
       await startConnAikariProc(updatedAikariStats);
     } else {
-      sendRetryStatusToMain(false);
+      sendRetryStatusToMain(false, "E_NOT_INSTALLED");
     }
 
     /*
@@ -352,6 +361,13 @@
         if (!global.__HUGO_AURA__.aikariStats) return;
         if (global.__HUGO_AURA__.aikariStats.connected) return;
         initAikariWebSocketConnection();
+      }
+    );
+
+    global.ipcRenderer.on(
+      `${IPC_METHOD_BASE}.post.onForceReloadRequested`,
+      (_evt, _arg) => {
+        window.location.reload();
       }
     );
 

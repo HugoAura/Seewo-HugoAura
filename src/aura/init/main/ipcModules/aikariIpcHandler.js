@@ -697,12 +697,30 @@ const applyAikariIpcHandler = (ipcMain) => {
   );
 
   ipcMain.handle(
+    `${methodBase}.forceReloadKeepAliveWin`,
+    /**
+     *
+     * @param {import("electron").IpcMainInvokeEvent} _event
+     * @param {any} arg
+     */
+    (_event, arg) => {
+      ipcMain.send(
+        "auraWsKeepAlive",
+        `${methodBase}.post.onForceReloadRequested`,
+        arg
+      );
+
+      return { success: true };
+    }
+  );
+
+  ipcMain.handle(
     `${methodBase}.post.updateRetryStatus`,
 
     /**
      *
      * @param {import("electron").IpcMainInvokeEvent} _event
-     * @param {{ success: boolean }} arg
+     * @param {{ success: boolean; message: string }} arg
      */
     (_event, arg) => {
       ipcMain.send("assistant", `${methodBase}.post.updateRetryStatus`, arg);

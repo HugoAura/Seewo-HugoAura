@@ -8,6 +8,8 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
   const REQUIRE_BASE = "../../aura/ui/pages/configSubPages/behaviourCtrl";
   const IPC_METHOD_BASE = "$aura.aikari";
 
+  const appRawCmds = require(`${REQUIRE_BASE}/../../../composables/rawCmdExec/app`);
+
   const lifecycleStatus = {
     installed: false,
     detached: false,
@@ -21,6 +23,30 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
   };
 
   global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus = {
+    openLink: async (link) => {
+      const childProc = require("child_process");
+      childProc.spawn("cmd.exe", [`/k start ${link}`]);
+    },
+
+    getRetryStatusDescByErrId: (errIdString) => {
+      switch (errIdString) {
+        case "E_AUTH_TOKEN_GET_FAILED":
+          return `<p>Aikari 注册表访问失败, 这是一个极为罕见的问题</p>
+<p>请检查 HKEY_USERS\\.DEFAULT 是否存在, 并反馈至 GitHub Issues</p>`;
+        case "E_WS_CONN_FAILED_AFT_MULTIPLE_TRIES":
+          return `<p>在多次尝试连接后仍然失败, 请检查服务是否已启动</p>`;
+        case "E_IS_LOADING":
+        case "E_START_WAIT_FOR_LOADING":
+          return `<p>Aikari 正在加载中, 请稍作等待</p>`; // 此提示理论上在当前版本不会出现
+        case "E_RETRY_PENDING":
+          return `<p>正在尝试重连中, 请勿重复操作</p>`;
+        case "E_NOT_INSTALLED":
+          return `<p>Aikari 未安装, 请安装后继续</p>`;
+        default:
+          return null;
+      }
+    },
+
     updateToast: async (
       variant,
       title,
@@ -583,22 +609,41 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       if (result.success && result.status === "Retrying") {
         updateOperationBtnStatus("Refresh", true, "正在重连");
 
+        let isRefreshCompleted = false;
+
         ipcRenderer.once(
           `${IPC_METHOD_BASE}.post.updateRetryStatus`,
           async (_evt, arg) => {
             await global.__HUGO_AURA_GLOBAL__.utils.sleep(50);
             updateOperationBtnStatus("Refresh", false, "刷新状态");
+            isRefreshCompleted = true;
             global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
               arg.success ? "success" : "error",
               arg.success ? "更新成功" : "连接失败",
-              null,
+              global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.getRetryStatusDescByErrId(
+                arg.message
+              ),
               true,
               true,
-              3000
+              5000
             );
             global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateStatusContent();
           }
         );
+
+        setTimeout(() => {
+          if (!isRefreshCompleted) {
+            ipcRenderer.invoke(`${IPC_METHOD_BASE}.forceReloadKeepAliveWin`);
+            global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
+              "error",
+              "连接控制器无响应, 强制重载中...",
+              null,
+              true,
+              true,
+              4000
+            );
+          }
+        }, 8000);
       } else if (result.success && result.status === "Already") {
         updateOperationBtnStatus("Refresh", false, "刷新状态");
         global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
@@ -690,8 +735,8 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
           "准备开始下载...",
           null,
           true,
-          true,
-          2000
+          false,
+          undefined
         );
         GLOBAL_FUNCTIONS.updateOperationBtnStatus("Install", true);
       } else {
@@ -700,8 +745,8 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
           "正在恢复下载状态",
           null,
           true,
-          true,
-          2000
+          false,
+          undefined
         );
       }
 
@@ -711,7 +756,14 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       const callbackFn = (_evt, info) => {
         switch (info.status) {
           case "failed":
-            if (info.id !== "INSTALL_STAGE") {
+            if (info.id === "PRECHECK_STAGE") {
+              GLOBAL_FUNCTIONS.updatePBarStatus(
+                100,
+                info.message,
+                "danger",
+                false
+              );
+            } else if (info.id !== "INSTALL_STAGE") {
               GLOBAL_FUNCTIONS.updateToast(
                 "error",
                 "下载失败",
@@ -878,6 +930,34 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             break;
         }
       };
+
+      const isVcRedistInstalledPrecheck = await appRawCmds.checkVcRedistInst();
+      if (!isVcRedistInstalledPrecheck.installed) {
+        callbackFn(null, {
+          id: "PRECHECK_STAGE",
+          progress: 100,
+          status: "failed",
+          dlUrl: null,
+          savePath: null,
+          message: "Visual C++ Redist 2015~2022 未安装",
+        });
+
+        setTimeout(() => {
+          GLOBAL_FUNCTIONS.updateToast(
+            "error",
+            "发生错误",
+            `<p>Aikari 需要 Visual C++ Redist 2015~2022 运行时以启动</p>
+          <p>请访问
+          <a href="javascript:global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.openLink('https://aka.ms/vc14/vc_redist.${isVcRedistInstalledPrecheck.arch}.exe')">此链接</a>
+          以下载并安装运行时</p>`,
+            true,
+            false,
+            undefined
+          );
+        }, 500);
+
+        return;
+      }
 
       ipcRenderer.on(CUR_CHANNEL, callbackFn);
 
