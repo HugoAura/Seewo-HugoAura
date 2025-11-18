@@ -2,7 +2,7 @@
 
 const __SCOPE = "main";
 
-const { exec } = require("child_process");
+const { exec, execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const nodeHttps = require("https");
@@ -300,6 +300,14 @@ const applyAikariIpcHandler = (ipcMain) => {
     AIKARI_TEMP_DL_DIR,
     "Aikari-Installer.exe"
   );
+
+  // Prev PLS Cfg
+  const OLD_PLS_INSTALL_DIR = path.join(
+    "C:\\Program Files",
+    "HugoAura PLS",
+    "bin"
+  );
+  const OLD_PLS_SVC_NAME = "HugoAuraPLS";
 
   const isAikariDetached = process.argv.includes("--aikari-detach");
 
@@ -650,6 +658,19 @@ const applyAikariIpcHandler = (ipcMain) => {
         }
       } else {
         fs.mkdirSync(AIKARI_TEMP_DL_DIR);
+      }
+      if (fs.existsSync(OLD_PLS_INSTALL_DIR)) {
+        try {
+          execSync(`sc stop ${OLD_PLS_SVC_NAME}`);
+          execSync(`sc delete ${OLD_PLS_SVC_NAME}`);
+        } catch (err) {
+          // ...
+        }
+        try {
+          fs.unlinkSync(OLD_PLS_INSTALL_DIR);
+        } catch (err) {
+          // ...
+        }
       }
       const channel = arg.channel ? arg.channel : "stable";
       const reportWin = arg.reportTo ? arg.reportTo : "assistant";
