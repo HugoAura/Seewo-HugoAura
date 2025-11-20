@@ -135,8 +135,6 @@
     );
 
     aikariWs.onopen = () => {
-      failedCounter = 0;
-      isErrorOccurred = false;
       callback(true, aikariWs);
     };
 

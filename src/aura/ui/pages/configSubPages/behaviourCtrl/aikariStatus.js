@@ -329,14 +329,14 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                 if (!isHostNotInit) {
                   global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                     "success",
-                    "Aikari 已启动",
+                    "Aikari 已启动, 将在 2 秒后尝试连接",
                     null,
                     true,
                     true,
                     2000
                   );
                 }
-                await global.__HUGO_AURA_GLOBAL__.utils.sleep(100);
+                await global.__HUGO_AURA_GLOBAL__.utils.sleep(2000);
                 await ipcRenderer.invoke(
                   `${IPC_METHOD_BASE}.retryAikariConnect`
                 );
