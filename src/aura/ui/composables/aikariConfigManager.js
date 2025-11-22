@@ -80,6 +80,46 @@ const updateAikariConfigToRemote = async (
   });
 };
 
+/**
+ *
+ * @param {boolean} newValue
+ */
+const updateAikariTelemetryConfigToRemote = async (newValue) => {
+  const aikariConfigUpdateEvent = new CustomEvent("onAikariConfigUpdate", {
+    detail: {
+      path: ["telemetry"],
+      value: newValue,
+    },
+  });
+  document.dispatchEvent(aikariConfigUpdateEvent);
+  const settingsEntries = document.getElementsByClassName(
+    "aura-settings-entry"
+  );
+  if (settingsEntries.length > 0) {
+    Array.from(settingsEntries).forEach((entry) => {
+      entry.dispatchEvent(aikariConfigUpdateEvent);
+    });
+  }
+
+  /**
+   * @type {ClientAikariRequest}
+   */
+  const data = {
+    method: "config.actions.setTelemetryIsEnabled",
+    data: {
+      isEnabled: newValue,
+    },
+    eventId: genRandomHex(),
+    module: "launcher",
+  };
+
+  global.ipcRenderer.invoke(`${IPC_METHOD_BASE}.ws.sendWsMessage`, data);
+  global.ipcRenderer.invoke(`${IPC_METHOD_BASE}.syncAikariConfig`, {
+    basic: global.__HUGO_AURA__.aikariSettings,
+    rules: global.__HUGO_AURA__.aikariRules,
+  });
+};
+
 // [!] Will be deprecated
 const updateAikariPLSRulesToRemote = async (
   configKey,
@@ -131,6 +171,7 @@ module.exports = {
   updateAikariRulesFromLocal,
   updateAikariStatusFromLocal,
   updateAikariSettingsFromLocal,
+  updateAikariTelemetryConfigToRemote,
   updateAikariConfigToRemote,
   updateAikariPLSRulesToRemote,
 };

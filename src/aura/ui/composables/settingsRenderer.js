@@ -380,7 +380,7 @@ const renderNormalSettingsItem = (entry, formEl) => {
   }
 
   if (entry.aikariRequired) {
-    if (!global.__HUGO_AURA__.aikariStats.connected) {
+    if (!global.__HUGO_AURA__.aikariStats.connected && !entry.alwaysEnable) {
       setDisableStatus(entryOperationArea, true, "连接至 Aikari 以继续");
     }
 

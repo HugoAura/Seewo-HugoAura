@@ -40,19 +40,36 @@ const actions = {
         data: {},
       })
     );
-    const promise = new Promise((resolve) => {
+    const promiseForConfig = new Promise((resolve) => {
       wsGetCallbacks.set(eventId, resolve);
     });
-    const data = await promise;
+    const data = await promiseForConfig;
     if (data.success) {
       console.debug(
         "[HugoAura / UI / Aikari OCMS] Received Aikari launcher config: ",
         data
       );
-      return data.data;
     } else {
       return null;
     }
+    wsObj.send(
+      JSON.stringify({
+        module: "launcher",
+        eventId,
+        method: "config.actions.getTelemetryIsEnabled",
+        data: {},
+      })
+    );
+    const promiseForTelemetry = new Promise((resolve) => {
+      wsGetCallbacks.set(eventId, resolve);
+    });
+    const telemetryConfig = await promiseForTelemetry;
+    if (telemetryConfig.success) {
+      data.data.telemetryEnabled = telemetryConfig.data.isEnabled;
+    } else {
+      data.data.telemetryEnabled = false;
+    }
+    return data.data;
   },
   getAikariPLSRules: async (wsObj) => {
     const eventId = genRandomHex();

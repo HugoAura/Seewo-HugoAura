@@ -606,6 +606,14 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
       const result = await ipcRenderer.invoke(
         `${IPC_METHOD_BASE}.retryAikariConnect`
       );
+      if (
+        !global.__HUGO_AURA__.aikariSettings ||
+        (global.__HUGO_AURA__.aikariStats.connected === false &&
+          global.__HUGO_AURA__.aikariStats.launched === true)
+      ) {
+        ipcRenderer.invoke(`${IPC_METHOD_BASE}.forceReloadKeepAliveWin`);
+      }
+
       if (result.success && result.status === "Retrying") {
         updateOperationBtnStatus("Refresh", true, "正在重连");
 
