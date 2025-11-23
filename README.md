@@ -3,13 +3,17 @@
 <h1 align="center">HugoAura</h1>
 <h4 align="center">下一代希沃管家注入式修改方案</h4>
 <div align="center">
-  <a href="https://github.com/HugoAura/HugoAura">首页</a> · <a href="https://hugo.aurax.cc/about">关于 (WIP)</a> · <a href="https://docs.aurax.cc/HugoAura-Main/">文档 (WIP)</a> · <a href="https://github.com/HugoAura/HugoAura/issues">反馈</a> · <a href="https://forum.aurax.cc/">社区</a>
+  <a href="https://github.com/HugoAura/HugoAura">首页</a> · <a href="https://hugo.aurax.cc/about">关于 (WIP)</a> · <a href="https://docs.aurax.cc/">文档</a> · <a href="https://github.com/HugoAura/HugoAura/issues">反馈</a> · <a href="https://forum.smart-teach.cn/t/hugoaura">社区</a>
 </div>
 
 <br />
 
 > [!TIP]
-> 在[此处](https://github.com/HugoAura/HugoAura/wiki)查看 HugoAura 的安装教程
+> 在[此处](https://docs.aurax.cc/)查看 HugoAura 的文档与安装教程
+
+> [!WARNING]
+>
+> 我们正在进行品牌形象更新, 本仓库 (`HugoAura/Seewo-HugoAura` / HugoAura SSA Electron Injection Loader) 将会逐渐改称 `HugoAura-Main`。这是为了区分 Project HugoAura 与 HugoAura SSA Electron Injection Loader 二者。
 
 > [!IMPORTANT]
 > 已经过测试的希沃管家版本: v1.5.5.3878
@@ -19,7 +23,7 @@
 >
 > - [QQ 群 (用户自治)](https://qm.qq.com/q/buo7m9oHBK)
 > - [Telegram 群组](https://www.bilibili.com/video/BV1GJ411x7h7/) (暂时还没有...)
-> - [STCN 论坛讨论版块](https://www.bilibili.com/video/BV1GJ411x7h7/) (暂时还没有...)
+> - [STCN 论坛讨论版块](https://forum.smart-teach.cn/t/hugoaura)
 
 ![Repobeats](https://repobeats.axiom.co/api/embed/69b5be5daacef624b8f5e4b8966a0b5898439a22.svg "Repobeats analytics image")
 
@@ -52,11 +56,11 @@
 > [!IMPORTANT]
 > 演示图片, 请以实际安装后效果为准
 
-<center><img src="https://s2.loli.net/2025/04/18/2KoGaXR9463tAgP.png" /></center>
+<center><img src="https://s2.loli.net/2025/11/24/CUNDch9yps5IY1L.png" /></center>
 
 <center><img src="https://s2.loli.net/2025/04/18/2lANiTpX79FcwfC.png" /></center>
 
-<center><img src="https://s2.loli.net/2025/04/18/VNrdt7IC1PgXSpl.png" /></center>
+<center><img src="https://s2.loli.net/2025/11/24/YgOqytCkxncRAs7.png" /></center>
 
 ## ⚡ 安装与使用
 
@@ -72,7 +76,7 @@
 
 ## 🎉 鸣谢
 
-![HugoAura-README_Special_Thanks](https://s2.loli.net/2025/06/30/hDZfM1AKHULszSG.png)
+![HugoAura-README_Special_Thanks](https://s2.loli.net/2025/11/24/W9nqjxi5EcJPtLN.png)
 
 ## ❗ 免责声明
 
