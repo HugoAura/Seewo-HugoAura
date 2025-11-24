@@ -187,10 +187,12 @@ const basicSettings = [
                 global.__HUGO_AURA_UI_REACTIVES__.subConfig.behaviourCtrl.telemetryId =
                   fileContent;
                 resolve("标识符: " + fileContent);
+                return;
               }
               global.__HUGO_AURA_UI_REACTIVES__.subConfig.behaviourCtrl.telemetryId =
                 null;
               resolve("未能获取标识符, Aikari 未安装或未初始化");
+              return;
             }, 1000);
           });
           return await getIdPromise;

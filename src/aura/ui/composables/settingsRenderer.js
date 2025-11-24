@@ -392,7 +392,9 @@ const renderNormalSettingsItem = (entry, formEl) => {
           setDisableStatus(entryOperationArea, false);
         }
       } else {
-        setDisableStatus(entryOperationArea, true, "连接至 Aikari 以继续");
+        if (!entry.alwaysEnable) {
+          setDisableStatus(entryOperationArea, true, "连接至 Aikari 以继续");
+        }
       }
     };
     entryContainerEl.addEventListener("onAikariStatsUpdate", evtListener);
@@ -411,7 +413,7 @@ const renderNormalSettingsItem = (entry, formEl) => {
         ? cls.remove("aura-settings-entry-hidden")
         : cls.add("aura-settings-entry-hidden");
 
-      if (entry.auraDisable) {
+      if (entry.auraDisable && !entry.alwaysEnable) {
         updateDisableStatus(entry);
       }
     };

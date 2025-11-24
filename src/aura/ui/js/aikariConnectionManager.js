@@ -79,17 +79,33 @@
     }
   };
 
-  const startConnAikariProc = async (updatedAikariStats) => {
+  const getAuthToken = async () => {
     const authTokenRet = await registryManager.readRegKey(
       AIKARI_RPC_CONFIG_REG_PATH,
       "authToken",
       true
     );
-    if (authTokenRet.success) {
-      updatedAikariStats.authToken = authTokenRet.data;
-      // @ts-expect-error
-      global.__HUGO_AURA__.aikariStats.authToken = authTokenRet.data;
-    } else {
+    return authTokenRet;
+  };
+
+  const startConnAikariProc = async (updatedAikariStats) => {
+    let authTokenTries = 0;
+    let GET_AUTH_TOKEN_MAX_TRIES = 3;
+    let getAuthTokenSuccess = false;
+    while (authTokenTries < GET_AUTH_TOKEN_MAX_TRIES) {
+      const authTokenRet = await getAuthToken();
+      if (authTokenRet.success) {
+        updatedAikariStats.authToken = authTokenRet.data;
+        // @ts-expect-error
+        global.__HUGO_AURA__.aikariStats.authToken = authTokenRet.data;
+        getAuthTokenSuccess = true;
+        break;
+      } else {
+        await window.__HUGO_AURA_GLOBAL__.utils.sleep(1000);
+        authTokenTries += 1;
+      }
+    }
+    if (!getAuthTokenSuccess) {
       sendRetryStatusToMain(false, "E_AUTH_TOKEN_GET_FAILED");
       return;
     }
