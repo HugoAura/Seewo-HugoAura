@@ -40,6 +40,8 @@ class NetworkHook {
             endOfHook: rule.endOfHook || null,
             hookedContent: rule.hookedContent || null,
             hookedContentFunc: rule.hookedContentFunc || null,
+            ruleFn: rule.ruleFn || null,
+            config: ruleConfig || null,
           });
           console.log(`[HugoAura / NetworkHook] Loaded rule: ${rulePath}`);
         }
@@ -240,44 +242,49 @@ class NetworkHook {
               hookContent +
               endHook +
               content.substring(endIdx);
-
-            const tempDir = path.join(os.tmpdir(), "hugo-aura-temp");
-            if (!fs.existsSync(tempDir)) {
-              fs.mkdirSync(tempDir, { recursive: true });
-            }
-
-            const tempFile = path.join(tempDir, path.basename(normalizedPath));
-            fs.writeFileSync(tempFile, content, "utf8");
-
-            return {
-              redirectURL: `file://${
-                process.platform === "win32" ? "/" : ""
-              }${encodeURI(tempFile.replace(/\\/g, "/"))}`, // Seewo Hugo is still on Node 12 / Electron 8  TwT
-            };
           } else {
             console.warn(
               `[HugoAura / NetworkHook] Could not find match points in file: ${normalizedPath}`
             );
-            return undefined;
+            return false;
           }
+        } else if (rule.ruleFn) {
+          content = rule.ruleFn(content, rule.config);
         } else {
           console.error(
             `[HugoAura / NetworkHook] Error processing rule:`,
-            rule
+            rule,
+            "No available hook impl found."
           );
+          return false;
         }
+
+        const tempDir = path.join(os.tmpdir(), "hugo-aura-temp");
+        if (!fs.existsSync(tempDir)) {
+          fs.mkdirSync(tempDir, { recursive: true });
+        }
+
+        const tempFile = path.join(tempDir, path.basename(normalizedPath));
+        fs.writeFileSync(tempFile, content, "utf8");
+
+        return {
+          redirectURL: `file://${
+            process.platform === "win32" ? "/" : ""
+          }${encodeURI(tempFile.replace(/\\/g, "/"))}`, // Seewo Hugo is still on Node 12 / Electron 8  TwT
+        };
       } else {
         console.error(
           `[HugoAura / NetworkHook] Error processing local file: normalizedPath not exists`,
           normalizedPath
         );
+        return false;
       }
     } catch (err) {
       console.error(
         `[HugoAura / NetworkHook] Error processing local file:`,
         err
       );
-      return null;
+      return false;
     }
   }
 

@@ -24,6 +24,10 @@
     },
     "disableBehaviorAudit": {
       "enabled": true
+    },
+    "appearance/switchUsbInsertPromptBtn": {
+      "enabled": true,
+      "mode": "switch"
     }
   },
   "ssa": {
