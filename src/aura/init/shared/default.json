@@ -26,8 +26,11 @@
       "enabled": true
     },
     "appearance/switchUsbInsertPromptBtn": {
-      "enabled": true,
+      "enabled": false,
       "mode": "switch"
+    },
+    "appearance/banAdBlockPrompt": {
+      "enabled": false
     }
   },
   "ssa": {

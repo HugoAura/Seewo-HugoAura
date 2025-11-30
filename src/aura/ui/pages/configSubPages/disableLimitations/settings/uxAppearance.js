@@ -165,6 +165,38 @@ const uxAndAppearanceSettings = [
       },
     ],
   },
+  {
+    id: 1,
+    categoryName: "广告拦截",
+    child: [
+      {
+        index: 0,
+        id: "banAdBlockPrompt",
+        type: "switch",
+        name: "隐藏广告拦截悬浮窗",
+        description: "启用后, 管家检测到未拦截广告弹窗时, 将不会再显示悬浮窗",
+        restart: true,
+        reload: false,
+        warning: true,
+        warningContent:
+          '此功能不会完全禁用 "广告拦截" 功能, 已被拦截的广告弹窗依然会被拦截。如果您希望彻底禁用广告拦截, 请参阅 Aikari 的相关设置项 (WIP)',
+        associateVal: [],
+        auraIf: () => true,
+        defaultValue: false,
+        valueGetter: () => {
+          return global.__HUGO_AURA_CONFIG__.networkRewrite[
+            "appearance/banAdBlockPrompt"
+          ].enabled;
+        },
+        callbackFn: (newVal) => {
+          if (typeof newVal !== "boolean") return;
+          global.__HUGO_AURA_CONFIG__.networkRewrite[
+            "appearance/banAdBlockPrompt"
+          ].enabled = newVal;
+        },
+      },
+    ],
+  },
 ];
 
 module.exports = { uxAndAppearanceSettings };
