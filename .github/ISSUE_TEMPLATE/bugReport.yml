@@ -3,6 +3,19 @@ description: 反馈应用中的问题, 或预期外的行为
 labels: ["Bug"]
 title: "[Bug] "
 body:
+  - type: checkboxes
+    attributes:
+      label: 在开始之前 / Before starting
+      options:
+        - label: 我了解本 Repo 仅接受 HugoAura-Main 本体 (管家 Electron 侧 Hook) 的问题反馈
+          required: true
+        - label: 我知晓, 如果这是关于 HugoAura 安装器的 Bug, 我应该前往 [HugoAura-Install Issues](https://github.com/HugoAura/HugoAura-Install/issues) 提交 Bug Report
+          required: true
+        - label: 我知晓, 如果这是 HugoAura Aikari 的 Bug, 我应该前往 [HugoAura-Aikari Issues](https://github.com/HugoAura/HugoAura-Aikari/issues) 提交 Bug Report
+          required: true
+        - label: 我知晓, 如果我将 Issue 提交到了错误的 Repo, 可能会引发开发者响应速度降低 / Issue 被忽略 / Issue 被 Close as duplicate / Issue 被 Transfer 等情况
+          required: true
+
   - type: textarea
     attributes:
       label: 复现步骤 / Reproduce steps
@@ -48,7 +61,7 @@ body:
       options:
         - label: 我已经在 [HugoAura Issues](https://github.com/HugoAura/Seewo-HugoAura/issues) 中查询过相关关键词, 并确定此 Issue 是唯一的。
           required: true
-        - label: 我已经确认, 我运行的 HugoAura 版本与希沃管家客户端版本相兼容
+        - label: 我已经确认, 我正在使用最新版本的希沃管家客户端
           required: true
 
   - type: textarea

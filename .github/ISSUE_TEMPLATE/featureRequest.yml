@@ -3,6 +3,19 @@ description: 提交你想要的新功能
 labels: ["Feature"]
 title: "[Feature Request] "
 body:
+  - type: checkboxes
+    attributes:
+      label: 在开始之前 / Before starting
+      options:
+        - label: 我了解本 Repo 仅接受 HugoAura-Main 本体 (管家 Electron 侧 Hook) 的功能请求
+          required: true
+        - label: 我知晓, 如果这是关于 HugoAura 安装器的功能请求, 我应该前往 [HugoAura-Install Issues](https://github.com/HugoAura/HugoAura-Install/issues) 提交 Feature Request
+          required: true
+        - label: 我知晓, 如果本功能请求涉及流量过滤、底层修改等目的, 我应该前往 [HugoAura-Aikari Issues](https://github.com/HugoAura/HugoAura-Aikari/issues) 提交 Feature Request
+          required: true
+        - label: 我知晓, 如果我将 Issue 提交到了错误的 Repo, 可能会引发开发者响应速度降低 / Issue 被忽略 / Issue 被 Close as duplicate / Issue 被 Transfer 等情况
+          required: true
+
   - type: textarea
     attributes:
       label: 概述 / Overview

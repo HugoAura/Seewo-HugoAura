@@ -16,5 +16,5 @@ body:
     attributes:
       label: 提交前请确认 / Confirm before submit
       options:
-        - label: 请勿利用此 Issue 类型进行闲聊 / 灌水, 如需闲聊, 可移步至 HugoAura 社区 (forum.aurax.cc)
+        - label: 请勿利用此 Issue 类型进行闲聊 / 灌水, 如需闲聊, 可移步至 HugoAura 位于 STCN Forum 的论坛版块 (https://forum.smart-teach.cn/t/hugoaura)
           required: true
