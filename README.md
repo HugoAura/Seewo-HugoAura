@@ -8,6 +8,14 @@
 
 <br />
 
+<center>
+  <a href="https://help.seewo.com/hugo/ILdncVaKrq">
+    <img src="https://docs.aurax.cc/static/img/emg_announcement_banner.png" />
+  </a>
+</center>
+
+<br />
+
 > [!TIP]
 > 在[此处](https://docs.aurax.cc/)查看 HugoAura 的文档与安装教程
 
@@ -16,7 +24,7 @@
 > 我们正在进行品牌形象更新, 本仓库 (`HugoAura/Seewo-HugoAura` / HugoAura SSA Electron Injection Loader) 将会逐渐改称 `HugoAura-Main`。这是为了区分 Project HugoAura 与 HugoAura SSA Electron Injection Loader 二者。
 
 > [!IMPORTANT]
-> 已经过测试的希沃管家版本: v1.5.5.3878
+> 已经过测试的希沃管家版本: v1.5.5.3917
 
 > [!NOTE]
 > **社群信息**
