@@ -114,9 +114,16 @@ class ConfigManager {
     );
 
     if (fs.existsSync(oldConfigPath)) {
+      console.log(
+        `[HugoAura / Config] Old plain config file detected at ${oldConfigPath}, migrating...`
+      );
       fs.copyFileSync(oldConfigPath, this.configPath);
       fs.unlinkSync(oldConfigPath);
+      this.useEncConfig = false;
     } else if (fs.existsSync(oldEncConfigPath)) {
+      console.log(
+        `[HugoAura / Config] Old enc config file detected at ${oldEncConfigPath}, migrating...`
+      );
       fs.copyFileSync(oldEncConfigPath, this.encConfigPath);
       fs.unlinkSync(oldEncConfigPath);
       this.useEncConfig = true;
@@ -176,9 +183,14 @@ class ConfigManager {
             return this.getDefaultConfig(); // should be changed, too
           }
         } else {
-          console.error("[HugoAura / Config / ERROR] Failed to decrypt config");
+          console.error(
+            "[HugoAura / Config / ERROR] Failed to decrypt config, falling back to use plain config"
+          );
+          this.useEncConfig = false;
           this.isConfigReadFailed = true;
-          return this.getDefaultConfig(); // This behaviour should be changed later
+          config = JSON.parse(fs.readFileSync(this.configPath, "utf8"));
+          if (this.isConfigReadFailed) this.isConfigReadFailed = false;
+          return config; // This behaviour should be changed later
         }
       } else {
         config = JSON.parse(fs.readFileSync(this.configPath, "utf8"));
@@ -208,7 +220,15 @@ class ConfigManager {
           console.error(
             "[HugoAura / Config / Write / ERROR] Failed to write config: Retrieve enc password failed"
           );
-          return false;
+          console.warn(
+            "[HugoAura / Config / Write / WARN] Falling back to use plain config."
+          );
+          fs.writeFileSync(
+            this.configPath,
+            JSON.stringify(config, null, 2),
+            "utf8"
+          );
+          this.useEncConfig = false;
         }
       } else {
         fs.writeFileSync(

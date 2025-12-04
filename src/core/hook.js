@@ -48,6 +48,7 @@ const ConfigManager = require("../aura/init/shared/configManager");
 const RegistryManager = require("../aura/init/shared/registryManager");
 const { buildIpcMain } = require("../aura/init/main/ipcHandler");
 const plsUtils = require("../aura/utils/pls");
+const stringUtils = require("../aura/utils/string");
 
 const { initLogger } = require("../aura/init/main/logger");
 
@@ -60,18 +61,26 @@ const getUserDocumentsDirPath = () => {
     true,
     /REG_EXPAND_SZ\s+(.+)/
   );
-  if (pathInfo.success && pathInfo.data) {
-    const resolvedPath = pathInfo.data.replace(
-      /%([^%]+)%/g,
-      (match, varName) => {
-        return process.env[varName] || match;
-      }
-    );
+  try {
+    if (pathInfo.success && pathInfo.data) {
+      const resolvedPath = pathInfo.data.replace(
+        /%([^%]+)%/g,
+        (match, varName) => {
+          return process.env[varName] || match;
+        }
+      );
 
-    return resolvedPath;
-  } else {
+      if (stringUtils.checkIfNonAscii(resolvedPath)) {
+        console.warn("[HugoAura / Init] Detected non-ASCII char in resolved user personal folder: ", resolvedPath);
+        throw new Error("Non-ASCII char detected");
+      }
+      return resolvedPath;
+    } else {
+      throw new Error("Registry data failed to get");
+    }
+  } catch (err) {
     console.error(
-      "[HugoAura / Init / Logger] Failed to get the path of documents dir, using default val."
+      "[HugoAura / Init / Logger] Failed to get the path of documents dir, using default val. | Error: ", err
     );
     return path.join(os.homedir(), "Documents");
   }

@@ -207,10 +207,12 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
                   global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
                     "success",
                     "Aikari 已完成卸载",
-                    null,
+                    `<p>
+                      您可能需要重启 SeewoCore 以重新建立 IoT 连接
+                    </p>`,
                     true,
                     true,
-                    2000
+                    5000
                   );
                 } else {
                   global.__HUGO_AURA_UI_FUNCTIONS__.subConfig.aikariStatus.updateToast(
