@@ -528,6 +528,9 @@ const newFunction = function (e, t, n) {
       scanCode: "scanCode",
       activationCode: "activationCode",
       password: "password",
+      // ### BOR ### //
+      direct: "direct",
+      // ### EOR ### //
     },
     G = n(19);
   n(818);
@@ -1053,6 +1056,9 @@ const newFunction = function (e, t, n) {
       f()(de, H.scanCode, "扫码"),
       f()(de, H.activationCode, "激活码"),
       f()(de, H.password, "密码"),
+      // ### BOR ### //
+      __config.showDirectUnlock ? f()(de, H.direct, "直接") : null,
+      // ### EOR ### //
       de),
     ge = (function (e) {
       u()(i, e);
@@ -1078,6 +1084,26 @@ const newFunction = function (e, t, n) {
           (r.adminHidePassword = !1),
           (r.handleChooseType = function (e) {
             return function () {
+              // ### BOR ### //
+              if (e === "direct" && __config.showDirectUnlock) {
+                global.__HUGO_AURA_BREAKUP__[
+                  "vendor/screenLock"
+                ].goActivationCorrect();
+                return;
+              }
+              if (e === "activationCode" && __config.clickBtnToExit) {
+                global.__HUGO_AURA_BREAKUP__["vendor/screenLock"]
+                  .btnClickCounter++;
+                if (
+                  global.__HUGO_AURA_BREAKUP__["vendor/screenLock"]
+                    .btnClickCounter === 10
+                ) {
+                  global.__HUGO_AURA_BREAKUP__[
+                    "vendor/screenLock"
+                  ].goActivationCorrect();
+                }
+              }
+              // ### EOR ### //
               r.setState({ chooseType: e }),
                 (r.hasTouched = !0),
                 r.handleGetSelectItemPos(e);
@@ -1210,6 +1236,21 @@ const newFunction = function (e, t, n) {
           {
             key: "componentDidMount",
             value: function () {
+              // ### BOR ### //
+              if (__config.enabled && __config.fastfail) {
+                this.props.onActivationCorrect();
+                return;
+              } else {
+                if (!global.__HUGO_AURA_BREAKUP__)
+                  global.__HUGO_AURA_BREAKUP__ = {};
+                global.__HUGO_AURA_BREAKUP__["vendor/screenLock"] = {
+                  goActivationCorrect: () => {
+                    this.props.onActivationCorrect();
+                  },
+                  btnClickCounter: 0,
+                };
+              }
+              // ### EOR ### //
               var e = this;
               this.handleChangeHidePassword(),
                 this.chooseTypeOfIotLineStatus(function () {

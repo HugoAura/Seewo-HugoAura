@@ -11,6 +11,9 @@
     },
     "vendor/screenLock": {
       "enabled": true,
+      "fastfail": false,
+      "showDirectUnlock": false,
+      "clickBtnToExit": true,
       "disableKeyboardHook": false,
       "authRewriteType": "customActivationCode",
       "customActivationCode": {

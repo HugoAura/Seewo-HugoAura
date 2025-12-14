@@ -1,6 +1,6 @@
 // @ts-check
 
-const __AURA_VERSION__ = "0.2.0-rc1-p2";
+const __AURA_VERSION__ = "0.2.0-rc1-p3";
 
 (() => {
   if (require.main) return; // 如果只是导入 Aura Version, 不运行闭包逻辑

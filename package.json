@@ -1,8 +1,7 @@
 {
   "name": "HugoAura",
-  "version": "0.2.0-rc1-p2",
+  "version": "0.2.0-rc1-p3",
   "description": "Aura for SeewoHugo",
-  "main": "app.asar/main.js",
   "dependencies": {},
   "devDependencies": {
     "electron": "^36.3.2"

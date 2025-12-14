@@ -9,7 +9,7 @@
 <br />
 
 <center>
-  <a href="https://help.seewo.com/hugo/ILdncVaKrq">
+  <a href="https://campus.seewo.com/iot-public/file/?key=iot_doc_seewoServiceUpdateLog">
     <img src="https://docs.aurax.cc/static/img/emg_announcement_banner.png" />
   </a>
 </center>
