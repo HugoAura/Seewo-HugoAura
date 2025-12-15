@@ -68,149 +68,166 @@ const functions = {
    * @param {"stable" | "alpha"} channel
    * @param {(arg: DownloadTask) => any} callbackFn
    * @param {string} binPath
+   * @param {string} logPath
+   * @param {string} progressFilePath
    */
-  handleAikariDlAndInstall: async (channel, callbackFn, binPath) => {
-    // TODO: Channel selection
-    const apiInfo = global.__HUGO_AURA_API__;
+  handleAikariDlAndInstall: async (
+    channel,
+    callbackFn,
+    binPath,
+    logPath,
+    progressFilePath
+  ) => {
+    let dlResult = false;
+    if (fs.existsSync(path.join(path.dirname(binPath), ".force"))) {
+      dlResult = true;
+    } else {
+      // TODO: Channel selection
+      const apiInfo = global.__HUGO_AURA_API__;
 
-    const getVerPromise = new Promise(async (resolveGetVerReq) => {
-      // ↓ 目前 channel param 没有什么用处
-      for (const apiDomain of apiInfo.domains) {
-        const reqPromise = new Promise((resolveHttpRequest) => {
-          nodeHttps
-            .get(
-              `${apiDomain}${apiInfo.aikariUpdate}?channel=${channel}`,
-              (rep) => {
-                let dataChunk = "";
-                rep.on("data", (chunk) => {
-                  dataChunk += chunk;
-                });
+      const getVerPromise = new Promise(async (resolveGetVerReq) => {
+        // ↓ 目前 channel param 没有什么用处
+        for (const apiDomain of apiInfo.domains) {
+          const reqPromise = new Promise((resolveHttpRequest) => {
+            nodeHttps
+              .get(
+                `${apiDomain}${apiInfo.aikariUpdate}?channel=${channel}`,
+                (rep) => {
+                  let dataChunk = "";
+                  rep.on("data", (chunk) => {
+                    dataChunk += chunk;
+                  });
 
-                rep.on("end", () => {
-                  let parsedData = {};
-                  try {
-                    parsedData = JSON.parse(dataChunk);
-                  } catch (e) {
-                    callbackFn({
-                      id: "",
-                      progress: 0,
-                      status: "struggling",
-                      dlUrl: null,
-                      savePath: null,
-                      message: `数据解析失败, 正在尝试 API 域名 ${
-                        apiInfo.domains[apiInfo.domains.indexOf(apiDomain) + 1]
-                      } ...`,
-                      errorObj: e,
-                    });
-
-                    setTimeout(() => {
-                      resolveHttpRequest({
-                        success: false,
+                  rep.on("end", () => {
+                    let parsedData = {};
+                    try {
+                      parsedData = JSON.parse(dataChunk);
+                    } catch (e) {
+                      callbackFn({
+                        id: "",
+                        progress: 0,
+                        status: "struggling",
+                        dlUrl: null,
+                        savePath: null,
+                        message: `数据解析失败, 正在尝试 API 域名 ${
+                          apiInfo.domains[
+                            apiInfo.domains.indexOf(apiDomain) + 1
+                          ]
+                        } ...`,
                         errorObj: e,
                       });
-                    }, 1000);
+
+                      setTimeout(() => {
+                        resolveHttpRequest({
+                          success: false,
+                          errorObj: e,
+                        });
+                      }, 1000);
+                      return;
+                    }
+
+                    resolveHttpRequest({
+                      success: true,
+                      data: parsedData,
+                    });
                     return;
-                  }
-
-                  resolveHttpRequest({
-                    success: true,
-                    data: parsedData,
                   });
-                  return;
-                });
-              }
-            )
-            .on("error", (e) => {
-              callbackFn({
-                id: "",
-                progress: 0,
-                status: "struggling",
-                dlUrl: null,
-                savePath: null,
-                message: `连接失败, 正在尝试 API 域名 ${
-                  apiInfo.domains[apiInfo.domains.indexOf(apiDomain) + 1]
-                } ...`,
-                errorObj: e,
-              });
-
-              setTimeout(() => {
-                resolveHttpRequest({
-                  success: false,
+                }
+              )
+              .on("error", (e) => {
+                callbackFn({
+                  id: "",
+                  progress: 0,
+                  status: "struggling",
+                  dlUrl: null,
+                  savePath: null,
+                  message: `连接失败, 正在尝试 API 域名 ${
+                    apiInfo.domains[apiInfo.domains.indexOf(apiDomain) + 1]
+                  } ...`,
                   errorObj: e,
                 });
-              }, 1000);
-            });
-        });
 
-        const requestResult = await reqPromise;
-        if (requestResult.success) {
-          resolveGetVerReq({
-            success: true,
-            data: requestResult.data,
+                setTimeout(() => {
+                  resolveHttpRequest({
+                    success: false,
+                    errorObj: e,
+                  });
+                }, 1000);
+              });
           });
-          break;
-        } else {
-          continue;
+
+          const requestResult = await reqPromise;
+          if (requestResult.success) {
+            resolveGetVerReq({
+              success: true,
+              data: requestResult.data,
+            });
+            break;
+          } else {
+            continue;
+          }
         }
+
+        resolveGetVerReq({
+          success: false,
+          data: null,
+        });
+      });
+
+      const rawResInfo = await getVerPromise;
+      if (!rawResInfo.success) {
+        callbackFn({
+          id: "",
+          progress: 0,
+          status: "failed",
+          dlUrl: null,
+          savePath: null,
+          message:
+            "未能获取 Aikari 版本信息, 所有 API 域名均无法连接, 建议前往 GitHub 下载安装包并自行安装",
+        });
+        return false;
       }
 
-      resolveGetVerReq({
-        success: false,
-        data: null,
-      });
-    });
+      const aikariVersionInfo = rawResInfo.data;
 
-    const rawResInfo = await getVerPromise;
-    if (!rawResInfo.success) {
-      callbackFn({
-        id: "",
-        progress: 0,
-        status: "failed",
-        dlUrl: null,
-        savePath: null,
-        message:
-          "未能获取 Aikari 版本信息, 所有 API 域名均无法连接, 建议前往 GitHub 下载安装包并自行安装",
-      });
-      return false;
-    }
+      let deviceArch = process.env.PROCESSOR_ARCHITEW6432
+        ? process.env.PROCESSOR_ARCHITEW6432
+        : process.env.PROCESSOR_ARCHITECTURE;
+      // @ts-expect-error
+      deviceArch = deviceArch.toLowerCase();
 
-    const aikariVersionInfo = rawResInfo.data;
+      if (
+        !Object.keys(aikariVersionInfo.data.downloadUrl).includes(deviceArch)
+      ) {
+        callbackFn({
+          id: "",
+          progress: 0,
+          status: "failed",
+          dlUrl: null,
+          savePath: null,
+          message: `不支持的处理器架构, 检测到的架构: "${deviceArch}"`,
+        });
+        return false;
+      }
 
-    let deviceArch = process.env.PROCESSOR_ARCHITEW6432
-      ? process.env.PROCESSOR_ARCHITEW6432
-      : process.env.PROCESSOR_ARCHITECTURE;
-    // @ts-expect-error
-    deviceArch = deviceArch.toLowerCase();
+      const downloadFilePromise = new Promise((resolve) => {
+        fsComposables.downloadFile(
+          aikariVersionInfo.data.downloadUrl[deviceArch],
+          binPath,
+          (...args) => {
+            if (args[0].status === "done") {
+              resolve(true);
+            } else if (args[0].status === "failed") {
+              resolve(false);
+            }
 
-    if (!Object.keys(aikariVersionInfo.data.downloadUrl).includes(deviceArch)) {
-      callbackFn({
-        id: "",
-        progress: 0,
-        status: "failed",
-        dlUrl: null,
-        savePath: null,
-        message: `不支持的处理器架构, 检测到的架构: "${deviceArch}"`,
-      });
-      return false;
-    }
-
-    const downloadFilePromise = new Promise((resolve) => {
-      fsComposables.downloadFile(
-        aikariVersionInfo.data.downloadUrl[deviceArch],
-        binPath,
-        (...args) => {
-          if (args[0].status === "done") {
-            resolve(true);
-          } else if (args[0].status === "failed") {
-            resolve(false);
+            callbackFn(...args);
           }
+        );
+      });
 
-          callbackFn(...args);
-        }
-      );
-    });
-
-    const dlResult = await downloadFilePromise;
+      dlResult = await downloadFilePromise;
+    }
 
     if (dlResult) {
       callbackFn({
@@ -224,7 +241,7 @@ const functions = {
 
       const runInstPromise = new Promise((resolve) => {
         exec(
-          `"${binPath}" /VERYSILENT /SUPPRESSMSGBOXES /LOG="${binPath}\\..\\Aikari-Install.log"`,
+          `"${binPath}" /VERYSILENT /SUPPRESSMSGBOXES /LOG="${logPath}" /PROGRESS_FILE="${progressFilePath}"`,
           (err, stdout, stderr) => {
             if (err) {
               console.error(
@@ -237,6 +254,13 @@ const functions = {
         );
       });
 
+      if (!fs.existsSync(path.dirname(progressFilePath))) {
+        fs.mkdirSync(path.dirname(progressFilePath));
+      }
+      if (!fs.existsSync(progressFilePath)) {
+        fs.writeFileSync(progressFilePath, "");
+      }
+
       callbackFn({
         id: "INSTALL_STAGE",
         progress: 15,
@@ -246,7 +270,86 @@ const functions = {
         message: "正在安装 Aikari...",
       });
 
+      let instFilesStageLastFakeLoadProgressPercent = -1;
+
+      const fileProgressWatcher = fs.watch(progressFilePath, (eventType) => {
+        if (eventType === "change") {
+          try {
+            const content = fs.readFileSync(progressFilePath, "utf-8").trim();
+            if (content === "") {
+              callbackFn({
+                id: "INSTALL_STAGE",
+                progress: 20,
+                status: "progressing",
+                dlUrl: null,
+                savePath: null,
+                message: "正在准备安装...",
+              });
+            } else {
+              const contentArr = content.split(";");
+              switch (contentArr[0]) {
+                case "DL_VC_REDIST":
+                  callbackFn({
+                    id: "INSTALL_STAGE",
+                    progress:
+                      20 +
+                      Math.round((parseFloat(contentArr[1]) / 10) * 2), // 20 + [0, 20] === 20 ~ 40
+                    status: "progressing",
+                    dlUrl: null,
+                    savePath: null,
+                    message: `正在下载 VC++ 运行时... (${contentArr[1]}%)`,
+                  });
+                  break;
+
+                case "INST_FILES":
+                  if (instFilesStageLastFakeLoadProgressPercent === -1) {
+                    instFilesStageLastFakeLoadProgressPercent = 60;
+                  } else if (instFilesStageLastFakeLoadProgressPercent < 85) {
+                    instFilesStageLastFakeLoadProgressPercent +=
+                      Math.random() * (5 - 1) + 1;
+                  }
+                  callbackFn({
+                    id: "INSTALL_STAGE",
+                    progress: instFilesStageLastFakeLoadProgressPercent,
+                    status: "progressing",
+                    dlUrl: null,
+                    savePath: null,
+                    message: `正在解压文件...`,
+                  });
+                  break;
+
+                case "INST_VC_REDIST":
+                  callbackFn({
+                    id: "INSTALL_STAGE",
+                    progress: 90,
+                    status: "progressing",
+                    dlUrl: null,
+                    savePath: null,
+                    message: `正在安装 VC++ 运行时...`,
+                  });
+                  break;
+
+                case "DONE":
+                  callbackFn({
+                    id: "INSTALL_STAGE",
+                    progress: 99,
+                    status: "progressing",
+                    dlUrl: null,
+                    savePath: null,
+                    message: `即将完成`,
+                  });
+                  break;
+              }
+            }
+          } catch (e) {
+            // Ignore
+          }
+        }
+      });
+
       const instResult = await runInstPromise;
+
+      fileProgressWatcher.close();
 
       callbackFn({
         id: "INSTALL_STAGE",
@@ -267,6 +370,8 @@ const functions = {
       }
 
       fs.unlinkSync(binPath);
+      fs.unlinkSync(logPath);
+      fs.unlinkSync(progressFilePath);
     }
   },
   clearHostFileItem: async () => {
@@ -340,6 +445,14 @@ const applyAikariIpcHandler = (ipcMain) => {
   const AIKARI_TEMP_INSTALLER_FILENAME = path.join(
     AIKARI_TEMP_DL_DIR,
     "Aikari-Installer.exe"
+  );
+  const AIKARI_INSTALLER_LOG_FILENAME = path.join(
+    AIKARI_TEMP_DL_DIR,
+    "install.log"
+  );
+  const AIKARI_INSTALLER_PROGRESS_FIPC_FILENAME = path.join(
+    AIKARI_TEMP_DL_DIR,
+    "PROGRESS"
   );
 
   // Prev PLS Cfg
@@ -694,6 +807,8 @@ const applyAikariIpcHandler = (ipcMain) => {
     async (_evt, arg) => {
       if (fs.existsSync(AIKARI_TEMP_DL_DIR)) {
         try {
+          fs.unlinkSync(AIKARI_INSTALLER_LOG_FILENAME);
+          fs.unlinkSync(AIKARI_INSTALLER_PROGRESS_FIPC_FILENAME);
           fs.unlinkSync(AIKARI_TEMP_DL_DIR);
         } catch (err) {
           console.error(err);
@@ -725,7 +840,9 @@ const applyAikariIpcHandler = (ipcMain) => {
             status
           );
         },
-        AIKARI_TEMP_INSTALLER_FILENAME
+        AIKARI_TEMP_INSTALLER_FILENAME,
+        AIKARI_INSTALLER_LOG_FILENAME,
+        AIKARI_INSTALLER_PROGRESS_FIPC_FILENAME
       );
     }
   );

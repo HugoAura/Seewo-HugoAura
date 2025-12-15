@@ -9,11 +9,12 @@
 <br />
 
 <center>
-  <a href="https://campus.seewo.com/iot-public/file/?key=iot_doc_seewoServiceUpdateLog">
+  <a href="https://forum.smart-teach.cn/d/898-xi-wo-guan-jia-zhe-kuai-zhen-de-shi-zhao-xiao-si-liao">
     <img src="https://docs.aurax.cc/static/img/emg_announcement_banner.png" />
   </a>
 </center>
 
+<br />
 <br />
 
 > [!TIP]

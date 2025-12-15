@@ -31,8 +31,8 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
     getRetryStatusDescByErrId: (errIdString) => {
       switch (errIdString) {
         case "E_AUTH_TOKEN_GET_FAILED":
-          return `<p>Aikari 注册表访问失败, 这是一个极为罕见的问题</p>
-<p>请检查 HKEY_USERS\\.DEFAULT 是否存在, 并反馈至 GitHub Issues</p>`;
+          return `<p>Aikari 注册表访问失败, 这可能代表 Aikari 在启动后立即发生了崩溃</p>
+<p>请将此情况反馈至 GitHub Issues, 并附上您的系统版本信息</p>`;
         case "E_WS_CONN_FAILED_AFT_MULTIPLE_TRIES":
           return `<p>在多次尝试连接后仍然失败, 请检查服务是否已启动</p>`;
         case "E_IS_LOADING":
@@ -921,7 +921,7 @@ if (!global.__HUGO_AURA_UI_REACTIVES__.subConfig)
             } else {
               GLOBAL_FUNCTIONS.updatePBarStatus(
                 info.progress,
-                `正在安装 Aikari...`,
+                info.message,
                 "normal",
                 false
               );
