@@ -1366,7 +1366,10 @@ const newFunction = function (e, t, n) {
                         style: { left: o, width: s },
                       }),
                       Object.keys(Me).map(function (e, t) {
-                        return r.includes(e)
+                        // ### BOR ### //
+                        const showDirectCondition =
+                          __config.showDirectUnlock && e === "direct";
+                        return r.includes(e) || showDirectCondition
                           ? p.a.createElement(
                               "div",
                               {
@@ -1381,6 +1384,7 @@ const newFunction = function (e, t, n) {
                               m
                             )
                           : null;
+                        // ### EOR ### //
                       })
                     )
                   )
