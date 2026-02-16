@@ -30,7 +30,7 @@
 > [!NOTE]
 > **社群信息**
 >
-> - [QQ 群 (用户自治)](https://qm.qq.com/q/buo7m9oHBK)
+> - [QQ 群 (用户自治)](https://checkin.hugoaura.tianmiao.fun/checkIn/exam)
 > - [Telegram 公告频道](https://t.me/HugoAura)
 > - [Telegram 群组](https://t.me/HugoAura_Chat)
 > - [STCN 论坛讨论版块](https://forum.smart-teach.cn/t/hugoaura)
